@@ -246,7 +246,7 @@ export interface UploadResult {
     key: string;
 }
 export interface ImageUploadInput {
-    file: File;
+    file: any;
     folder?: string;
 }
 //# sourceMappingURL=index.d.ts.map

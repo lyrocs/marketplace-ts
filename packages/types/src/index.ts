@@ -326,6 +326,6 @@ export interface UploadResult {
 }
 
 export interface ImageUploadInput {
-  file: File
+  file: any // Express.Multer.File or File from DOM
   folder?: string
 }
