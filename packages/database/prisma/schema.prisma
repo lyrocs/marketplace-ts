@@ -1,0 +1,339 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum DealStatus {
+  DRAFT
+  PUBLISHED
+  DECLINED
+  EXPIRED
+  SOLD
+  ARCHIVED
+}
+
+enum DealCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  POOR
+}
+
+// ============================================================================
+// USER & AUTH TABLES
+// ============================================================================
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String?
+  email           String    @unique
+  emailVerified   DateTime? @map("email_verified")
+  image           String?
+  password        String?
+  matrixLogin     String?   @map("matrix_login")
+  matrixPassword  String?   @map("matrix_password")
+  matrixToken     String?   @map("matrix_token")
+  role            UserRole  @default(USER)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  accounts            Account[]
+  deals               Deal[]
+  rememberMeTokens    RememberMeToken[]
+  passwordResetTokens PasswordResetToken[]
+  buyerDiscussions    Discussion[]         @relation("BuyerDiscussions")
+  sellerDiscussions   Discussion[]         @relation("SellerDiscussions")
+  discussionStatuses  DiscussionStatus[]
+
+  @@map("users")
+}
+
+model Account {
+  userId            String  @map("user_id") @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refreshToken      String? @map("refresh_token") @db.Text
+  accessToken       String? @map("access_token") @db.Text
+  expiresAt         Int?    @map("expires_at")
+  tokenType         String? @map("token_type")
+  scope             String? @db.Text
+  idToken           String? @map("id_token") @db.Text
+  sessionState      String? @map("session_state") @db.Text
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model RememberMeToken {
+  id          Int      @id @default(autoincrement())
+  tokenableId String   @map("tokenable_id") @db.Uuid
+  hash        String   @unique
+  createdAt   DateTime @map("created_at")
+  updatedAt   DateTime @map("updated_at")
+  expiresAt   DateTime @map("expires_at")
+
+  user User @relation(fields: [tokenableId], references: [id], onDelete: Cascade)
+
+  @@map("remember_me_tokens")
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    String    @map("user_id") @db.Uuid
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model RateLimit {
+  key    String  @id @db.VarChar(255)
+  points Int     @default(0)
+  expire BigInt?
+
+  @@map("rate_limits")
+}
+
+// ============================================================================
+// PRODUCT TABLES
+// ============================================================================
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String
+  key         String  @unique
+  image       String?
+  description String?
+  parentId    Int?    @map("parent_id")
+
+  // Self-reference for hierarchical categories
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  // Relations
+  products  Product[]
+  specTypes CategorySpecType[]
+
+  @@map("categories")
+}
+
+model Brand {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  products Product[]
+
+  @@map("brands")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  categoryId  Int      @map("category_id")
+  brandId     Int?     @map("brand_id")
+  images      Json     @default("[]")
+  description String?  @db.Text
+  features    Json?
+  status      String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  category          Category           @relation(fields: [categoryId], references: [id])
+  brand             Brand?             @relation(fields: [brandId], references: [id])
+  specs             ProductSpec[]
+  shops             Shop[]
+  dealProducts      DealProduct[]
+  parentComponents  ProductComponent[] @relation("ParentProduct")
+  childComponents   ProductComponent[] @relation("ComponentProduct")
+
+  @@map("products")
+}
+
+model SpecType {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  label       String
+  description String?
+  createdAt   DateTime? @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+
+  // Relations
+  specs      Spec[]
+  categories CategorySpecType[]
+
+  @@map("spec_types")
+}
+
+model Spec {
+  id         Int  @id @default(autoincrement())
+  specTypeId Int? @map("spec_type_id")
+  value      String
+
+  // Relations
+  specType SpecType?     @relation(fields: [specTypeId], references: [id], onDelete: Cascade)
+  products ProductSpec[]
+
+  @@map("specs")
+}
+
+model CategorySpecType {
+  categoryId Int @map("category_id")
+  specTypeId Int @map("spec_type_id")
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  specType SpecType @relation(fields: [specTypeId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, specTypeId])
+  @@map("category_spec_types")
+}
+
+model ProductSpec {
+  productId Int @map("product_id")
+  specId    Int @map("spec_id")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  spec    Spec    @relation(fields: [specId], references: [id], onDelete: Cascade)
+
+  @@id([productId, specId])
+  @@map("product_specs")
+}
+
+model Shop {
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id")
+  url       String
+  price     Float?
+  currency  String?
+  available Boolean?
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("shops")
+}
+
+model ProductComponent {
+  id          Int      @id @default(autoincrement())
+  parentId    Int      @map("parent_id")
+  componentId Int      @map("component_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  parent    Product @relation("ParentProduct", fields: [parentId], references: [id], onDelete: Cascade)
+  component Product @relation("ComponentProduct", fields: [componentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, componentId])
+  @@map("product_components")
+}
+
+// ============================================================================
+// DEAL TABLES
+// ============================================================================
+
+model Deal {
+  id               Int           @id @default(autoincrement())
+  userId           String        @map("user_id") @db.Uuid
+  status           DealStatus    @default(DRAFT)
+  price            Decimal?      @db.Decimal
+  currency         String?
+  location         String?
+  title            String?
+  description      String?       @db.Text
+  images           Json          @default("[]")
+  invoiceAvailable Boolean       @default(false) @map("invoice_available")
+  sellingReason    String?       @map("selling_reason") @db.Text
+  canBeDelivered   Boolean       @default(false) @map("can_be_delivered")
+  features         Json          @default("[]")
+  condition        DealCondition @default(GOOD)
+  reasonDeclined   String?       @map("reason_declined") @db.Text
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user        User          @relation(fields: [userId], references: [id])
+  products    DealProduct[]
+  discussions Discussion[]
+
+  @@map("deals")
+}
+
+model DealProduct {
+  id        Int      @id @default(autoincrement())
+  dealId    Int      @map("deal_id")
+  productId Int      @map("product_id")
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  deal    Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([dealId, productId])
+  @@map("deal_products")
+}
+
+// ============================================================================
+// CHAT/DISCUSSION TABLES
+// ============================================================================
+
+model Discussion {
+  id           Int      @id @default(autoincrement())
+  dealId       Int      @map("deal_id")
+  buyerId      String   @map("buyer_id") @db.Uuid
+  sellerId     String   @map("seller_id") @db.Uuid
+  matrixRoomId String   @map("matrix_room_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  deal     Deal               @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  buyer    User               @relation("BuyerDiscussions", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller   User               @relation("SellerDiscussions", fields: [sellerId], references: [id], onDelete: Cascade)
+  statuses DiscussionStatus[]
+
+  @@map("discussions")
+}
+
+model DiscussionStatus {
+  id           Int      @id @default(autoincrement())
+  discussionId Int      @map("discussion_id")
+  userId       String   @map("user_id") @db.Uuid
+  newMessage   Boolean  @default(false) @map("new_message")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  discussion Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("discussion_statuses")
+}

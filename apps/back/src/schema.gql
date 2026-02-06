@@ -1,0 +1,281 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayloadOutput {
+  accessToken: String!
+  user: UserOutput!
+}
+
+type BrandGqlOutput {
+  id: Int!
+  name: String!
+}
+
+type BrandOutput {
+  id: Int!
+  name: String!
+}
+
+type CategoryOutput {
+  id: Int!
+  key: String!
+  name: String!
+  parentId: Float
+}
+
+type CategoryTreeOutput {
+  children: [CategoryTreeOutput!]!
+  description: String
+  id: Int!
+  image: String
+  key: String!
+  name: String!
+  parentId: Int
+  specTypes: [SpecTypeInCategoryOutput!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input DealFeatureInput {
+  label: String!
+  value: String!
+}
+
+type DealFeatureOutput {
+  label: String!
+  value: String!
+}
+
+type DealOutput {
+  canBeDelivered: Boolean!
+  condition: String!
+  createdAt: DateTime!
+  currency: String
+  description: String
+  features: [DealFeatureOutput!]!
+  id: Int!
+  images: [String!]!
+  invoiceAvailable: Boolean!
+  location: String
+  price: Float
+  products: [DealProductOutput!]!
+  reasonDeclined: String
+  seller: DealSellerOutput
+  sellingReason: String
+  status: String!
+  title: String
+  updatedAt: DateTime!
+  userId: String!
+}
+
+input DealProductInput {
+  productId: Int!
+  quantity: Int!
+}
+
+type DealProductOutput {
+  brandName: String
+  categoryName: String
+  productId: Int!
+  productName: String
+  quantity: Int!
+}
+
+type DealSellerOutput {
+  id: String!
+  image: String
+  name: String
+}
+
+type DealsListOutput {
+  data: [DealOutput!]!
+  meta: PaginationMetaOutput!
+}
+
+type DiscussionDealOutput {
+  id: Int!
+  title: String
+}
+
+type DiscussionOutput {
+  buyer: DiscussionUserOutput!
+  createdAt: DateTime!
+  deal: DiscussionDealOutput!
+  hasUnread: Boolean!
+  id: Int!
+  matrixRoomId: String!
+  seller: DiscussionUserOutput!
+}
+
+type DiscussionUserOutput {
+  id: String!
+  image: String
+  matrixLogin: String
+  name: String
+}
+
+type Mutation {
+  addDealImage(dealId: Int!, imageUrl: String!): DealOutput!
+  adminUpdateDealStatus(id: Int!, reason: String, status: String!): DealOutput!
+  createBrand(name: String!): BrandGqlOutput!
+  createCategory(description: String, image: String, key: String!, name: String!, parentId: Int): CategoryTreeOutput!
+  createDealDraft: DealOutput!
+  createProduct(brandId: Int, categoryId: Int!, description: String, name: String!): ProductOutput!
+  createSpec(specTypeId: Int!, value: String!): SpecGqlOutput!
+  createSpecType(description: String, key: String!, label: String!): SpecTypeGqlOutput!
+  deleteBrand(id: Int!): Boolean!
+  deleteCategory(id: Int!): Boolean!
+  deleteDealImage(dealId: Int!, imageUrl: String!): DealOutput!
+  deleteProduct(id: Int!): Boolean!
+  deleteSpec(id: Int!): Boolean!
+  deleteSpecType(id: Int!): Boolean!
+  login(email: String!, password: String!): AuthPayloadOutput!
+  markDiscussionRead(discussionId: Int!): Boolean!
+  publishDeal(id: Int!): DealOutput!
+  register(email: String!, name: String!, password: String!): AuthPayloadOutput!
+  requestPasswordReset(email: String!): SuccessOutput!
+  resetPassword(password: String!, token: String!): SuccessOutput!
+  startDiscussion(dealId: Int!): DiscussionOutput!
+  updateBrand(id: Int!, name: String!): BrandGqlOutput!
+  updateCategory(description: String, id: Int!, image: String, key: String, name: String): CategoryTreeOutput!
+  updateDeal(canBeDelivered: Boolean, condition: String, currency: String, description: String, features: [DealFeatureInput!], id: Int!, invoiceAvailable: Boolean, location: String, price: Float, products: [DealProductInput!], sellingReason: String, title: String): DealOutput!
+  updateProduct(categoryId: Int, description: String, id: Int!, name: String): ProductOutput!
+  updateProfile(image: String, name: String): UserProfileOutput!
+  updateSpecType(description: String, id: Int!, key: String, label: String): SpecTypeGqlOutput!
+}
+
+type PaginationMetaOutput {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  limit: Int!
+  page: Int!
+  total: Int!
+  totalPages: Int!
+}
+
+type ProductOutput {
+  brand: BrandOutput
+  brandId: Int
+  category: CategoryOutput
+  categoryId: Float!
+  createdAt: DateTime!
+  description: String
+  id: Int!
+  images: [String!]!
+  name: String!
+  shops: [ShopOutput!]!
+  status: String!
+  updatedAt: DateTime!
+}
+
+type ProductsListOutput {
+  data: [ProductOutput!]!
+  meta: PaginationMetaOutput!
+}
+
+type PublicProfileOutput {
+  createdAt: DateTime!
+  id: String!
+  image: String
+  name: String
+  publishedDeals: Float!
+  soldDeals: Float!
+  totalDeals: Float!
+}
+
+type Query {
+  adminDeals(limit: Int! = 20, page: Int! = 1, status: String! = "PUBLISHED"): DealsListOutput!
+  brand(id: Int!): BrandGqlOutput
+  brands: [BrandGqlOutput!]!
+  categories: [CategoryTreeOutput!]!
+  category(id: Int!): CategoryTreeOutput
+  categoryByKey(key: String!): CategoryTreeOutput
+  deal(id: Int!): DealOutput
+  deals(categoryId: Int, limit: Int! = 12, page: Int! = 1, specIds: [Int!], title: String): DealsListOutput!
+  discussion(id: Int!): DiscussionOutput
+  me: UserOutput!
+  myDeals: [DealOutput!]!
+  myDiscussions: [DiscussionOutput!]!
+  myProfile: UserProfileOutput!
+  myStats: UserStatsOutput!
+  product(id: Int!): ProductOutput
+  products(brandId: Int, categoryId: Int, limit: Int! = 12, name: String, page: Int! = 1, specIds: [Int!]): ProductsListOutput!
+  publicProfile(id: String!): PublicProfileOutput
+  recentDeals: [DealOutput!]!
+  rootCategories: [CategoryTreeOutput!]!
+  specType(id: Int!): SpecTypeGqlOutput
+  specTypes: [SpecTypeGqlOutput!]!
+  specsByType(specTypeId: Int!): [SpecGqlOutput!]!
+  unreadCount: UnreadCountOutput!
+}
+
+type ShopOutput {
+  available: Boolean
+  currency: String
+  id: Int!
+  name: String!
+  price: Float
+  url: String!
+}
+
+type SpecGqlOutput {
+  id: Int!
+  specTypeId: Int
+  value: String!
+}
+
+type SpecTypeGqlOutput {
+  description: String
+  id: Int!
+  key: String!
+  label: String!
+  specs: [SpecGqlOutput!]!
+}
+
+type SpecTypeInCategoryOutput {
+  id: Int!
+  key: String!
+  label: String!
+}
+
+type SpecTypeOutput {
+  id: Int!
+  key: String!
+  label: String!
+}
+
+type SuccessOutput {
+  success: Boolean!
+}
+
+type UnreadCountOutput {
+  count: Int!
+}
+
+type UserOutput {
+  email: String!
+  id: String!
+  image: String
+  name: String
+  role: String!
+}
+
+type UserProfileOutput {
+  createdAt: DateTime!
+  email: String!
+  id: String!
+  image: String
+  name: String
+  role: String!
+  updatedAt: DateTime!
+}
+
+type UserStatsOutput {
+  publishedDeals: Float!
+  soldDeals: Float!
+  totalDeals: Float!
+}
