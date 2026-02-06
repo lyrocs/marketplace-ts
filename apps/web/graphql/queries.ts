@@ -42,6 +42,8 @@ export const ME_QUERY = gql`
       email
       image
       role
+      matrixLogin
+      matrixPassword
     }
   }
 `

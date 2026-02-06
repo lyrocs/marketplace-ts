@@ -189,6 +189,9 @@ importers:
       lucide-react:
         specifier: ^0.563.0
         version: 0.563.0(react@19.2.4)
+      matrix-js-sdk:
+        specifier: 40.2.0-rc.0
+        version: 40.2.0-rc.0
       next:
         specifier: 16.1.6
         version: 16.1.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)

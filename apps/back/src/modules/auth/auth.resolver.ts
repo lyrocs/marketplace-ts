@@ -1,6 +1,7 @@
 import { Resolver, Mutation, Args, ObjectType, Field, Query } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service.js'
+import { UsersService } from '../users/users.service.js'
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
 import { Public } from '../../common/decorators/public.decorator.js'
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js'
@@ -21,6 +22,12 @@ export class UserOutput {
 
   @Field()
   role: string
+
+  @Field({ nullable: true })
+  matrixLogin?: string
+
+  @Field({ nullable: true })
+  matrixPassword?: string
 }
 
 @ObjectType()
@@ -40,7 +47,10 @@ export class SuccessOutput {
 
 @Resolver()
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Public()
   @Mutation(() => AuthPayloadOutput)
@@ -80,12 +90,16 @@ export class AuthResolver {
   @UseGuards(JwtAuthGuard)
   @Query(() => UserOutput)
   async me(@CurrentUser() user: any): Promise<UserOutput> {
+    // Fetch full user data including Matrix credentials from database
+    const fullUser = await this.usersService.findById(user.id)
     return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      image: user.image,
-      role: user.role,
+      id: fullUser.id,
+      name: fullUser.name,
+      email: fullUser.email,
+      image: fullUser.image,
+      role: fullUser.role,
+      matrixLogin: fullUser.matrixLogin,
+      matrixPassword: fullUser.matrixPassword,
     }
   }
 }

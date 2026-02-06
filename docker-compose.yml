@@ -1,0 +1,126 @@
+version: '3.9'
+
+services:
+  # ============================================================================
+  # PostgreSQL Database
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: nextrade-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nextrade
+      POSTGRES_USER: nextrade
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nextrade_dev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - nextrade-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nextrade"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # Backend API (NestJS)
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: apps/back/Dockerfile
+    container_name: nextrade-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      API_PORT: 3001
+      DATABASE_URL: postgresql://nextrade:${POSTGRES_PASSWORD:-nextrade_dev}@postgres:5432/nextrade
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:3001}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID}
+      FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET}
+      MATRIX_HOST: ${MATRIX_HOST}
+      MATRIX_USER: ${MATRIX_USER}
+      MATRIX_PASSWORD: ${MATRIX_PASSWORD}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nextrade-network
+    command: >
+      sh -c "
+        cd /app/packages/database &&
+        npx prisma migrate deploy &&
+        cd /app &&
+        node dist/main.js
+      "
+
+  # ============================================================================
+  # Frontend (Next.js)
+  # ============================================================================
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/graphql}
+        NEXT_PUBLIC_MATRIX_HOST: ${NEXT_PUBLIC_MATRIX_HOST}
+    container_name: nextrade-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/graphql}
+      NEXT_PUBLIC_MATRIX_HOST: ${NEXT_PUBLIC_MATRIX_HOST}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - nextrade-network
+
+  # ============================================================================
+  # Matrix Synapse (Optional - for real-time chat)
+  # ============================================================================
+  matrix:
+    image: matrixdotorg/synapse:latest
+    container_name: nextrade-matrix
+    restart: unless-stopped
+    profiles:
+      - full # Only start with --profile full
+    environment:
+      SYNAPSE_SERVER_NAME: ${MATRIX_HOST:-matrix.localhost}
+      SYNAPSE_REPORT_STATS: "no"
+    volumes:
+      - matrix_data:/data
+    ports:
+      - "8008:8008"
+    networks:
+      - nextrade-network
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  matrix_data:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  nextrade-network:
+    driver: bridge

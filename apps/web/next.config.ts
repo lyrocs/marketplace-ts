@@ -2,6 +2,13 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+
+  // Enable standalone output for Docker
+  output: 'standalone',
+
+  // Transpile packages from monorepo
+  transpilePackages: ['@nextrade/ui', '@nextrade/types'],
+
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   },

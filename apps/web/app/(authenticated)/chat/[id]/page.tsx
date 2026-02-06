@@ -1,25 +1,21 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { useQuery, useMutation } from '@apollo/client/react'
+import Link from 'next/link'
 import { DISCUSSION_QUERY, MARK_DISCUSSION_READ_MUTATION } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
+import { useMatrix } from '@/hooks/use-matrix'
 import { Input, Button, Avatar, AvatarFallback, AvatarImage, Skeleton } from '@nextrade/ui'
-import { Send, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
-
-interface MatrixMessage {
-  eventId: string
-  sender: string
-  body: string
-  timestamp: number
-}
+import { ArrowLeft, Send } from 'lucide-react'
 
 export default function ChatRoomPage() {
   const params = useParams()
   const discussionId = parseInt(params.id as string)
   const { user, loading: authLoading } = useAuthGuard()
+  const [inputText, setInputText] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const { data, loading } = useQuery(DISCUSSION_QUERY, {
     variables: { id: discussionId },
@@ -27,48 +23,41 @@ export default function ChatRoomPage() {
   })
 
   const [markRead] = useMutation(MARK_DISCUSSION_READ_MUTATION)
-  const [messages, setMessages] = useState<MatrixMessage[]>([])
-  const [inputText, setInputText] = useState('')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const discussion = data?.discussion
+  const matrixRoomId = discussion?.matrixRoomId
 
-  // Mark as read when viewing
+  // Initialize Matrix client and load messages
+  const { messages, loading: matrixLoading, error: matrixError, sendMessage, loadMessages } = useMatrix()
+
   useEffect(() => {
-    if (discussionId && user) {
-      markRead({ variables: { discussionId } })
+    if (matrixRoomId) {
+      loadMessages(matrixRoomId)
+      markRead({ variables: { discussionId } }).catch(() => {})
     }
-  }, [discussionId, user, markRead])
+  }, [matrixRoomId, discussionId, loadMessages, markRead])
 
-  // Matrix real-time messaging is handled server-side via the Matrix module.
-  // New messages trigger discussion_status updates which are polled via GraphQL.
-
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   const handleSend = async () => {
-    if (!inputText.trim() || !discussion) return
+    if (!inputText.trim() || !matrixRoomId) return
     const text = inputText.trim()
     setInputText('')
 
-    // In production, this would send via Matrix SDK
-    // Placeholder: add message to local state
-    setMessages((prev) => [
-      ...prev,
-      {
-        eventId: Date.now().toString(),
-        sender: user?.id || '',
-        body: text,
-        timestamp: Date.now(),
-      },
-    ])
+    try {
+      await sendMessage(matrixRoomId, text)
+    } catch (err) {
+      console.error('Failed to send message:', err)
+      // Optionally show error toast
+    }
   }
 
   if (authLoading) return null
 
-  if (loading) {
+  if (loading || matrixLoading) {
     return (
       <div className="container max-w-2xl py-8">
         <Skeleton className="h-16 rounded-lg" />
@@ -81,6 +70,21 @@ export default function ChatRoomPage() {
     return (
       <div className="container max-w-2xl py-8">
         <p className="text-muted-foreground">Discussion not found</p>
+      </div>
+    )
+  }
+
+  if (matrixError) {
+    return (
+      <div className="container max-w-2xl py-8">
+        <div className="rounded-lg border border-destructive bg-destructive/10 p-4">
+          <p className="text-sm text-destructive">
+            Matrix error: {matrixError}
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Make sure Matrix credentials are configured properly.
+          </p>
+        </div>
       </div>
     )
   }
@@ -114,7 +118,7 @@ export default function ChatRoomPage() {
           </div>
         )}
         {messages.map((msg) => {
-          const isOwn = msg.sender === user?.id
+          const isOwn = msg.sender === user?.matrixLogin
           return (
             <div key={msg.eventId} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
               <div
@@ -147,10 +151,12 @@ export default function ChatRoomPage() {
         </Button>
       </div>
 
-      {/* Matrix Room ID for debugging/integration */}
-      <p className="text-xs text-muted-foreground mt-3 text-center">
-        Matrix Room: {discussion.matrixRoomId}
-      </p>
+      {/* Matrix Room ID for debugging */}
+      {process.env.NODE_ENV === 'development' && (
+        <p className="text-xs text-muted-foreground mt-3 text-center">
+          Matrix Room: {discussion.matrixRoomId}
+        </p>
+      )}
     </div>
   )
 }
