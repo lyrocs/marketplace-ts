@@ -151,10 +151,13 @@ export const ROOT_CATEGORIES_QUERY = gql`
       name
       key
       image
+      description
       children {
         id
         name
         key
+        image
+        description
       }
     }
   }
