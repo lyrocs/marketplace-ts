@@ -183,6 +183,19 @@ export default function AdminDealsPage() {
       {/* Deal Detail Dialog */}
       <Dialog open={!!selectedDealId} onOpenChange={(open) => !open && setSelectedDealId(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{dealLoading ? 'Loading...' : (deal?.title || 'Untitled Deal')}</DialogTitle>
+            {!dealLoading && deal && (
+              <div className="flex items-center gap-2 mt-2">
+                <Badge>{deal.status}</Badge>
+                <Badge variant="outline">{deal.condition}</Badge>
+                <span className="text-sm text-muted-foreground">
+                  by {deal.seller?.name || 'Unknown'}
+                </span>
+              </div>
+            )}
+          </DialogHeader>
+
           {dealLoading ? (
             <div className="space-y-4">
               <Skeleton className="h-8 w-3/4" />
@@ -190,16 +203,6 @@ export default function AdminDealsPage() {
             </div>
           ) : deal ? (
             <>
-              <DialogHeader>
-                <DialogTitle>{deal.title || 'Untitled Deal'}</DialogTitle>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge>{deal.status}</Badge>
-                  <Badge variant="outline">{deal.condition}</Badge>
-                  <span className="text-sm text-muted-foreground">
-                    by {deal.seller?.name || 'Unknown'}
-                  </span>
-                </div>
-              </DialogHeader>
 
               <div className="space-y-6 mt-4">
                 {/* Images */}

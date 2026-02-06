@@ -319,6 +319,7 @@ export const PRODUCT_QUERY = gql`
       category { id name key }
       brand { id name }
       shops { id url price currency available name }
+      specs { id value specType { id key label } }
       createdAt
       updatedAt
     }
@@ -353,10 +354,13 @@ export const PRODUCTS_QUERY = gql`
       data {
         id
         name
+        categoryId
         images
+        description
         category { id name key }
         brand { id name }
         shops { price currency available }
+        specs { id value specType { id key label } }
       }
       meta { total page limit totalPages hasNextPage hasPreviousPage }
     }
@@ -391,6 +395,15 @@ export const UPDATE_PRODUCT_MUTATION = gql`
 export const DELETE_PRODUCT_MUTATION = gql`
   mutation DeleteProduct($id: Int!) {
     deleteProduct(id: $id)
+  }
+`
+
+export const UPDATE_PRODUCT_SPECS_MUTATION = gql`
+  mutation UpdateProductSpecs($productId: Int!, $specIds: [Int!]!) {
+    updateProductSpecs(productId: $productId, specIds: $specIds) {
+      id
+      specs { id value specType { id key label } }
+    }
   }
 `
 

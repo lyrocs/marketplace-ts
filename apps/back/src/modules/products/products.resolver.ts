@@ -117,6 +117,9 @@ export class ProductOutput {
   @Field(() => [ShopOutput], { defaultValue: [] })
   shops: ShopOutput[]
 
+  @Field(() => [SpecOutput], { defaultValue: [] })
+  specs: SpecOutput[]
+
   @Field()
   createdAt: Date
 
@@ -212,5 +215,35 @@ export class ProductsResolver {
   async deleteProduct(@Args({ name: 'id', type: () => Int }) id: number): Promise<boolean> {
     await this.productsService.delete(id)
     return true
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => ProductOutput)
+  async addProductSpec(
+    @Args({ name: 'productId', type: () => Int }) productId: number,
+    @Args({ name: 'specId', type: () => Int }) specId: number,
+  ): Promise<ProductOutput> {
+    return this.productsService.addSpec(productId, specId) as any
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => ProductOutput)
+  async removeProductSpec(
+    @Args({ name: 'productId', type: () => Int }) productId: number,
+    @Args({ name: 'specId', type: () => Int }) specId: number,
+  ): Promise<ProductOutput> {
+    return this.productsService.removeSpec(productId, specId) as any
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => ProductOutput)
+  async updateProductSpecs(
+    @Args({ name: 'productId', type: () => Int }) productId: number,
+    @Args({ name: 'specIds', type: () => [Int] }) specIds: number[],
+  ): Promise<ProductOutput> {
+    return this.productsService.updateSpecs(productId, specIds) as any
   }
 }

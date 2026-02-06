@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client/react'
-import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY } from '@/graphql/queries'
+import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import {
   Card,
@@ -24,6 +24,7 @@ import {
   Skeleton,
   Badge,
   Textarea,
+  Checkbox,
 } from '@nextrade/ui'
 import { Plus, Trash2, Eye, Edit } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
@@ -37,7 +38,7 @@ export default function AdminProductsPage() {
   const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '' })
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const [editOpen, setEditOpen] = useState(false)
-  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', description: '' })
+  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', description: '', specIds: [] as number[] })
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
@@ -45,24 +46,28 @@ export default function AdminProductsPage() {
   })
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)
+  const { data: specTypesData } = useQuery(SPEC_TYPES_QUERY)
   const { data: productData, loading: productLoading } = useQuery(PRODUCT_QUERY, {
     variables: { id: selectedProductId },
     skip: !selectedProductId,
   })
   const [createProduct] = useMutation(CREATE_PRODUCT_MUTATION)
   const [updateProduct] = useMutation(UPDATE_PRODUCT_MUTATION)
+  const [updateProductSpecs] = useMutation(UPDATE_PRODUCT_SPECS_MUTATION)
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
 
   const products = data?.products?.data || []
   const meta = data?.products?.meta
   const product = productData?.product
+  const specTypes = specTypesData?.specTypes || []
 
   const openEditDialog = (product: any) => {
     setEditProduct({
       id: product.id,
       name: product.name,
-      categoryId: product.categoryId.toString(),
+      categoryId: (product.categoryId || product.category?.id || '').toString(),
       description: product.description || '',
+      specIds: product.specs?.map((s: any) => s.id) || [],
     })
     setEditOpen(true)
   }
@@ -102,6 +107,13 @@ export default function AdminProductsPage() {
           name: editProduct.name,
           categoryId: parseInt(editProduct.categoryId),
           description: editProduct.description || undefined,
+        },
+      })
+      // Update specs separately
+      await updateProductSpecs({
+        variables: {
+          productId: editProduct.id,
+          specIds: editProduct.specIds,
         },
       })
       toast({ title: 'Product updated', variant: 'success' })
@@ -251,6 +263,18 @@ export default function AdminProductsPage() {
       {/* View Product Dialog */}
       <Dialog open={!!selectedProductId && !editOpen} onOpenChange={(open) => !open && setSelectedProductId(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{productLoading ? 'Loading...' : (product?.name || 'Product Details')}</DialogTitle>
+            {!productLoading && product && (
+              <div className="flex items-center gap-2 mt-2">
+                <Badge>{product.status}</Badge>
+                <span className="text-sm text-muted-foreground">
+                  {product.category?.name} {product.brand && `· ${product.brand.name}`}
+                </span>
+              </div>
+            )}
+          </DialogHeader>
+
           {productLoading ? (
             <div className="space-y-4">
               <Skeleton className="h-8 w-3/4" />
@@ -258,15 +282,6 @@ export default function AdminProductsPage() {
             </div>
           ) : product ? (
             <>
-              <DialogHeader>
-                <DialogTitle>{product.name}</DialogTitle>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge>{product.status}</Badge>
-                  <span className="text-sm text-muted-foreground">
-                    {product.category?.name} {product.brand && `· ${product.brand.name}`}
-                  </span>
-                </div>
-              </DialogHeader>
 
               <div className="space-y-6 mt-4">
                 {/* Images */}
@@ -288,6 +303,21 @@ export default function AdminProductsPage() {
                   <div>
                     <Label>Description</Label>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">{product.description}</p>
+                  </div>
+                )}
+
+                {/* Specifications */}
+                {product.specs && product.specs.length > 0 && (
+                  <div>
+                    <Label>Specifications</Label>
+                    <div className="grid grid-cols-2 gap-3 mt-2">
+                      {product.specs.map((spec: any) => (
+                        <div key={spec.id} className="flex items-center justify-between p-2 border rounded">
+                          <span className="text-sm font-medium">{spec.specType?.label}:</span>
+                          <Badge variant="secondary">{spec.value}</Badge>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -349,7 +379,7 @@ export default function AdminProductsPage() {
 
       {/* Edit Product Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
@@ -377,6 +407,36 @@ export default function AdminProductsPage() {
                 onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
                 rows={4}
               />
+            </div>
+            <div className="space-y-3">
+              <Label>Specifications</Label>
+              <div className="border rounded-lg p-4 max-h-60 overflow-y-auto space-y-3">
+                {specTypes.map((specType: any) => (
+                  <div key={specType.id} className="space-y-2">
+                    <p className="text-sm font-semibold text-muted-foreground">{specType.label}</p>
+                    <div className="grid grid-cols-2 gap-2 pl-4">
+                      {specType.specs?.map((spec: any) => (
+                        <div key={spec.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`spec-${spec.id}`}
+                            checked={editProduct.specIds.includes(spec.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setEditProduct({ ...editProduct, specIds: [...editProduct.specIds, spec.id] })
+                              } else {
+                                setEditProduct({ ...editProduct, specIds: editProduct.specIds.filter(id => id !== spec.id) })
+                              }
+                            }}
+                          />
+                          <label htmlFor={`spec-${spec.id}`} className="text-sm cursor-pointer">
+                            {spec.value}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <DialogFooter>

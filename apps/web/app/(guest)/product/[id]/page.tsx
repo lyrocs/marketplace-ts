@@ -76,6 +76,20 @@ export default function ProductDetailsPage() {
             </p>
           </ProductSection>
 
+          {/* Specifications */}
+          {product.specs && product.specs.length > 0 && (
+            <ProductSection title="Specifications">
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                {product.specs.map((spec: any) => (
+                  <div key={spec.id} className="border rounded-lg p-3 bg-white">
+                    <dt className="text-sm font-medium text-gray-600">{spec.specType?.label}</dt>
+                    <dd className="mt-1 text-base font-semibold text-gray-900">{spec.value}</dd>
+                  </div>
+                ))}
+              </div>
+            </ProductSection>
+          )}
+
           {/* Technical Specifications */}
           {product.features && product.features.length > 0 && (
             <ProductSection title="Technical Specifications">

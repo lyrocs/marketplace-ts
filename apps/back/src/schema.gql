@@ -120,6 +120,7 @@ type DiscussionUserOutput {
 
 type Mutation {
   addDealImage(dealId: Int!, imageUrl: String!): DealOutput!
+  addProductSpec(productId: Int!, specId: Int!): ProductOutput!
   adminUpdateDealStatus(id: Int!, reason: String, status: String!): DealOutput!
   createBrand(name: String!): BrandGqlOutput!
   createCategory(description: String, image: String, key: String!, name: String!, parentId: Int): CategoryTreeOutput!
@@ -137,6 +138,7 @@ type Mutation {
   markDiscussionRead(discussionId: Int!): Boolean!
   publishDeal(id: Int!): DealOutput!
   register(email: String!, name: String!, password: String!): AuthPayloadOutput!
+  removeProductSpec(productId: Int!, specId: Int!): ProductOutput!
   requestPasswordReset(email: String!): SuccessOutput!
   resetPassword(password: String!, token: String!): SuccessOutput!
   startDiscussion(dealId: Int!): DiscussionOutput!
@@ -144,6 +146,7 @@ type Mutation {
   updateCategory(description: String, id: Int!, image: String, key: String, name: String): CategoryTreeOutput!
   updateDeal(canBeDelivered: Boolean, condition: String, currency: String, description: String, features: [DealFeatureInput!], id: Int!, invoiceAvailable: Boolean, location: String, price: Float, products: [DealProductInput!], sellingReason: String, title: String): DealOutput!
   updateProduct(categoryId: Int, description: String, id: Int!, name: String): ProductOutput!
+  updateProductSpecs(productId: Int!, specIds: [Int!]!): ProductOutput!
   updateProfile(image: String, name: String): UserProfileOutput!
   updateSpecType(description: String, id: Int!, key: String, label: String): SpecTypeGqlOutput!
 }
@@ -168,6 +171,7 @@ type ProductOutput {
   images: [String!]!
   name: String!
   shops: [ShopOutput!]!
+  specs: [SpecOutput!]!
   status: String!
   updatedAt: DateTime!
 }
@@ -225,6 +229,12 @@ type ShopOutput {
 type SpecGqlOutput {
   id: Int!
   specTypeId: Int
+  value: String!
+}
+
+type SpecOutput {
+  id: Int!
+  specType: SpecTypeOutput
   value: String!
 }
 

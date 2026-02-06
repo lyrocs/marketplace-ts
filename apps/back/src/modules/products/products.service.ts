@@ -4,7 +4,7 @@ import { prisma } from '@nextrade/database'
 @Injectable()
 export class ProductsService {
   async findById(id: number): Promise<any> {
-    return prisma.product.findUnique({
+    const product = await prisma.product.findUnique({
       where: { id },
       include: {
         category: true,
@@ -13,6 +13,14 @@ export class ProductsService {
         shops: true,
       },
     })
+
+    if (!product) return null
+
+    // Transform specs from ProductSpec[] to Spec[]
+    return {
+      ...product,
+      specs: product.specs.map((ps: any) => ps.spec),
+    }
   }
 
   async search({
@@ -105,8 +113,14 @@ export class ProductsService {
       })
     }
 
+    // Transform specs from ProductSpec[] to Spec[]
+    const transformedProducts = products.map((p: any) => ({
+      ...p,
+      specs: p.specs.map((ps: any) => ps.spec),
+    }))
+
     return {
-      data: products,
+      data: transformedProducts,
       meta: {
         total,
         page,
@@ -159,14 +173,32 @@ export class ProductsService {
   }
 
   async addSpec(productId: number, specId: number): Promise<any> {
-    return prisma.productSpec.create({
+    await prisma.productSpec.create({
       data: { productId, specId },
     })
+    return this.findById(productId)
   }
 
   async removeSpec(productId: number, specId: number): Promise<any> {
-    return prisma.productSpec.delete({
+    await prisma.productSpec.delete({
       where: { productId_specId: { productId, specId } },
     })
+    return this.findById(productId)
+  }
+
+  async updateSpecs(productId: number, specIds: number[]): Promise<any> {
+    // Delete all existing specs for this product
+    await prisma.productSpec.deleteMany({
+      where: { productId },
+    })
+
+    // Create new specs
+    if (specIds.length > 0) {
+      await prisma.productSpec.createMany({
+        data: specIds.map(specId => ({ productId, specId })),
+      })
+    }
+
+    return this.findById(productId)
   }
 }
