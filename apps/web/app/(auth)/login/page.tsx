@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import { Button, Input, Label, Card, CardContent } from '@nextrade/ui'
@@ -14,6 +14,18 @@ export default function LoginPage() {
   const { login } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error === 'oauth_failed') {
+      toast({
+        title: 'Authentication failed',
+        description: 'Unable to sign in with social provider. Please try again.',
+        variant: 'destructive',
+      })
+    }
+  }, [searchParams, toast])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()

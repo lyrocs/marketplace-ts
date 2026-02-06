@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { useMutation, useQuery } from '@apollo/client/react'
+import { useMutation, useLazyQuery } from '@apollo/client/react'
 import { LOGIN_MUTATION, REGISTER_MUTATION, ME_QUERY } from '../graphql/queries'
 
 interface AuthUser {
@@ -18,6 +18,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
+  refetch: () => Promise<any>
   isAdmin: boolean
   isAuthenticated: boolean
 }
@@ -30,8 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [loginMutation] = useMutation(LOGIN_MUTATION)
   const [registerMutation] = useMutation(REGISTER_MUTATION)
-  const { data: meData, refetch: refetchMe } = useQuery(ME_QUERY, {
-    skip: typeof window !== 'undefined' && !localStorage.getItem('nextrade_token'),
+  const [fetchMe, { data: meData }] = useLazyQuery(ME_QUERY, {
     fetchPolicy: 'network-only',
   })
 
@@ -39,39 +39,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (meData?.me) {
       setUser(meData.me)
     }
-    setLoading(false)
   }, [meData])
 
-  // On mount, check if token exists
+  // On mount, check if token exists and fetch user
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('nextrade_token') : null
-    if (!token) {
+    if (token) {
+      fetchMe().catch(() => {
+        // Token might be invalid, clear it
+        localStorage.removeItem('nextrade_token')
+        setLoading(false)
+      })
+    } else {
       setLoading(false)
     }
-  }, [])
+  }, [fetchMe])
 
   const login = useCallback(async (email: string, password: string) => {
     const { data } = await loginMutation({ variables: { email, password } })
     if (data?.login) {
       localStorage.setItem('nextrade_token', data.login.accessToken)
       setUser(data.login.user)
-      await refetchMe()
+      setLoading(false)
     }
-  }, [loginMutation, refetchMe])
+  }, [loginMutation])
 
   const register = useCallback(async (name: string, email: string, password: string) => {
     const { data } = await registerMutation({ variables: { name, email, password } })
     if (data?.register) {
       localStorage.setItem('nextrade_token', data.register.accessToken)
       setUser(data.register.user)
-      await refetchMe()
+      setLoading(false)
     }
-  }, [registerMutation, refetchMe])
+  }, [registerMutation])
 
   const logout = useCallback(() => {
     localStorage.removeItem('nextrade_token')
     setUser(null)
   }, [])
+
+  const refetch = useCallback(async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('nextrade_token') : null
+    if (token) {
+      const result = await fetchMe()
+      setLoading(false)
+      return result
+    }
+  }, [fetchMe])
 
   return (
     <AuthContext.Provider
@@ -81,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        refetch,
         isAdmin: user?.role === 'ADMIN',
         isAuthenticated: !!user,
       }}

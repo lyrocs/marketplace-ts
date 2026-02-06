@@ -10,7 +10,15 @@ async function bootstrap() {
     credentials: true,
   })
 
-  app.setGlobalPrefix('api', { exclude: ['/graphql'] })
+  app.setGlobalPrefix('api', {
+    exclude: [
+      '/graphql',
+      '/auth/google',
+      '/auth/google/callback',
+      '/auth/facebook',
+      '/auth/facebook/callback',
+    ]
+  })
 
   // Initialize Matrix service listener
   try {

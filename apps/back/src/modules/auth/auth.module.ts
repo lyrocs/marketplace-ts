@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PassportModule } from '@nestjs/passport'
 import { AuthService } from './auth.service.js'
 import { AuthResolver } from './auth.resolver.js'
+import { AuthController } from './auth.controller.js'
 import { LocalStrategy } from './local.strategy.js'
 import { JwtStrategy } from './jwt.strategy.js'
 import { GoogleStrategy } from './google.strategy.js'
@@ -17,6 +18,7 @@ import { MatrixModule } from '../matrix/matrix.module.js'
     UsersModule,
     MatrixModule,
   ],
+  controllers: [AuthController],
   providers: [
     AuthService,
     AuthResolver,

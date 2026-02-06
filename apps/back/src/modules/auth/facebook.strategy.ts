@@ -13,7 +13,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     super({
       clientID: configService.get<string>('FACEBOOK_CLIENT_ID') || 'placeholder',
       clientSecret: configService.get<string>('FACEBOOK_CLIENT_SECRET') || 'placeholder',
-      callbackURL: `${configService.get('FRONTEND_URL') || 'http://localhost:3000'}/auth/facebook/callback`,
+      callbackURL: `${configService.get('BACKEND_URL') || 'http://localhost:3001'}/auth/facebook/callback`,
       scope: ['email'],
       profileFields: ['emails', 'displayName', 'photos'],
     })
