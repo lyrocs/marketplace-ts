@@ -1,9 +1,9 @@
 import { Resolver, Query, Mutation, Args, Int, ObjectType, Field } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { CategoriesService } from './categories.service'
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { Public } from '../../common/decorators/public.decorator'
+import { CategoriesService } from './categories.service.js'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
+import { Roles } from '../../common/decorators/roles.decorator.js'
+import { Public } from '../../common/decorators/public.decorator.js'
 import { UserRole } from '@nextrade/types'
 
 @ObjectType()

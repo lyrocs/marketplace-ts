@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PassportModule } from '@nestjs/passport'
-import { AuthService } from './auth.service'
-import { AuthResolver } from './auth.resolver'
-import { LocalStrategy } from './local.strategy'
-import { JwtStrategy } from './jwt.strategy'
-import { GoogleStrategy } from './google.strategy'
-import { FacebookStrategy } from './facebook.strategy'
-import { UsersModule } from '../users/users.module'
-import { MatrixModule } from '../matrix/matrix.module'
+import { AuthService } from './auth.service.js'
+import { AuthResolver } from './auth.resolver.js'
+import { LocalStrategy } from './local.strategy.js'
+import { JwtStrategy } from './jwt.strategy.js'
+import { GoogleStrategy } from './google.strategy.js'
+import { FacebookStrategy } from './facebook.strategy.js'
+import { UsersModule } from '../users/users.module.js'
+import { MatrixModule } from '../matrix/matrix.module.js'
 
 @Module({
   imports: [

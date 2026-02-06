@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
-import { DealsService } from './deals.service'
-import { DealsResolver } from './deals.resolver'
-import { DiscussionsModule } from '../discussions/discussions.module'
+import { DealsService } from './deals.service.js'
+import { DealsResolver } from './deals.resolver.js'
+import { DiscussionsModule } from '../discussions/discussions.module.js'
 
 @Module({
   imports: [DiscussionsModule],

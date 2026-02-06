@@ -10,13 +10,13 @@ import {
   InputType,
 } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { DealsService } from './deals.service'
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { CurrentUser } from '../../common/decorators/current-user.decorator'
-import { Public } from '../../common/decorators/public.decorator'
+import { DealsService } from './deals.service.js'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
+import { Roles } from '../../common/decorators/roles.decorator.js'
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js'
+import { Public } from '../../common/decorators/public.decorator.js'
 import { UserRole } from '@nextrade/types'
-import { PaginationMetaOutput } from '../../common/types/pagination.types'
+import { PaginationMetaOutput } from '../../common/types/pagination.types.js'
 
 @InputType()
 export class DealFeatureInput {

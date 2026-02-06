@@ -1,9 +1,9 @@
 import { Resolver, Mutation, Args, ObjectType, Field, Query } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { AuthService } from './auth.service'
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
-import { Public } from '../../common/decorators/public.decorator'
-import { CurrentUser } from '../../common/decorators/current-user.decorator'
+import { AuthService } from './auth.service.js'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
+import { Public } from '../../common/decorators/public.decorator.js'
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js'
 
 @ObjectType()
 export class UserOutput {

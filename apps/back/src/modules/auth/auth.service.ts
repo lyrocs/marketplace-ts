@@ -1,12 +1,12 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as bcrypt from 'bcrypt'
-import { sign, SignOptions } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import { prisma } from '@nextrade/database'
 import { UserRole, JwtPayload } from '@nextrade/types'
-import { UsersService } from '../users/users.service'
-import { MatrixService } from '../matrix/matrix.service'
+import { UsersService } from '../users/users.service.js'
+import { MatrixService } from '../matrix/matrix.service.js'
 
 @Injectable()
 export class AuthService {
@@ -45,7 +45,7 @@ export class AuthService {
 
     const secret = this.configService.get<string>('JWT_SECRET') || 'default-secret'
     const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') || '7d'
-    const accessToken = sign(payload, secret, { expiresIn } as SignOptions)
+    const accessToken = jwt.sign(payload, secret, { expiresIn })
 
     return {
       accessToken,

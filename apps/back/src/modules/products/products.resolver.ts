@@ -9,12 +9,12 @@ import {
   Float,
 } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { ProductsService } from './products.service'
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { Public } from '../../common/decorators/public.decorator'
+import { ProductsService } from './products.service.js'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
+import { Roles } from '../../common/decorators/roles.decorator.js'
+import { Public } from '../../common/decorators/public.decorator.js'
 import { UserRole } from '@nextrade/types'
-import { PaginationMetaOutput } from '../../common/types/pagination.types'
+import { PaginationMetaOutput } from '../../common/types/pagination.types.js'
 
 @ObjectType()
 export class SpecTypeOutput {

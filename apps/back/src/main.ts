@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
-import { MatrixService } from './modules/matrix/matrix.service'
+import { AppModule } from './app.module.js'
+import { MatrixService } from './modules/matrix/matrix.service.js'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)

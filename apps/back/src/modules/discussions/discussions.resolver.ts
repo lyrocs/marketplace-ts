@@ -1,8 +1,8 @@
 import { Resolver, Query, Mutation, Args, Int, ObjectType, Field } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
-import { DiscussionsService } from './discussions.service'
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
-import { CurrentUser } from '../../common/decorators/current-user.decorator'
+import { DiscussionsService } from './discussions.service.js'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js'
 
 @ObjectType()
 export class DiscussionUserOutput {

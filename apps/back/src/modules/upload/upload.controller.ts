@@ -1,7 +1,7 @@
 import { Controller, Post, UseInterceptors, UploadedFile, UseGuards, BadRequestException } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { UploadService } from './upload.service'
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { UploadService } from './upload.service.js'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
 
 @Controller('upload')
 @UseGuards(JwtAuthGuard)

@@ -1,4 +1,4 @@
-import * as Joi from 'joi'
+import Joi from 'joi'
 
 export const envValidation = Joi.object({
   DATABASE_URL: Joi.string().default('postgresql://localhost:5432/nextrade'),

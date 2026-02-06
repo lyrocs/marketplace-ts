@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { prisma } from '@nextrade/database'
-import { MatrixService } from '../matrix/matrix.service'
+import { MatrixService } from '../matrix/matrix.service.js'
 
 @Injectable()
 export class DiscussionsService {

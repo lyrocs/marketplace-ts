@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
-import { DiscussionsService } from './discussions.service'
-import { DiscussionsResolver } from './discussions.resolver'
-import { MatrixModule } from '../matrix/matrix.module'
+import { DiscussionsService } from './discussions.service.js'
+import { DiscussionsResolver } from './discussions.resolver.js'
+import { MatrixModule } from '../matrix/matrix.module.js'
 
 @Module({
   imports: [MatrixModule],
