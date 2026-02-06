@@ -2,8 +2,9 @@
 
 import { useQuery } from '@apollo/client/react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { PRODUCTS_QUERY, DEALS_QUERY, CATEGORIES_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
+import { PRODUCTS_QUERY, DEALS_QUERY, CATEGORIES_QUERY, SPEC_TYPES_QUERY, BRANDS_QUERY } from '@/graphql/queries'
 import { FilterSidebar } from '@/components/filters/filter-sidebar'
+import { ActiveFilters } from '@/components/filters/active-filters'
 import { ProductCard } from '@/components/cards/product-card'
 import { DealCard } from '@/components/cards/deal-card'
 import { PageBanner } from '@/components/shared/page-banner'
@@ -22,10 +23,19 @@ export default function AllProductsPage() {
   const specIds = specsParam ? specsParam.split(',').map(Number) : undefined
   const categoryIdParam = searchParams.get('categoryId')
   const categoryId = categoryIdParam ? parseInt(categoryIdParam) : undefined
+  const brandId = searchParams.get('brandId') ? parseInt(searchParams.get('brandId')!) : undefined
+  const minPrice = searchParams.get('minPrice') ? parseFloat(searchParams.get('minPrice')!) : undefined
+  const maxPrice = searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined
+  const sortBy = searchParams.get('sortBy') || 'createdAt'
+  const sortOrder = searchParams.get('sortOrder') || 'desc'
 
   // Fetch all categories for sidebar dropdown
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const categories = categoriesData?.categories || []
+
+  // Fetch all brands
+  const { data: brandsData } = useQuery(BRANDS_QUERY)
+  const brands = brandsData?.brands || []
 
   // Fetch products or deals
   const { data: productsData, loading: productsLoading } = useQuery(
@@ -35,7 +45,12 @@ export default function AllProductsPage() {
         categoryId,
         title: search,
         name: search,
+        brandId,
         specIds,
+        minPrice,
+        maxPrice,
+        sortBy,
+        sortOrder,
         page,
         limit: 12,
       },
@@ -97,6 +112,87 @@ export default function AllProductsPage() {
     router.push(url.pathname + url.search)
   }
 
+  const handleBrandChange = (newBrandId?: number) => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('page')
+    if (newBrandId) {
+      url.searchParams.set('brandId', newBrandId.toString())
+    } else {
+      url.searchParams.delete('brandId')
+    }
+    router.push(url.pathname + url.search)
+  }
+
+  const handlePriceChange = (min?: number, max?: number) => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('page')
+    if (min !== undefined) {
+      url.searchParams.set('minPrice', min.toString())
+    } else {
+      url.searchParams.delete('minPrice')
+    }
+    if (max !== undefined) {
+      url.searchParams.set('maxPrice', max.toString())
+    } else {
+      url.searchParams.delete('maxPrice')
+    }
+    router.push(url.pathname + url.search)
+  }
+
+  const handleSortChange = (newSortBy: string, newSortOrder: string) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('sortBy', newSortBy)
+    url.searchParams.set('sortOrder', newSortOrder)
+    router.push(url.pathname + url.search)
+  }
+
+  const handleClearAllFilters = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('search')
+    url.searchParams.delete('specs')
+    url.searchParams.delete('brandId')
+    url.searchParams.delete('minPrice')
+    url.searchParams.delete('maxPrice')
+    url.searchParams.delete('categoryId')
+    url.searchParams.delete('page')
+    router.push(url.pathname + url.search)
+  }
+
+  // Build active filters
+  const activeFilters = []
+  if (search) {
+    activeFilters.push({
+      label: 'Search',
+      value: search,
+      onRemove: () => handleSearchChange(''),
+    })
+  }
+  if (brandId) {
+    const brand = brands.find((b: any) => b.id === brandId)
+    if (brand) {
+      activeFilters.push({
+        label: 'Brand',
+        value: brand.name,
+        onRemove: () => handleBrandChange(undefined),
+      })
+    }
+  }
+  if (minPrice || maxPrice) {
+    const priceRange = `${minPrice || '0'} - ${maxPrice || '∞'}`
+    activeFilters.push({
+      label: 'Price',
+      value: priceRange,
+      onRemove: () => handlePriceChange(undefined, undefined),
+    })
+  }
+  if (specIds && specIds.length > 0) {
+    activeFilters.push({
+      label: 'Specs',
+      value: `${specIds.length} selected`,
+      onRemove: () => handleFilterChange([]),
+    })
+  }
+
   return (
     <main className="container mx-auto px-4 py-2">
       {/* Page Banner */}
@@ -126,16 +222,36 @@ export default function AllProductsPage() {
             specs={specs}
             selectedSpecIds={specIds || []}
             categories={categories}
+            brands={brands}
             currentCategoryId={categoryId}
+            selectedBrandId={brandId}
             searchValue={search || ''}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
             onFilterChange={handleFilterChange}
             onSearchChange={handleSearchChange}
             onCategoryChange={handleCategoryChange}
+            onBrandChange={handleBrandChange}
+            onPriceChange={handlePriceChange}
+            onSortChange={handleSortChange}
           />
         </aside>
 
         {/* Products/Deals Grid */}
         <div className="mt-8 lg:col-span-2 xl:col-span-3 2xl:col-span-4 lg:mt-0">
+          {/* Results count and active filters */}
+          {!productsLoading && meta && (
+            <div className="mb-4">
+              <p className="text-sm text-muted-foreground">
+                Showing {meta.total} {meta.total === 1 ? 'result' : 'results'}
+                {search && <> for "<strong>{search}</strong>"</>}
+              </p>
+              <ActiveFilters filters={activeFilters} onClearAll={handleClearAllFilters} />
+            </div>
+          )}
+
           {productsLoading ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 mb-6">
               {[...Array(6)].map((_, i) => (

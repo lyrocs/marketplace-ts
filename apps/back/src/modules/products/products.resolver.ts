@@ -151,10 +151,25 @@ export class ProductsResolver {
     @Args({ name: 'categoryId', type: () => Int, nullable: true }) categoryId?: number,
     @Args({ name: 'brandId', type: () => Int, nullable: true }) brandId?: number,
     @Args({ name: 'specIds', type: () => [Int], nullable: true }) specIds?: number[],
+    @Args({ name: 'minPrice', type: () => Float, nullable: true }) minPrice?: number,
+    @Args({ name: 'maxPrice', type: () => Float, nullable: true }) maxPrice?: number,
+    @Args({ name: 'sortBy', nullable: true, defaultValue: 'createdAt' }) sortBy?: string,
+    @Args({ name: 'sortOrder', nullable: true, defaultValue: 'desc' }) sortOrder?: string,
     @Args({ name: 'page', type: () => Int, defaultValue: 1 }) page?: number,
     @Args({ name: 'limit', type: () => Int, defaultValue: 12 }) limit?: number,
   ): Promise<ProductsListOutput> {
-    return this.productsService.search({ name, categoryId, brandId, specIds, page, limit }) as any
+    return this.productsService.search({
+      name,
+      categoryId,
+      brandId,
+      specIds,
+      minPrice,
+      maxPrice,
+      sortBy,
+      sortOrder,
+      page,
+      limit,
+    }) as any
   }
 
   @UseGuards(JwtAuthGuard)

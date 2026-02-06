@@ -37,16 +37,30 @@ interface Category {
   parentId?: number | null
 }
 
+interface Brand {
+  id: number
+  name: string
+}
+
 interface FilterSidebarProps {
   title?: string
   specs: SpecType[]
   selectedSpecIds: number[]
   categories: Category[]
+  brands?: Brand[]
   currentCategoryId?: number
+  selectedBrandId?: number
   searchValue: string
+  minPrice?: number
+  maxPrice?: number
+  sortBy?: string
+  sortOrder?: string
   onFilterChange: (specIds: number[]) => void
   onSearchChange: (search: string) => void
   onCategoryChange: (categoryId: number) => void
+  onBrandChange?: (brandId?: number) => void
+  onPriceChange?: (min?: number, max?: number) => void
+  onSortChange?: (sortBy: string, sortOrder: string) => void
 }
 
 export function FilterSidebar({
@@ -54,13 +68,24 @@ export function FilterSidebar({
   specs,
   selectedSpecIds,
   categories,
+  brands = [],
   currentCategoryId,
+  selectedBrandId,
   searchValue,
+  minPrice,
+  maxPrice,
+  sortBy = 'createdAt',
+  sortOrder = 'desc',
   onFilterChange,
   onSearchChange,
   onCategoryChange,
+  onBrandChange,
+  onPriceChange,
+  onSortChange,
 }: FilterSidebarProps) {
   const [localSearch, setLocalSearch] = useState(searchValue)
+  const [localMinPrice, setLocalMinPrice] = useState(minPrice?.toString() || '')
+  const [localMaxPrice, setLocalMaxPrice] = useState(maxPrice?.toString() || '')
 
   const handleSpecToggle = (specId: number) => {
     const newSelection = selectedSpecIds.includes(specId)
@@ -73,6 +98,10 @@ export function FilterSidebar({
     onFilterChange([])
     setLocalSearch('')
     onSearchChange('')
+    setLocalMinPrice('')
+    setLocalMaxPrice('')
+    onPriceChange?.(undefined, undefined)
+    onBrandChange?.(undefined)
   }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -80,8 +109,15 @@ export function FilterSidebar({
     onSearchChange(localSearch)
   }
 
+  const handlePriceSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const min = localMinPrice ? parseFloat(localMinPrice) : undefined
+    const max = localMaxPrice ? parseFloat(localMaxPrice) : undefined
+    onPriceChange?.(min, max)
+  }
+
   // Group specs by type
-  const hasActiveFilters = selectedSpecIds.length > 0
+  const hasActiveFilters = selectedSpecIds.length > 0 || selectedBrandId || minPrice || maxPrice
 
   return (
     <div className="flex flex-col gap-4">
@@ -104,6 +140,36 @@ export function FilterSidebar({
           </form>
         </CardContent>
       </Card>
+
+      {/* Sort Options */}
+      {onSortChange && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Sort By</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select
+              value={`${sortBy}-${sortOrder}`}
+              onValueChange={(value) => {
+                const [newSortBy, newSortOrder] = value.split('-')
+                onSortChange(newSortBy, newSortOrder)
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt-desc">Newest First</SelectItem>
+                <SelectItem value="createdAt-asc">Oldest First</SelectItem>
+                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                <SelectItem value="price-asc">Price (Low to High)</SelectItem>
+                <SelectItem value="price-desc">Price (High to Low)</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Category Selector */}
       <Card>
@@ -139,6 +205,67 @@ export function FilterSidebar({
           </Select>
         </CardContent>
       </Card>
+
+      {/* Brand Filter */}
+      {onBrandChange && brands.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Brand</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select
+              value={selectedBrandId?.toString() || 'all'}
+              onValueChange={(value) => onBrandChange(value === 'all' ? undefined : parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All Brands" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Brands</SelectItem>
+                {brands.map((brand) => (
+                  <SelectItem key={brand.id} value={brand.id.toString()}>
+                    {brand.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Price Range */}
+      {onPriceChange && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Price Range</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handlePriceSubmit} className="space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="Min"
+                  value={localMinPrice}
+                  onChange={(e) => setLocalMinPrice(e.target.value)}
+                  min="0"
+                  step="0.01"
+                />
+                <Input
+                  type="number"
+                  placeholder="Max"
+                  value={localMaxPrice}
+                  onChange={(e) => setLocalMaxPrice(e.target.value)}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              <Button type="submit" variant="outline" size="sm" className="w-full">
+                Apply
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Clear Filters */}
       {hasActiveFilters && (

@@ -312,8 +312,30 @@ export const PRODUCT_QUERY = gql`
 `
 
 export const PRODUCTS_QUERY = gql`
-  query Products($name: String, $categoryId: Int, $brandId: Int, $specIds: [Int!], $page: Int, $limit: Int) {
-    products(name: $name, categoryId: $categoryId, brandId: $brandId, specIds: $specIds, page: $page, limit: $limit) {
+  query Products(
+    $name: String
+    $categoryId: Int
+    $brandId: Int
+    $specIds: [Int!]
+    $minPrice: Float
+    $maxPrice: Float
+    $sortBy: String
+    $sortOrder: String
+    $page: Int
+    $limit: Int
+  ) {
+    products(
+      name: $name
+      categoryId: $categoryId
+      brandId: $brandId
+      specIds: $specIds
+      minPrice: $minPrice
+      maxPrice: $maxPrice
+      sortBy: $sortBy
+      sortOrder: $sortOrder
+      page: $page
+      limit: $limit
+    ) {
       data {
         id
         name

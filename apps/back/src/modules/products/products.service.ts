@@ -20,6 +20,10 @@ export class ProductsService {
     categoryId,
     brandId,
     specIds,
+    minPrice,
+    maxPrice,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
     page = 1,
     limit = 12,
   }: {
@@ -27,6 +31,10 @@ export class ProductsService {
     categoryId?: number
     brandId?: number
     specIds?: number[]
+    minPrice?: number
+    maxPrice?: number
+    sortBy?: string
+    sortOrder?: string
     page?: number
     limit?: number
   }): Promise<any> {
@@ -49,7 +57,30 @@ export class ProductsService {
       }
     }
 
-    const [products, total] = await Promise.all([
+    // Price filtering through shops
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.shops = {
+        some: {
+          AND: [
+            minPrice !== undefined ? { price: { gte: minPrice } } : {},
+            maxPrice !== undefined ? { price: { lte: maxPrice } } : {},
+          ],
+        },
+      }
+    }
+
+    // Determine sort order
+    const orderBy: any = {}
+    if (sortBy === 'name') {
+      orderBy.name = sortOrder
+    } else if (sortBy === 'price') {
+      // For price sorting, we'll do it in-memory after fetching
+      orderBy.createdAt = 'desc'
+    } else {
+      orderBy.createdAt = sortOrder
+    }
+
+    let [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
         include: {
@@ -60,10 +91,19 @@ export class ProductsService {
         },
         skip: (page - 1) * limit,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
       }),
       prisma.product.count({ where }),
     ])
+
+    // Sort by price if requested (in-memory)
+    if (sortBy === 'price') {
+      products = products.sort((a, b) => {
+        const priceA = a.shops.filter((s: any) => s.available && s.price).map((s: any) => s.price)[0] || 0
+        const priceB = b.shops.filter((s: any) => s.available && s.price).map((s: any) => s.price)[0] || 0
+        return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
+      })
+    }
 
     return {
       data: products,
