@@ -1,161 +1,178 @@
 'use client'
 
-import { useQuery } from '@apollo/client/react'
-import { CATEGORIES_QUERY, SPEC_TYPES_QUERY, BRANDS_QUERY } from '../../graphql/queries'
-import { Button, Checkbox, Label, Input, Separator } from '@nextrade/ui'
-import { Search, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
+import {
+  Input,
+  Button,
+  Checkbox,
+  Label,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@nextrade/ui'
+import { Search, X } from 'lucide-react'
+
+interface Spec {
+  id: number
+  value: string
+}
+
+interface SpecType {
+  id: number
+  key: string
+  label: string
+  specs: Spec[]
+}
+
+interface Category {
+  id: number
+  name: string
+  key: string
+  parentId?: number | null
+}
 
 interface FilterSidebarProps {
-  categoryId?: number
-  brandId?: number
-  selectedSpecs: number[]
-  searchQuery: string
-  onCategoryChange: (id: number | undefined) => void
-  onBrandChange: (id: number | undefined) => void
-  onSpecToggle: (specId: number) => void
-  onSearchChange: (query: string) => void
-  onReset: () => void
+  title?: string
+  specs: SpecType[]
+  selectedSpecIds: number[]
+  categories: Category[]
+  currentCategoryId?: number
+  searchValue: string
+  onFilterChange: (specIds: number[]) => void
+  onSearchChange: (search: string) => void
+  onCategoryChange: (categoryId: number) => void
 }
 
 export function FilterSidebar({
-  categoryId,
-  brandId,
-  selectedSpecs,
-  searchQuery,
-  onCategoryChange,
-  onBrandChange,
-  onSpecToggle,
+  title = 'Filters',
+  specs,
+  selectedSpecIds,
+  categories,
+  currentCategoryId,
+  searchValue,
+  onFilterChange,
   onSearchChange,
-  onReset,
+  onCategoryChange,
 }: FilterSidebarProps) {
-  const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
-  const { data: specTypesData } = useQuery(SPEC_TYPES_QUERY)
-  const { data: brandsData } = useQuery(BRANDS_QUERY)
+  const [localSearch, setLocalSearch] = useState(searchValue)
 
-  const categories = categoriesData?.categories || []
-  const specTypes = specTypesData?.specTypes || []
-  const brands = brandsData?.brands || []
+  const handleSpecToggle = (specId: number) => {
+    const newSelection = selectedSpecIds.includes(specId)
+      ? selectedSpecIds.filter((id) => id !== specId)
+      : [...selectedSpecIds, specId]
+    onFilterChange(newSelection)
+  }
 
-  const rootCategories = categories.filter((c: any) => !c.parentId)
-  const hasFilters = categoryId || brandId || selectedSpecs.length > 0 || searchQuery
+  const handleReset = () => {
+    onFilterChange([])
+    setLocalSearch('')
+    onSearchChange('')
+  }
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSearchChange(localSearch)
+  }
+
+  // Group specs by type
+  const hasActiveFilters = selectedSpecIds.length > 0
 
   return (
-    <aside className="w-full max-w-xs space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4" />
-          <h3 className="font-semibold">Filters</h3>
-        </div>
-        {hasFilters && (
-          <Button variant="ghost" size="sm" onClick={onReset}>
-            Reset
-          </Button>
-        )}
-      </div>
+    <div className="flex flex-col gap-4">
+      <h3 className="text-xl font-bold text-gray-800">{title}</h3>
 
       {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search..."
-          className="pl-9"
-        />
-      </div>
-
-      <Separator />
-
-      {/* Categories */}
-      <div className="space-y-2">
-        <h4 className="text-sm font-semibold">Categories</h4>
-        <div className="space-y-1.5">
-          <Button
-            variant={!categoryId ? 'secondary' : 'ghost'}
-            size="sm"
-            className="w-full justify-start"
-            onClick={() => onCategoryChange(undefined)}
-          >
-            All Categories
-          </Button>
-          {rootCategories.map((cat: any) => (
-            <div key={cat.id}>
-              <Button
-                variant={categoryId === cat.id ? 'secondary' : 'ghost'}
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => onCategoryChange(cat.id)}
-              >
-                {cat.name}
-              </Button>
-              {cat.children?.map((child: any) => (
-                <Button
-                  key={child.id}
-                  variant={categoryId === child.id ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="w-full justify-start pl-6 text-muted-foreground"
-                  onClick={() => onCategoryChange(child.id)}
-                >
-                  {child.name}
-                </Button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Brands */}
-      <div className="space-y-2">
-        <h4 className="text-sm font-semibold">Brands</h4>
-        <div className="space-y-1.5">
-          <Button
-            variant={!brandId ? 'secondary' : 'ghost'}
-            size="sm"
-            className="w-full justify-start"
-            onClick={() => onBrandChange(undefined)}
-          >
-            All Brands
-          </Button>
-          {brands.map((brand: any) => (
-            <Button
-              key={brand.id}
-              variant={brandId === brand.id ? 'secondary' : 'ghost'}
-              size="sm"
-              className="w-full justify-start"
-              onClick={() => onBrandChange(brand.id)}
-            >
-              {brand.name}
+      <Card>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSearchSubmit} className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Search..."
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              className="flex-1"
+            />
+            <Button type="submit" size="icon" variant="outline">
+              <Search className="h-4 w-4" />
             </Button>
-          ))}
-        </div>
-      </div>
+          </form>
+        </CardContent>
+      </Card>
 
-      <Separator />
+      {/* Category Selector */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Category</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select
+            value={currentCategoryId?.toString()}
+            onValueChange={(value) => onCategoryChange(parseInt(value))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories
+                .filter((cat) => cat.parentId === null)
+                .map((parentCat) => (
+                  <div key={parentCat.id}>
+                    <SelectItem value={parentCat.id.toString()} className="font-semibold">
+                      {parentCat.name}
+                    </SelectItem>
+                    {categories
+                      .filter((cat) => cat.parentId === parentCat.id)
+                      .map((childCat) => (
+                        <SelectItem key={childCat.id} value={childCat.id.toString()} className="pl-6">
+                          {childCat.name}
+                        </SelectItem>
+                      ))}
+                  </div>
+                ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
 
-      {/* Specifications */}
-      <div className="space-y-3">
-        <h4 className="text-sm font-semibold">Specifications</h4>
-        {specTypes.map((specType: any) => (
-          <div key={specType.id} className="space-y-1.5">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{specType.label}</p>
-            {specType.specs?.map((spec: any) => (
-              <div key={spec.id} className="flex items-center gap-2">
+      {/* Clear Filters */}
+      {hasActiveFilters && (
+        <Button variant="outline" onClick={handleReset} className="w-full">
+          <X className="h-4 w-4 mr-2" />
+          Clear Filters ({selectedSpecIds.length})
+        </Button>
+      )}
+
+      {/* Spec Type Filters */}
+      {specs.map((specType) => (
+        <Card key={specType.id}>
+          <CardHeader>
+            <CardTitle className="text-sm">{specType.label}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {specType.specs.map((spec) => (
+              <div key={spec.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={`spec-${spec.id}`}
-                  checked={selectedSpecs.includes(spec.id)}
-                  onCheckedChange={() => onSpecToggle(spec.id)}
+                  checked={selectedSpecIds.includes(spec.id)}
+                  onCheckedChange={() => handleSpecToggle(spec.id)}
                 />
-                <Label htmlFor={`spec-${spec.id}`} className="text-sm cursor-pointer">
+                <Label
+                  htmlFor={`spec-${spec.id}`}
+                  className="text-sm font-normal cursor-pointer flex-1"
+                >
                   {spec.value}
                 </Label>
               </div>
             ))}
-          </div>
-        ))}
-      </div>
-    </aside>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   )
 }

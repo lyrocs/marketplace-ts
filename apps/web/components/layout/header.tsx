@@ -3,11 +3,15 @@
 import Link from 'next/link'
 import { useAuth } from '../../hooks/use-auth'
 import { Badge, Avatar, AvatarFallback, AvatarImage } from '@nextrade/ui'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@nextrade/ui'
-import { MessageSquare } from 'lucide-react'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuPortal, DropdownMenuSubContent } from '@nextrade/ui'
+import { MessageSquare, ChevronDown } from 'lucide-react'
+import { useQuery } from '@apollo/client/react'
+import { ROOT_CATEGORIES_QUERY } from '../../graphql/queries'
 
 export function Header() {
   const { user, logout, isAdmin, isAuthenticated } = useAuth()
+  const { data: categoriesData } = useQuery(ROOT_CATEGORIES_QUERY)
+  const rootCategories = categoriesData?.rootCategories || []
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -20,9 +24,47 @@ export function Header() {
             <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Home
             </Link>
-            <Link href="/products" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Products
-            </Link>
+
+            {/* Categories Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Categories
+                <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuLabel>Browse by Category</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {rootCategories.map((category: any) => (
+                  category.children && category.children.length > 0 ? (
+                    <DropdownMenuSub key={category.id}>
+                      <DropdownMenuSubTrigger>{category.name}</DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          <Link href={`/products/${category.key.toLowerCase()}`}>
+                            <DropdownMenuItem>All {category.name}</DropdownMenuItem>
+                          </Link>
+                          <DropdownMenuSeparator />
+                          {category.children.map((child: any) => (
+                            <Link key={child.id} href={`/products/${child.key.toLowerCase()}`}>
+                              <DropdownMenuItem>{child.name}</DropdownMenuItem>
+                            </Link>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  ) : (
+                    <Link key={category.id} href={`/products/${category.key.toLowerCase()}`}>
+                      <DropdownMenuItem>{category.name}</DropdownMenuItem>
+                    </Link>
+                  )
+                ))}
+                <DropdownMenuSeparator />
+                <Link href="/products">
+                  <DropdownMenuItem className="font-medium">View All Products</DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Link href="/deals" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Deals
             </Link>

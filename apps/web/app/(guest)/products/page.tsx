@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@apollo/client/react'
-import { useParams, useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { PRODUCTS_QUERY, DEALS_QUERY, CATEGORIES_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { FilterSidebar } from '@/components/filters/filter-sidebar'
 import { ProductCard } from '@/components/cards/product-card'
@@ -11,59 +11,36 @@ import { ToggleSwitch } from '@/components/shared/toggle-switch'
 import { Pagination } from '@/components/shared/pagination'
 import { Skeleton } from '@nextrade/ui'
 
-export default function ProductListingPage() {
-  const params = useParams()
+export default function AllProductsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const categoryKey = (params.category as string)?.toUpperCase()
   const isDeal = searchParams.get('type') === 'deal'
   const page = parseInt(searchParams.get('page') || '1')
   const search = searchParams.get('search') || undefined
   const specsParam = searchParams.get('specs')
   const specIds = specsParam ? specsParam.split(',').map(Number) : undefined
+  const categoryIdParam = searchParams.get('categoryId')
+  const categoryId = categoryIdParam ? parseInt(categoryIdParam) : undefined
 
   // Fetch all categories for sidebar dropdown
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const categories = categoriesData?.categories || []
 
-  // Find current category
-  const currentCategory = categories.find(
-    (cat: any) => cat.key === categoryKey
-  )
-
-  // Get category IDs to filter by (include subcategories if parent category)
-  const categoryIdsToFilter = currentCategory
-    ? [
-        currentCategory.id,
-        ...categories
-          .filter((cat: any) => cat.parentId === currentCategory.id)
-          .map((cat: any) => cat.id),
-      ]
-    : []
-
-  // Use first category ID for the query (backend doesn't support multiple yet)
-  // TODO: Update backend to support filtering by multiple category IDs
-  const categoryIdForQuery = categoryIdsToFilter[0]
-
-  // Fetch products or deals based on toggle
+  // Fetch products or deals
   const { data: productsData, loading: productsLoading } = useQuery(
     isDeal ? DEALS_QUERY : PRODUCTS_QUERY,
     {
       variables: {
-        categoryId: categoryIdForQuery,
+        categoryId,
         title: search,
         name: search,
         specIds,
         page,
         limit: 12,
       },
-      skip: !categoryIdForQuery,
     }
   )
-
-  // If parent category, fetch from all subcategories
-  const hasSubcategories = categories.some((cat: any) => cat.parentId === currentCategory?.id)
 
   // Fetch specs for filtering
   const { data: specsData } = useQuery(SPEC_TYPES_QUERY)
@@ -98,10 +75,6 @@ export default function ProductListingPage() {
   const handleCategoryChange = (categoryId: number) => {
     const category = categories.find((cat: any) => cat.id === categoryId)
     if (category) {
-      const url = new URL(window.location.href)
-      url.searchParams.delete('page')
-      url.searchParams.delete('search')
-      url.searchParams.delete('specs')
       router.push(`/products/${category.key.toLowerCase()}${isDeal ? '?type=deal' : ''}`)
     }
   }
@@ -128,11 +101,11 @@ export default function ProductListingPage() {
     <main className="container mx-auto px-4 py-2">
       {/* Page Banner */}
       <PageBanner
-        title={isDeal ? 'Browse Used Deals' : 'Browse New Products'}
+        title={isDeal ? 'All Used Deals' : 'All Products'}
         description={
           isDeal
-            ? 'Find great deals on used audio, photography, and video equipment'
-            : 'Discover the latest professional audio, photography, and video gear'
+            ? 'Browse all available deals on used equipment'
+            : 'Browse our complete catalog of professional equipment'
         }
       >
         <ToggleSwitch
@@ -144,16 +117,6 @@ export default function ProductListingPage() {
         />
       </PageBanner>
 
-      {/* Show message if parent category selected */}
-      {hasSubcategories && !search && !specIds && (
-        <div className="mt-4 p-4 bg-muted rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            Showing products from <strong>{currentCategory?.name}</strong> category.
-            Use the category filter to browse specific subcategories, or view all products without filters.
-          </p>
-        </div>
-      )}
-
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-x-12 mt-6">
         {/* Filter Sidebar */}
@@ -163,7 +126,7 @@ export default function ProductListingPage() {
             specs={specs}
             selectedSpecIds={specIds || []}
             categories={categories}
-            currentCategoryId={currentCategory?.id}
+            currentCategoryId={categoryId}
             searchValue={search || ''}
             onFilterChange={handleFilterChange}
             onSearchChange={handleSearchChange}
@@ -185,9 +148,7 @@ export default function ProductListingPage() {
                 {isDeal ? 'No deals found' : 'No products found'}
               </p>
               <p className="text-muted-foreground text-sm mt-2">
-                {hasSubcategories
-                  ? 'Try selecting a specific subcategory from the filters'
-                  : 'Try adjusting your filters or search query'}
+                Try adjusting your filters or search query
               </p>
             </div>
           ) : (
