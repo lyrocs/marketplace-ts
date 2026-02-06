@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client/react'
 import { RESET_PASSWORD_MUTATION } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import { Button, Input, Label, Card, CardContent } from '@nextrade/ui'

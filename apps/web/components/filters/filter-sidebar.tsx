@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 import { CATEGORIES_QUERY, SPEC_TYPES_QUERY, BRANDS_QUERY } from '../../graphql/queries'
 import { Button, Checkbox, Label, Input, Separator } from '@nextrade/ui'
 import { Search, SlidersHorizontal } from 'lucide-react'

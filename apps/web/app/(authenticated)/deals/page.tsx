@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 import Link from 'next/link'
 import { MY_DEALS_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'

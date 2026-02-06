@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client/react'
 import { LOGIN_MUTATION, REGISTER_MUTATION, ME_QUERY } from '../graphql/queries'
 
 interface AuthUser {

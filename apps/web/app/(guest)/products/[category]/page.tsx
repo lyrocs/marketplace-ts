@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 import { DEALS_QUERY, CATEGORY_BY_KEY_QUERY } from '@/graphql/queries'
 import { FilterSidebar } from '@/components/filters/filter-sidebar'
 import { DealCard } from '@/components/cards/deal-card'

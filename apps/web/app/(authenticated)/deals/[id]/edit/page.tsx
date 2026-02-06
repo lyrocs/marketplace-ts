@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 import { DEAL_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { Skeleton } from '@nextrade/ui'

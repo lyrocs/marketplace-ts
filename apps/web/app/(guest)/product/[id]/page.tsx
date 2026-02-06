@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 import Image from 'next/image'
 import { PRODUCT_QUERY } from '@/graphql/queries'
 import { Card, CardContent, Badge, Skeleton } from '@nextrade/ui'

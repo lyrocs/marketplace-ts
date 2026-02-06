@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client/react'
 import { MY_PROFILE_QUERY, MY_STATS_QUERY, UPDATE_PROFILE_MUTATION, MY_DEALS_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { useToast } from '@/hooks/use-toast'

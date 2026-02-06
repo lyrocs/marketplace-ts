@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client/react'
 import { ADMIN_DEALS_QUERY, ADMIN_UPDATE_DEAL_STATUS_MUTATION } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import {

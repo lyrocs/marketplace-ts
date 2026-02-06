@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client/react'
 import { DISCUSSION_QUERY, MARK_DISCUSSION_READ_MUTATION } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { Input, Button, Avatar, AvatarFallback, AvatarImage, Skeleton } from '@nextrade/ui'

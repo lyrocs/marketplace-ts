@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { DEAL_QUERY, START_DISCUSSION_MUTATION } from '@/graphql/queries'

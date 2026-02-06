@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 import { ADMIN_DEALS_QUERY } from '@/graphql/queries'
 import { Card, CardContent, Skeleton } from '@nextrade/ui'
 import { ShoppingBag, Users, TrendingUp, Clock } from 'lucide-react'

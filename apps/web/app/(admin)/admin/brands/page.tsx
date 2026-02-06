@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client/react'
 import { BRANDS_QUERY, CREATE_BRAND_MUTATION, DELETE_BRAND_MUTATION } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, Button, Input, Label, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Skeleton } from '@nextrade/ui'

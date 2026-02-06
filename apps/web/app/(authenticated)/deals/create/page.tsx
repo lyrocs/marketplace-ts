@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, FormEvent } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client/react'
 import { useRouter } from 'next/navigation'
 import { CREATE_DEAL_DRAFT_MUTATION, UPDATE_DEAL_MUTATION, PUBLISH_DEAL_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, PRODUCTS_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'

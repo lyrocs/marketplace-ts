@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client/react'
 import { SPEC_TYPES_QUERY, CREATE_SPEC_TYPE_MUTATION, CREATE_SPEC_MUTATION, DELETE_SPEC_MUTATION, DELETE_SPEC_TYPE_MUTATION } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import {

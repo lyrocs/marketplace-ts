@@ -1,6 +1,6 @@
 'use client'
 
-import { ApolloProvider } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client/react'
 import { apolloClient } from '@/graphql/client'
 import { AuthProvider } from '@/hooks/use-auth'
 import { ToastProvider } from '@nextrade/ui'
