@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client/react'
-import { PRODUCTS_QUERY, CREATE_PRODUCT_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY } from '@/graphql/queries'
+import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import {
   Card,
@@ -22,15 +22,22 @@ import {
   DialogDescription,
   DialogFooter,
   Skeleton,
+  Badge,
+  Textarea,
 } from '@nextrade/ui'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function AdminProductsPage() {
   const [page, setPage] = useState(1)
   const [searchName, setSearchName] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '' })
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', description: '' })
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
@@ -38,11 +45,27 @@ export default function AdminProductsPage() {
   })
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)
+  const { data: productData, loading: productLoading } = useQuery(PRODUCT_QUERY, {
+    variables: { id: selectedProductId },
+    skip: !selectedProductId,
+  })
   const [createProduct] = useMutation(CREATE_PRODUCT_MUTATION)
+  const [updateProduct] = useMutation(UPDATE_PRODUCT_MUTATION)
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
 
   const products = data?.products?.data || []
   const meta = data?.products?.meta
+  const product = productData?.product
+
+  const openEditDialog = (product: any) => {
+    setEditProduct({
+      id: product.id,
+      name: product.name,
+      categoryId: product.categoryId.toString(),
+      description: product.description || '',
+    })
+    setEditOpen(true)
+  }
 
   const handleCreate = async () => {
     if (!newProduct.name || !newProduct.categoryId) {
@@ -64,6 +87,29 @@ export default function AdminProductsPage() {
       await refetch()
     } catch {
       toast({ title: 'Failed to create product', variant: 'destructive' })
+    }
+  }
+
+  const handleUpdate = async () => {
+    if (!editProduct.name || !editProduct.categoryId) {
+      toast({ title: 'Name and category are required', variant: 'destructive' })
+      return
+    }
+    try {
+      await updateProduct({
+        variables: {
+          id: editProduct.id,
+          name: editProduct.name,
+          categoryId: parseInt(editProduct.categoryId),
+          description: editProduct.description || undefined,
+        },
+      })
+      toast({ title: 'Product updated', variant: 'success' })
+      setEditOpen(false)
+      setSelectedProductId(null)
+      await refetch()
+    } catch {
+      toast({ title: 'Failed to update product', variant: 'destructive' })
     }
   }
 
@@ -128,9 +174,17 @@ export default function AdminProductsPage() {
                         <td className="px-4 py-3 text-muted-foreground">{product.brand?.name || '—'}</td>
                         <td className="px-4 py-3 text-muted-foreground">{product.shops?.length || 0}</td>
                         <td className="px-4 py-3 text-right">
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
+                          <div className="flex items-center justify-end gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => setSelectedProductId(product.id)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -190,6 +244,144 @@ export default function AdminProductsPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
             <Button onClick={handleCreate}>Create Product</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Product Dialog */}
+      <Dialog open={!!selectedProductId && !editOpen} onOpenChange={(open) => !open && setSelectedProductId(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {productLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          ) : product ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>{product.name}</DialogTitle>
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge>{product.status}</Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {product.category?.name} {product.brand && `· ${product.brand.name}`}
+                  </span>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-6 mt-4">
+                {/* Images */}
+                {product.images && product.images.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Images</h3>
+                    <div className="grid grid-cols-3 gap-2">
+                      {product.images.map((img: string, i: number) => (
+                        <div key={i} className="relative h-32 rounded-lg overflow-hidden border">
+                          <Image src={img} alt={`Product image ${i + 1}`} fill className="object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Description */}
+                {product.description && (
+                  <div>
+                    <Label>Description</Label>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{product.description}</p>
+                  </div>
+                )}
+
+                {/* Shop Links */}
+                {product.shops && product.shops.length > 0 && (
+                  <div>
+                    <Label>Available at {product.shops.length} shop(s)</Label>
+                    <div className="space-y-2 mt-2">
+                      {product.shops.map((shop: any) => (
+                        <div key={shop.id} className="flex items-center justify-between p-3 border rounded">
+                          <div>
+                            <p className="font-medium">{shop.name}</p>
+                            <a href={shop.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
+                              {shop.url}
+                            </a>
+                          </div>
+                          <div className="text-right">
+                            {shop.price && (
+                              <p className="font-semibold">{shop.currency || 'USD'} {Number(shop.price).toFixed(2)}</p>
+                            )}
+                            <Badge variant={shop.available ? 'default' : 'secondary'}>
+                              {shop.available ? 'In Stock' : 'Out of Stock'}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <Label>Created</Label>
+                    <p className="text-muted-foreground">{new Date(product.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <Label>Updated</Label>
+                    <p className="text-muted-foreground">{new Date(product.updatedAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="mt-6">
+                <Button variant="outline" onClick={() => setSelectedProductId(null)}>Close</Button>
+                <Link href={`/product/${product.id}`} target="_blank">
+                  <Button variant="outline">View Public Page</Button>
+                </Link>
+                <Button onClick={() => {
+                  openEditDialog(product)
+                }}>
+                  <Edit className="mr-1 h-4 w-4" /> Edit
+                </Button>
+              </DialogFooter>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Product Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+            <DialogDescription>Update product information</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Product Name</Label>
+              <Input value={editProduct.name} onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Category</Label>
+              <Select value={editProduct.categoryId} onValueChange={(v) => setEditProduct({ ...editProduct, categoryId: v })}>
+                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                <SelectContent>
+                  {(categoriesData?.categories || []).map((cat: any) => (
+                    <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Description</Label>
+              <Textarea
+                value={editProduct.description}
+                onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button onClick={handleUpdate}>Update Product</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

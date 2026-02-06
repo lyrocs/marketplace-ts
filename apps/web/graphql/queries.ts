@@ -228,6 +228,15 @@ export const CREATE_BRAND_MUTATION = gql`
   }
 `
 
+export const UPDATE_BRAND_MUTATION = gql`
+  mutation UpdateBrand($id: Int!, $name: String!) {
+    updateBrand(id: $id, name: $name) {
+      id
+      name
+    }
+  }
+`
+
 export const DELETE_BRAND_MUTATION = gql`
   mutation DeleteBrand($id: Int!) {
     deleteBrand(id: $id)
@@ -361,6 +370,18 @@ export const CREATE_PRODUCT_MUTATION = gql`
       name
       categoryId
       brandId
+      description
+      status
+    }
+  }
+`
+
+export const UPDATE_PRODUCT_MUTATION = gql`
+  mutation UpdateProduct($id: Int!, $name: String, $categoryId: Int, $description: String) {
+    updateProduct(id: $id, name: $name, categoryId: $categoryId, description: $description) {
+      id
+      name
+      categoryId
       description
       status
     }

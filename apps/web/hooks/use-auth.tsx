@@ -45,11 +45,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('nextrade_token') : null
     if (token) {
-      fetchMe().catch(() => {
-        // Token might be invalid, clear it
-        localStorage.removeItem('nextrade_token')
-        setLoading(false)
-      })
+      fetchMe()
+        .then(() => {
+          setLoading(false)
+        })
+        .catch(() => {
+          // Token might be invalid, clear it
+          localStorage.removeItem('nextrade_token')
+          setLoading(false)
+        })
     } else {
       setLoading(false)
     }
