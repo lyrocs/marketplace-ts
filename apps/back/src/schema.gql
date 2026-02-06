@@ -120,6 +120,7 @@ type DiscussionUserOutput {
 
 type Mutation {
   addDealImage(dealId: Int!, imageUrl: String!): DealOutput!
+  addProductImage(imageUrl: String!, productId: Int!): ProductOutput!
   addProductSpec(productId: Int!, specId: Int!): ProductOutput!
   adminUpdateDealStatus(id: Int!, reason: String, status: String!): DealOutput!
   createBrand(name: String!): BrandGqlOutput!
@@ -132,6 +133,7 @@ type Mutation {
   deleteCategory(id: Int!): Boolean!
   deleteDealImage(dealId: Int!, imageUrl: String!): DealOutput!
   deleteProduct(id: Int!): Boolean!
+  deleteProductImage(imageUrl: String!, productId: Int!): ProductOutput!
   deleteSpec(id: Int!): Boolean!
   deleteSpecType(id: Int!): Boolean!
   login(email: String!, password: String!): AuthPayloadOutput!

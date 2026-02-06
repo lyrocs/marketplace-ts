@@ -201,4 +201,34 @@ export class ProductsService {
 
     return this.findById(productId)
   }
+
+  async addImage(productId: number, imageUrl: string): Promise<any> {
+    const product = await prisma.product.findUnique({ where: { id: productId } })
+    if (!product) throw new Error('Product not found')
+
+    const images = Array.isArray(product.images) ? product.images : []
+    const updatedImages = [...images, imageUrl]
+
+    await prisma.product.update({
+      where: { id: productId },
+      data: { images: updatedImages },
+    })
+
+    return this.findById(productId)
+  }
+
+  async deleteImage(productId: number, imageUrl: string): Promise<any> {
+    const product = await prisma.product.findUnique({ where: { id: productId } })
+    if (!product) throw new Error('Product not found')
+
+    const images = Array.isArray(product.images) ? product.images : []
+    const updatedImages = images.filter((img: any) => img !== imageUrl)
+
+    await prisma.product.update({
+      where: { id: productId },
+      data: { images: updatedImages },
+    })
+
+    return this.findById(productId)
+  }
 }

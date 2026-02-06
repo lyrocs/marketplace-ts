@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client/react'
-import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
+import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
+import { ImageUpload } from '@/components/shared/image-upload'
 import {
   Card,
   CardContent,
@@ -35,10 +36,10 @@ export default function AdminProductsPage() {
   const [page, setPage] = useState(1)
   const [searchName, setSearchName] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
-  const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '' })
+  const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '', specIds: [] as number[], images: [] as string[] })
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const [editOpen, setEditOpen] = useState(false)
-  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', description: '', specIds: [] as number[] })
+  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', description: '', specIds: [] as number[], images: [] as string[] })
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
@@ -54,12 +55,20 @@ export default function AdminProductsPage() {
   const [createProduct] = useMutation(CREATE_PRODUCT_MUTATION)
   const [updateProduct] = useMutation(UPDATE_PRODUCT_MUTATION)
   const [updateProductSpecs] = useMutation(UPDATE_PRODUCT_SPECS_MUTATION)
+  const [addProductImage] = useMutation(ADD_PRODUCT_IMAGE_MUTATION)
+  const [deleteProductImage] = useMutation(DELETE_PRODUCT_IMAGE_MUTATION)
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
 
   const products = data?.products?.data || []
   const meta = data?.products?.meta
   const product = productData?.product
   const specTypes = specTypesData?.specTypes || []
+  const categories = categoriesData?.categories || []
+
+  // Get spec types for selected category (for create dialog)
+  const selectedCategory = categories.find((c: any) => c.id === parseInt(newProduct.categoryId))
+  const availableSpecTypeIds = selectedCategory?.specTypes?.map((st: any) => st.id) || []
+  const availableSpecTypes = specTypes.filter((st: any) => availableSpecTypeIds.includes(st.id))
 
   const openEditDialog = (product: any) => {
     setEditProduct({
@@ -68,6 +77,7 @@ export default function AdminProductsPage() {
       categoryId: (product.categoryId || product.category?.id || '').toString(),
       description: product.description || '',
       specIds: product.specs?.map((s: any) => s.id) || [],
+      images: Array.isArray(product.images) ? product.images : [],
     })
     setEditOpen(true)
   }
@@ -78,7 +88,7 @@ export default function AdminProductsPage() {
       return
     }
     try {
-      await createProduct({
+      const { data } = await createProduct({
         variables: {
           name: newProduct.name,
           categoryId: parseInt(newProduct.categoryId),
@@ -86,9 +96,31 @@ export default function AdminProductsPage() {
           description: newProduct.description || undefined,
         },
       })
+
+      const productId = data?.createProduct?.id
+
+      // Add images if any
+      if (productId && newProduct.images.length > 0) {
+        for (const imageUrl of newProduct.images) {
+          await addProductImage({
+            variables: { productId, imageUrl },
+          })
+        }
+      }
+
+      // Set specs if any selected
+      if (productId && newProduct.specIds.length > 0) {
+        await updateProductSpecs({
+          variables: {
+            productId,
+            specIds: newProduct.specIds,
+          },
+        })
+      }
+
       toast({ title: 'Product created', variant: 'success' })
       setCreateOpen(false)
-      setNewProduct({ name: '', categoryId: '', brandId: '', description: '' })
+      setNewProduct({ name: '', categoryId: '', brandId: '', description: '', specIds: [], images: [] })
       await refetch()
     } catch {
       toast({ title: 'Failed to create product', variant: 'destructive' })
@@ -122,6 +154,30 @@ export default function AdminProductsPage() {
       await refetch()
     } catch {
       toast({ title: 'Failed to update product', variant: 'destructive' })
+    }
+  }
+
+  const handleEditImageAdded = async (url: string) => {
+    try {
+      await addProductImage({
+        variables: { productId: editProduct.id, imageUrl: url },
+      })
+      setEditProduct({ ...editProduct, images: [...editProduct.images, url] })
+      toast({ title: 'Image added', variant: 'success' })
+    } catch {
+      toast({ title: 'Failed to add image', variant: 'destructive' })
+    }
+  }
+
+  const handleEditImageRemoved = async (url: string) => {
+    try {
+      await deleteProductImage({
+        variables: { productId: editProduct.id, imageUrl: url },
+      })
+      setEditProduct({ ...editProduct, images: editProduct.images.filter(img => img !== url) })
+      toast({ title: 'Image removed', variant: 'success' })
+    } catch {
+      toast({ title: 'Failed to remove image', variant: 'destructive' })
     }
   }
 
@@ -216,7 +272,7 @@ export default function AdminProductsPage() {
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Product</DialogTitle>
             <DialogDescription>Create a new product in the catalog</DialogDescription>
@@ -226,9 +282,20 @@ export default function AdminProductsPage() {
               <Label>Product Name</Label>
               <Input value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
             </div>
+
+            <div className="space-y-1.5">
+              <Label>Product Images</Label>
+              <ImageUpload
+                images={newProduct.images}
+                onImageAdded={(url) => setNewProduct({ ...newProduct, images: [...newProduct.images, url] })}
+                onImageRemoved={(url) => setNewProduct({ ...newProduct, images: newProduct.images.filter(img => img !== url) })}
+                maxImages={10}
+              />
+            </div>
+
             <div className="space-y-1.5">
               <Label>Category</Label>
-              <Select value={newProduct.categoryId} onValueChange={(v) => setNewProduct({ ...newProduct, categoryId: v })}>
+              <Select value={newProduct.categoryId} onValueChange={(v) => setNewProduct({ ...newProduct, categoryId: v, specIds: [] })}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {(categoriesData?.categories || []).map((cat: any) => (
@@ -252,6 +319,40 @@ export default function AdminProductsPage() {
               <Label>Description (optional)</Label>
               <Input value={newProduct.description} onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} />
             </div>
+
+            {/* Specifications - only show if category is selected */}
+            {newProduct.categoryId && availableSpecTypes.length > 0 && (
+              <div className="space-y-3">
+                <Label>Specifications (optional)</Label>
+                <div className="border rounded-lg p-4 max-h-60 overflow-y-auto space-y-3">
+                  {availableSpecTypes.map((specType: any) => (
+                    <div key={specType.id} className="space-y-2">
+                      <p className="text-sm font-semibold text-muted-foreground">{specType.label}</p>
+                      <div className="grid grid-cols-2 gap-2 pl-4">
+                        {specType.specs?.map((spec: any) => (
+                          <div key={spec.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`new-spec-${spec.id}`}
+                              checked={newProduct.specIds.includes(spec.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setNewProduct({ ...newProduct, specIds: [...newProduct.specIds, spec.id] })
+                                } else {
+                                  setNewProduct({ ...newProduct, specIds: newProduct.specIds.filter(id => id !== spec.id) })
+                                }
+                              }}
+                            />
+                            <label htmlFor={`new-spec-${spec.id}`} className="text-sm cursor-pointer">
+                              {spec.value}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
@@ -389,6 +490,17 @@ export default function AdminProductsPage() {
               <Label>Product Name</Label>
               <Input value={editProduct.name} onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })} />
             </div>
+
+            <div className="space-y-1.5">
+              <Label>Product Images</Label>
+              <ImageUpload
+                images={editProduct.images}
+                onImageAdded={handleEditImageAdded}
+                onImageRemoved={handleEditImageRemoved}
+                maxImages={10}
+              />
+            </div>
+
             <div className="space-y-1.5">
               <Label>Category</Label>
               <Select value={editProduct.categoryId} onValueChange={(v) => setEditProduct({ ...editProduct, categoryId: v })}>

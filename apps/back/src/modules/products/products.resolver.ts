@@ -246,4 +246,24 @@ export class ProductsResolver {
   ): Promise<ProductOutput> {
     return this.productsService.updateSpecs(productId, specIds) as any
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => ProductOutput)
+  async addProductImage(
+    @Args({ name: 'productId', type: () => Int }) productId: number,
+    @Args({ name: 'imageUrl' }) imageUrl: string,
+  ): Promise<ProductOutput> {
+    return this.productsService.addImage(productId, imageUrl) as any
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => ProductOutput)
+  async deleteProductImage(
+    @Args({ name: 'productId', type: () => Int }) productId: number,
+    @Args({ name: 'imageUrl' }) imageUrl: string,
+  ): Promise<ProductOutput> {
+    return this.productsService.deleteImage(productId, imageUrl) as any
+  }
 }

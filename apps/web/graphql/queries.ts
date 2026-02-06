@@ -407,6 +407,24 @@ export const UPDATE_PRODUCT_SPECS_MUTATION = gql`
   }
 `
 
+export const ADD_PRODUCT_IMAGE_MUTATION = gql`
+  mutation AddProductImage($productId: Int!, $imageUrl: String!) {
+    addProductImage(productId: $productId, imageUrl: $imageUrl) {
+      id
+      images
+    }
+  }
+`
+
+export const DELETE_PRODUCT_IMAGE_MUTATION = gql`
+  mutation DeleteProductImage($productId: Int!, $imageUrl: String!) {
+    deleteProductImage(productId: $productId, imageUrl: $imageUrl) {
+      id
+      images
+    }
+  }
+`
+
 // ============================================================================
 // DEAL QUERIES
 // ============================================================================
