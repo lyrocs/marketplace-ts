@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button } from '@nextrade/ui'
+import { Button } from '@marketplace/ui'
 import { useAuth } from '../../hooks/use-auth'
 
 export function HeroSection() {
@@ -13,11 +13,11 @@ export function HeroSection() {
       </div>
       <div className="relative z-10 max-w-3xl">
         <h1 className="text-4xl font-bold text-white md:text-6xl">
-          Buy & Sell with
-          <span className="block text-primary-foreground/80">Confidence</span>
+          Buy & Sell
+          <span className="block mt-2 text-primary-foreground/90">Tech Products</span>
         </h1>
-        <p className="mt-4 text-lg text-white/80 md:text-xl">
-          Discover amazing deals, connect with sellers, and find exactly what you're looking for on NexTrade.
+        <p className="mt-6 text-lg text-white/90 md:text-xl">
+          Your trusted marketplace for buying and selling quality tech products.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link href="/deals">

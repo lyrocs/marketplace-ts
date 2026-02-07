@@ -1,5 +1,5 @@
 {
-  "name": "@nextrade/web",
+  "name": "@marketplace/web",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@apollo/client": "^4.1.4",
-    "@nextrade/types": "workspace:*",
-    "@nextrade/ui": "workspace:*",
+    "@marketplace/types": "workspace:*",
+    "@marketplace/ui": "workspace:*",
     "graphql": "^16.12.0",
     "lucide-react": "^0.563.0",
     "matrix-js-sdk": "40.2.0-rc.0",

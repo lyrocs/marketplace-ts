@@ -7,7 +7,7 @@ import { ProductGallery } from '@/components/product/product-gallery'
 import { ShopList } from '@/components/product/shop-list'
 import { ProductBreadcrumb } from '@/components/product/product-breadcrumb'
 import { ProductSection } from '@/components/product/product-section'
-import { Skeleton } from '@nextrade/ui'
+import { Skeleton } from '@marketplace/ui'
 
 export default function ProductDetailsPage() {
   const params = useParams()

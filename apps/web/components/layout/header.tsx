@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '../../hooks/use-auth'
-import { Badge, Avatar, AvatarFallback, AvatarImage } from '@nextrade/ui'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@nextrade/ui'
+import { Badge, Avatar, AvatarFallback, AvatarImage } from '@marketplace/ui'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@marketplace/ui'
 import { MessageSquare, ChevronDown } from 'lucide-react'
 import { useQuery } from '@apollo/client/react'
 import { ROOT_CATEGORIES_QUERY } from '../../graphql/queries'
@@ -21,7 +21,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-primary">NexTrade</span>
+            <span className="text-xl font-bold text-primary">Marketplace</span>
           </Link>
           <nav className="hidden md:flex items-center gap-4">
             <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">

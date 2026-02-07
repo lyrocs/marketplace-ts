@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 # Production Docker Compose with Nginx reverse proxy
 
@@ -8,19 +8,19 @@ services:
   # ============================================================================
   postgres:
     image: postgres:16-alpine
-    container_name: nextrade-postgres
+    container_name: marketplace-ts-postgres
     restart: always
     environment:
-      POSTGRES_DB: nextrade
-      POSTGRES_USER: nextrade
+      POSTGRES_DB: marketplace-ts
+      POSTGRES_USER: marketplace-ts
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backups:/backups
     networks:
-      - nextrade-network
+      - marketplace-ts-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nextrade"]
+      test: ["CMD-SHELL", "pg_isready -U marketplace-ts"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,12 +32,12 @@ services:
     build:
       context: .
       dockerfile: apps/back/Dockerfile
-    container_name: nextrade-api
+    container_name: marketplace-ts-api
     restart: always
     environment:
       NODE_ENV: production
       API_PORT: 3001
-      DATABASE_URL: postgresql://nextrade:${POSTGRES_PASSWORD}@postgres:5432/nextrade
+      DATABASE_URL: postgresql://marketplace-ts:${POSTGRES_PASSWORD}@postgres:5432/marketplace-ts
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: 7d
       FRONTEND_URL: ${FRONTEND_URL}
@@ -57,7 +57,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - nextrade-network
+      - marketplace-ts-network
     command: >
       sh -c "
         cd /app/packages/database &&
@@ -76,7 +76,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         NEXT_PUBLIC_MATRIX_HOST: ${NEXT_PUBLIC_MATRIX_HOST}
-    container_name: nextrade-web
+    container_name: marketplace-ts-web
     restart: always
     environment:
       NODE_ENV: production
@@ -85,14 +85,14 @@ services:
     depends_on:
       - api
     networks:
-      - nextrade-network
+      - marketplace-ts-network
 
   # ============================================================================
   # Nginx Reverse Proxy
   # ============================================================================
   nginx:
     image: nginx:alpine
-    container_name: nextrade-nginx
+    container_name: marketplace-ts-nginx
     restart: always
     ports:
       - "80:80"
@@ -104,14 +104,14 @@ services:
       - web
       - api
     networks:
-      - nextrade-network
+      - marketplace-ts-network
 
   # ============================================================================
   # Matrix Synapse (Optional)
   # ============================================================================
   matrix:
     image: matrixdotorg/synapse:latest
-    container_name: nextrade-matrix
+    container_name: marketplace-ts-matrix
     restart: always
     environment:
       SYNAPSE_SERVER_NAME: ${MATRIX_HOST}
@@ -121,7 +121,7 @@ services:
     ports:
       - "8008:8008"
     networks:
-      - nextrade-network
+      - marketplace-ts-network
 
 # ============================================================================
 # Volumes
@@ -136,5 +136,5 @@ volumes:
 # Networks
 # ============================================================================
 networks:
-  nextrade-network:
+  marketplace-ts-network:
     driver: bridge

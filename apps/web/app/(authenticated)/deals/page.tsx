@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client/react'
 import Link from 'next/link'
 import { MY_DEALS_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
-import { Card, CardContent, Badge, Button, Skeleton } from '@nextrade/ui'
+import { Card, CardContent, Badge, Button, Skeleton } from '@marketplace/ui'
 import { Plus } from 'lucide-react'
 
 const statusColors: Record<string, string> = {

@@ -10,7 +10,7 @@ import { DealCard } from '@/components/cards/deal-card'
 import { PageBanner } from '@/components/shared/page-banner'
 import { ToggleSwitch } from '@/components/shared/toggle-switch'
 import { Pagination } from '@/components/shared/pagination'
-import { Skeleton } from '@nextrade/ui'
+import { Skeleton } from '@marketplace/ui'
 
 export default function AllProductsPage() {
   const searchParams = useSearchParams()

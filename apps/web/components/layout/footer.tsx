@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="border-t bg-muted/50">
       <div className="container flex flex-col items-center justify-between gap-4 py-10 md:flex-row">
         <div className="flex flex-col items-center gap-2 md:items-start">
-          <span className="text-lg font-bold">NexTrade</span>
+          <span className="text-lg font-bold">Marketplace</span>
           <p className="text-sm text-muted-foreground">Your trusted marketplace for buying and selling.</p>
         </div>
         <div className="flex flex-wrap justify-center gap-8 md:justify-end">
@@ -31,7 +31,7 @@ export function Footer() {
       </div>
       <div className="border-t">
         <div className="container flex h-12 items-center justify-center">
-          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} NexTrade. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} Marketplace. All rights reserved.</p>
         </div>
       </div>
     </footer>

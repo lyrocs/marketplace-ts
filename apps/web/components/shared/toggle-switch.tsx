@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@nextrade/ui'
+import { cn } from '@marketplace/ui'
 
 interface ToggleSwitchProps {
   leftLabel: string

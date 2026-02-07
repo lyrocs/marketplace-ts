@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Card, CardContent } from '@nextrade/ui'
+import { Card, CardContent } from '@marketplace/ui'
 
 interface ProductCardProps {
   product: {

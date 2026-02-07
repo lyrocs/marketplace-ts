@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { DISCUSSION_QUERY, MARK_DISCUSSION_READ_MUTATION } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { useMatrix } from '@/hooks/use-matrix'
-import { Input, Button, Avatar, AvatarFallback, AvatarImage, Skeleton } from '@nextrade/ui'
+import { Input, Button, Avatar, AvatarFallback, AvatarImage, Skeleton } from '@marketplace/ui'
 import { ArrowLeft, Send } from 'lucide-react'
 
 export default function ChatRoomPage() {

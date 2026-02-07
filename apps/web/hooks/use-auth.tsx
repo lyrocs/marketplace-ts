@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // On mount, check if token exists and fetch user
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('nextrade_token') : null
+    const token = typeof window !== 'undefined' ? localStorage.getItem('marketplace_token') : null
     if (token) {
       fetchMe()
         .then(() => {
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
         .catch(() => {
           // Token might be invalid, clear it
-          localStorage.removeItem('nextrade_token')
+          localStorage.removeItem('marketplace_token')
           setLoading(false)
         })
     } else {
@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const { data } = await loginMutation({ variables: { email, password } })
     if (data?.login) {
-      localStorage.setItem('nextrade_token', data.login.accessToken)
+      localStorage.setItem('marketplace_token', data.login.accessToken)
       setUser(data.login.user)
       setLoading(false)
     }
@@ -71,19 +71,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(async (name: string, email: string, password: string) => {
     const { data } = await registerMutation({ variables: { name, email, password } })
     if (data?.register) {
-      localStorage.setItem('nextrade_token', data.register.accessToken)
+      localStorage.setItem('marketplace_token', data.register.accessToken)
       setUser(data.register.user)
       setLoading(false)
     }
   }, [registerMutation])
 
   const logout = useCallback(() => {
-    localStorage.removeItem('nextrade_token')
+    localStorage.removeItem('marketplace_token')
     setUser(null)
   }, [])
 
   const refetch = useCallback(async () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('nextrade_token') : null
+    const token = typeof window !== 'undefined' ? localStorage.getItem('marketplace_token') : null
     if (token) {
       const result = await fetchMe()
       setLoading(false)

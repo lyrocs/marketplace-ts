@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
-import { Button, Input, Label, Card, CardContent } from '@nextrade/ui'
+import { Button, Input, Label, Card, CardContent } from '@marketplace/ui'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -46,7 +46,7 @@ export default function LoginPage() {
     <Card>
       <CardContent className="pt-6">
         <h1 className="text-2xl font-bold text-center">Welcome Back</h1>
-        <p className="text-center text-muted-foreground mt-1">Sign in to your NexTrade account</p>
+        <p className="text-center text-muted-foreground mt-1">Sign in to your Marketplace account</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div className="space-y-1.5">

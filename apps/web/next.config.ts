@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
 
   // Transpile packages from monorepo
-  transpilePackages: ["@nextrade/ui", "@nextrade/types"],
+  transpilePackages: ["@marketplace/ui", "@marketplace/types"],
 
   env: {
     NEXT_PUBLIC_API_URL:

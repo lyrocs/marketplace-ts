@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
-import { Button, Input, Label, Card, CardContent } from '@nextrade/ui'
+import { Button, Input, Label, Card, CardContent } from '@marketplace/ui'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -31,7 +31,7 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       await register(name, email, password)
-      toast({ title: 'Account created!', description: 'Welcome to NexTrade', variant: 'success' })
+      toast({ title: 'Account created!', description: 'Welcome to Marketplace', variant: 'success' })
       router.push('/')
     } catch (err: any) {
       const message = err?.graphQLErrors?.[0]?.message || 'Registration failed'
@@ -45,7 +45,7 @@ export default function RegisterPage() {
     <Card>
       <CardContent className="pt-6">
         <h1 className="text-2xl font-bold text-center">Create Account</h1>
-        <p className="text-center text-muted-foreground mt-1">Join NexTrade and start trading</p>
+        <p className="text-center text-muted-foreground mt-1">Join Marketplace and start trading</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div className="space-y-1.5">

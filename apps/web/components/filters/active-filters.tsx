@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@nextrade/ui'
+import { Badge } from '@marketplace/ui'
 import { X } from 'lucide-react'
 
 interface ActiveFilter {

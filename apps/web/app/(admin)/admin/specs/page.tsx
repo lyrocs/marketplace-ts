@@ -18,7 +18,7 @@ import {
   DialogFooter,
   Skeleton,
   Badge,
-} from '@nextrade/ui'
+} from '@marketplace/ui'
 import { Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react'
 
 export default function AdminSpecsPage() {

@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@nextrade/ui'
+import { Button } from '@marketplace/ui'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface PaginationProps {

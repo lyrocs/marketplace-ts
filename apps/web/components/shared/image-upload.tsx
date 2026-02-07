@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { Button, Card } from '@nextrade/ui'
+import { Button, Card } from '@marketplace/ui'
 import { Upload, X } from 'lucide-react'
 
 interface ImageUploadProps {
@@ -24,7 +24,7 @@ export function ImageUpload({ images, onImageAdded, onImageRemoved, maxImages = 
     setUploading(true)
     try {
       // Upload via REST endpoint (GraphQL file upload is complex)
-      const token = typeof window !== 'undefined' ? localStorage.getItem('nextrade_token') : null
+      const token = typeof window !== 'undefined' ? localStorage.getItem('marketplace_token') : null
       const formData = new FormData()
       formData.append('file', file)
       formData.append('folder', 'deals')

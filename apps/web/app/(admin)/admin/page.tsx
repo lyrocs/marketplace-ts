@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client/react'
 import { ADMIN_DEALS_QUERY } from '@/graphql/queries'
-import { Card, CardContent, Skeleton } from '@nextrade/ui'
+import { Card, CardContent, Skeleton } from '@marketplace/ui'
 import { ShoppingBag, Users, TrendingUp, Clock } from 'lucide-react'
 import Link from 'next/link'
 

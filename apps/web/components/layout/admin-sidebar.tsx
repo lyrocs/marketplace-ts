@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@nextrade/ui'
+import { cn } from '@marketplace/ui'
 import { LayoutDashboard, ShoppingBag, Package, Tag, Settings, ChevronRight } from 'lucide-react'
 
 const sidebarItems = [
@@ -20,7 +20,7 @@ export function AdminSidebar() {
   return (
     <aside className="flex h-full w-64 flex-col border-r bg-muted/40">
       <div className="flex h-16 items-center px-6">
-        <Link href="/" className="text-xl font-bold text-primary">NexTrade</Link>
+        <Link href="/" className="text-xl font-bold text-primary">Marketplace</Link>
         <span className="ml-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Admin</span>
       </div>
       <nav className="flex-1 overflow-y-auto p-4">

@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { prisma } from '@nextrade/database'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { prisma } from '@marketplace/database';
 
 @Injectable()
 export class CategoriesService {
@@ -11,7 +11,7 @@ export class CategoriesService {
         specTypes: { include: { specType: true } },
       },
       orderBy: { name: 'asc' },
-    })
+    });
   }
 
   async findById(id: number): Promise<any> {
@@ -22,7 +22,7 @@ export class CategoriesService {
         children: true,
         specTypes: { include: { specType: true } },
       },
-    })
+    });
   }
 
   async findByKey(key: string): Promise<any> {
@@ -33,7 +33,7 @@ export class CategoriesService {
         children: true,
         specTypes: { include: { specType: true } },
       },
-    })
+    });
   }
 
   async getRootCategories(): Promise<any> {
@@ -41,32 +41,47 @@ export class CategoriesService {
       where: { parentId: null },
       include: { children: true },
       orderBy: { name: 'asc' },
-    })
+    });
   }
 
-  async create(data: { name: string; key: string; image?: string; description?: string; parentId?: number }): Promise<any> {
-    return prisma.category.create({ data })
+  async create(data: {
+    name: string;
+    key: string;
+    image?: string;
+    description?: string;
+    parentId?: number;
+  }): Promise<any> {
+    return prisma.category.create({ data });
   }
 
-  async update(id: number, data: Partial<{ name: string; key: string; image: string; description: string; parentId: number | null }>): Promise<any> {
-    const category = await prisma.category.findUnique({ where: { id } })
-    if (!category) throw new NotFoundException('Category not found')
-    return prisma.category.update({ where: { id }, data })
+  async update(
+    id: number,
+    data: Partial<{
+      name: string;
+      key: string;
+      image: string;
+      description: string;
+      parentId: number | null;
+    }>,
+  ): Promise<any> {
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) throw new NotFoundException('Category not found');
+    return prisma.category.update({ where: { id }, data });
   }
 
   async delete(id: number): Promise<any> {
-    return prisma.category.delete({ where: { id } })
+    return prisma.category.delete({ where: { id } });
   }
 
   async addSpecType(categoryId: number, specTypeId: number): Promise<any> {
     return prisma.categorySpecType.create({
       data: { categoryId, specTypeId },
-    })
+    });
   }
 
   async removeSpecType(categoryId: number, specTypeId: number): Promise<any> {
     return prisma.categorySpecType.delete({
       where: { categoryId_specTypeId: { categoryId, specTypeId } },
-    })
+    });
   }
 }

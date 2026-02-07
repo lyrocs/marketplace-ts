@@ -6,7 +6,7 @@ import { useQuery, useMutation } from '@apollo/client/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { DEAL_QUERY, START_DISCUSSION_MUTATION } from '@/graphql/queries'
-import { Card, CardContent, Badge, Button, Avatar, AvatarFallback, AvatarImage, Skeleton } from '@nextrade/ui'
+import { Card, CardContent, Badge, Button, Avatar, AvatarFallback, AvatarImage, Skeleton } from '@marketplace/ui'
 import { MessageSquare, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 

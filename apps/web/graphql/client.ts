@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('nextrade_token')
+  return localStorage.getItem('marketplace_token')
 }
 
 const httpLink = new HttpLink({

@@ -1,6 +1,6 @@
-# NexTrade Deployment Guide
+# Marketplace-ts Deployment Guide
 
-This guide covers deploying NexTrade to production using Docker.
+This guide covers deploying Marketplace-ts to production using Docker.
 
 ## Prerequisites
 
@@ -38,6 +38,7 @@ pnpm dev
 ```
 
 Access the application:
+
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:3001
 - GraphQL Playground: http://localhost:3001/graphql
@@ -65,8 +66,8 @@ sudo apt install docker-compose-plugin
 
 ```bash
 cd /opt
-git clone <repository-url> nextrade
-cd nextrade
+git clone <repository-url> marketplace-ts
+cd marketplace-ts
 ```
 
 **3. Configure environment:**
@@ -80,7 +81,7 @@ nano .env
 
 ```bash
 # Database
-DATABASE_URL=postgresql://nextrade:STRONG_PASSWORD@postgres:5432/nextrade
+DATABASE_URL=postgresql://marketplace-ts:STRONG_PASSWORD@postgres:5432/marketplace-ts
 POSTGRES_PASSWORD=STRONG_PASSWORD
 
 # Security
@@ -108,7 +109,7 @@ NEXT_PUBLIC_MATRIX_HOST=matrix.yourdomain.com
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
 AWS_REGION=us-east-1
-AWS_S3_BUCKET=nextrade-uploads
+AWS_S3_BUCKET=marketplace-ts-uploads
 ```
 
 **4. SSL Certificates:**
@@ -123,9 +124,9 @@ sudo apt install certbot
 sudo certbot certonly --standalone -d yourdomain.com -d api.yourdomain.com
 
 # Copy certificates
-sudo mkdir -p /opt/nextrade/ssl
-sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem /opt/nextrade/ssl/cert.pem
-sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem /opt/nextrade/ssl/key.pem
+sudo mkdir -p /opt/marketplace-ts/ssl
+sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem /opt/marketplace-ts/ssl/cert.pem
+sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem /opt/marketplace-ts/ssl/key.pem
 ```
 
 **5. Configure Nginx:**
@@ -207,7 +208,7 @@ docker compose -f docker-compose.prod.yml up -d matrix
 **2. Create admin user:**
 
 ```bash
-docker exec -it nextrade-matrix register_new_matrix_user \
+docker exec -it marketplace-ts-matrix register_new_matrix_user \
   http://localhost:8008 \
   -c /data/homeserver.yaml \
   -u admin \
@@ -218,6 +219,7 @@ docker exec -it nextrade-matrix register_new_matrix_user \
 **3. Configure backend:**
 
 Update `.env`:
+
 ```bash
 MATRIX_HOST=matrix.yourdomain.com
 MATRIX_USER=@admin:matrix.yourdomain.com
@@ -230,30 +232,30 @@ MATRIX_PASSWORD=ADMIN_PASSWORD
 
 ```bash
 # Create backup script
-cat > /opt/nextrade/backup.sh << 'EOF'
+cat > /opt/marketplace-ts/backup.sh << 'EOF'
 #!/bin/bash
-BACKUP_DIR="/opt/nextrade/backups"
+BACKUP_DIR="/opt/marketplace-ts/backups"
 mkdir -p $BACKUP_DIR
-docker exec nextrade-postgres pg_dump -U nextrade nextrade | gzip > "$BACKUP_DIR/backup-$(date +%Y%m%d-%H%M%S).sql.gz"
+docker exec marketplace-ts-postgres pg_dump -U marketplace-ts marketplace-ts | gzip > "$BACKUP_DIR/backup-$(date +%Y%m%d-%H%M%S).sql.gz"
 find $BACKUP_DIR -name "backup-*.sql.gz" -mtime +30 -delete
 EOF
 
-chmod +x /opt/nextrade/backup.sh
+chmod +x /opt/marketplace-ts/backup.sh
 
 # Add to crontab (daily at 2 AM)
-echo "0 2 * * * /opt/nextrade/backup.sh" | sudo crontab -
+echo "0 2 * * * /opt/marketplace-ts/backup.sh" | sudo crontab -
 ```
 
 **Manual backup:**
 
 ```bash
-docker exec nextrade-postgres pg_dump -U nextrade nextrade > backup.sql
+docker exec marketplace-ts-postgres pg_dump -U marketplace-ts marketplace-ts > backup.sql
 ```
 
 **Restore:**
 
 ```bash
-docker exec -i nextrade-postgres psql -U nextrade nextrade < backup.sql
+docker exec -i marketplace-ts-postgres psql -U marketplace-ts marketplace-ts < backup.sql
 ```
 
 ## Monitoring & Maintenance
@@ -294,7 +296,7 @@ curl https://api.yourdomain.com/api/health
 curl https://yourdomain.com/api/health
 
 # Database health
-docker exec nextrade-postgres pg_isready -U nextrade
+docker exec marketplace-ts-postgres pg_isready -U marketplace-ts
 ```
 
 ## CI/CD with GitHub Actions
@@ -330,25 +332,29 @@ The repository includes a GitHub Actions workflow (`.github/workflows/ci.yml`) t
 ## Troubleshooting
 
 **Service won't start:**
+
 ```bash
 docker compose -f docker-compose.prod.yml logs <service-name>
 ```
 
 **Database connection errors:**
+
 ```bash
 # Check if PostgreSQL is running
 docker compose -f docker-compose.prod.yml ps postgres
 
 # Test connection
-docker exec nextrade-postgres psql -U nextrade -d nextrade -c "SELECT 1"
+docker exec marketplace-ts-postgres psql -U marketplace-ts -d marketplace-ts -c "SELECT 1"
 ```
 
 **Frontend can't reach backend:**
+
 - Check `NEXT_PUBLIC_API_URL` in `.env`
 - Verify Nginx configuration
 - Check backend logs for errors
 
 **Matrix integration not working:**
+
 - Verify Matrix server is accessible
 - Check Matrix credentials in `.env`
 - Ensure users have Matrix accounts created (auto-created on registration)
@@ -356,16 +362,19 @@ docker exec nextrade-postgres psql -U nextrade -d nextrade -c "SELECT 1"
 ## Performance Optimization
 
 **Database:**
+
 - Enable connection pooling in Prisma
 - Add indexes for frequently queried fields
 - Regular `VACUUM` and `ANALYZE`
 
 **Frontend:**
+
 - Enable Next.js image optimization
 - Configure CDN for static assets
 - Enable Redis caching (optional)
 
 **Backend:**
+
 - Enable response caching for GraphQL queries
 - Use DataLoader for batch queries
 - Monitor and optimize N+1 queries

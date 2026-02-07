@@ -1,6 +1,6 @@
 'use client'
 
-import { ToastViewport, Toast, ToastTitle, ToastDescription, ToastClose } from '@nextrade/ui'
+import { ToastViewport, Toast, ToastTitle, ToastDescription, ToastClose } from '@marketplace/ui'
 import { useToast } from '@/hooks/use-toast'
 
 export function Toaster() {

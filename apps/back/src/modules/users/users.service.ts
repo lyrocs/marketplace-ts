@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common'
-import { prisma } from '@nextrade/database'
+import { Injectable } from '@nestjs/common';
+import { prisma } from '@marketplace/database';
 
 @Injectable()
 export class UsersService {
@@ -17,14 +17,17 @@ export class UsersService {
         matrixLogin: true,
         matrixToken: true,
       },
-    })
+    });
   }
 
   async findByEmail(email: string): Promise<any> {
-    return prisma.user.findUnique({ where: { email } })
+    return prisma.user.findUnique({ where: { email } });
   }
 
-  async updateProfile(id: string, data: { name?: string; image?: string }): Promise<any> {
+  async updateProfile(
+    id: string,
+    data: { name?: string; image?: string },
+  ): Promise<any> {
     return prisma.user.update({
       where: { id },
       data,
@@ -37,7 +40,7 @@ export class UsersService {
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
   }
 
   async getUserStats(id: string): Promise<any> {
@@ -45,9 +48,9 @@ export class UsersService {
       prisma.deal.count({ where: { userId: id } }),
       prisma.deal.count({ where: { userId: id, status: 'PUBLISHED' } }),
       prisma.deal.count({ where: { userId: id, status: 'SOLD' } }),
-    ])
+    ]);
 
-    return { totalDeals, publishedDeals, soldDeals }
+    return { totalDeals, publishedDeals, soldDeals };
   }
 
   async getPublicProfile(id: string): Promise<any> {
@@ -59,11 +62,11 @@ export class UsersService {
         image: true,
         createdAt: true,
       },
-    })
+    });
 
-    if (!user) return null
+    if (!user) return null;
 
-    const stats = await this.getUserStats(id)
-    return { ...user, ...stats }
+    const stats = await this.getUserStats(id);
+    return { ...user, ...stats };
   }
 }

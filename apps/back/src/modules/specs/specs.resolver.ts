@@ -4,7 +4,7 @@ import { SpecsService } from './specs.service.js'
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
 import { Roles } from '../../common/decorators/roles.decorator.js'
 import { Public } from '../../common/decorators/public.decorator.js'
-import { UserRole } from '@nextrade/types'
+import { UserRole } from '@marketplace/types'
 
 @ObjectType()
 export class SpecTypeGqlOutput {

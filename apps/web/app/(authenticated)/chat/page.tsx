@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { MY_DISCUSSIONS_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, Avatar, AvatarFallback, AvatarImage, Badge, Skeleton } from '@nextrade/ui'
+import { Card, CardContent, Avatar, AvatarFallback, AvatarImage, Badge, Skeleton } from '@marketplace/ui'
 import { MessageSquare } from 'lucide-react'
 
 export default function ChatListPage() {

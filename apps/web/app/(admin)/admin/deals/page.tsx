@@ -22,7 +22,7 @@ import {
   Input,
   Label,
   Textarea,
-} from '@nextrade/ui'
+} from '@marketplace/ui'
 import { Pagination } from '@/components/shared/pagination'
 import { Check, X, Eye } from 'lucide-react'
 import Image from 'next/image'

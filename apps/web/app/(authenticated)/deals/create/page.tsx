@@ -21,7 +21,7 @@ import {
   SelectContent,
   SelectItem,
   Switch,
-} from '@nextrade/ui'
+} from '@marketplace/ui'
 
 export default function CreateDealPage() {
   const { user, loading: authLoading } = useAuthGuard()

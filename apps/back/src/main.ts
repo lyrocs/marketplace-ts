@@ -30,7 +30,7 @@ async function bootstrap() {
 
   const port = process.env.API_PORT || 3001
   await app.listen(port)
-  console.log(`NexTrade API listening on port ${port}`)
+  console.log(`Marketplace API listening on port ${port}`)
   console.log(`GraphQL playground: http://localhost:${port}/graphql`)
 }
 

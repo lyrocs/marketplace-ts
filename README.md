@@ -34,7 +34,7 @@ This Turborepo has some additional tools already setup for you:
 
 ### fix prismalClient issue
 
-pnpm --filter @nextrade/database db:generate
+pnpm --filter @marketplace-ts/database db:generate
 
 ### Build
 

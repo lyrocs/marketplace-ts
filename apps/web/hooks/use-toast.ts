@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import type { ToastProps, ToastActionElement } from '@nextrade/ui'
+import type { ToastProps, ToastActionElement } from '@marketplace/ui'
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000

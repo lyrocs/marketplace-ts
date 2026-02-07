@@ -1,61 +1,69 @@
-import { Resolver, Query, Mutation, Args, Int, ObjectType, Field } from '@nestjs/graphql'
-import { UseGuards } from '@nestjs/common'
-import { DiscussionsService } from './discussions.service.js'
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js'
-import { CurrentUser } from '../../common/decorators/current-user.decorator.js'
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ObjectType,
+  Field,
+} from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { DiscussionsService } from './discussions.service.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 
 @ObjectType()
 export class DiscussionUserOutput {
   @Field()
-  id: string
+  id: string;
 
   @Field({ nullable: true })
-  name?: string
+  name?: string;
 
   @Field({ nullable: true })
-  image?: string
+  image?: string;
 
   @Field({ nullable: true })
-  matrixLogin?: string
+  matrixLogin?: string;
 }
 
 @ObjectType()
 export class DiscussionDealOutput {
   @Field(() => Int)
-  id: number
+  id: number;
 
   @Field({ nullable: true })
-  title?: string
+  title?: string;
 }
 
 @ObjectType()
 export class DiscussionOutput {
   @Field(() => Int)
-  id: number
+  id: number;
 
   @Field()
-  matrixRoomId: string
+  matrixRoomId: string;
 
   @Field()
-  deal: DiscussionDealOutput
+  deal: DiscussionDealOutput;
 
   @Field()
-  buyer: DiscussionUserOutput
+  buyer: DiscussionUserOutput;
 
   @Field()
-  seller: DiscussionUserOutput
+  seller: DiscussionUserOutput;
 
   @Field()
-  hasUnread: boolean
+  hasUnread: boolean;
 
   @Field()
-  createdAt: Date
+  createdAt: Date;
 }
 
 @ObjectType()
 export class UnreadCountOutput {
   @Field(() => Int)
-  count: number
+  count: number;
 }
 
 @Resolver()
@@ -65,7 +73,7 @@ export class DiscussionsResolver {
   @UseGuards(JwtAuthGuard)
   @Query(() => [DiscussionOutput])
   async myDiscussions(@CurrentUser() user: any): Promise<DiscussionOutput[]> {
-    const discussions = await this.discussionsService.findByUser(user.id)
+    const discussions = await this.discussionsService.findByUser(user.id);
     return discussions.map((d: any): any => ({
       id: d.id,
       matrixRoomId: d.matrixRoomId,
@@ -74,14 +82,16 @@ export class DiscussionsResolver {
       buyer: d.buyer,
       seller: d.seller,
       hasUnread: d.statuses.length > 0 && d.statuses[0].newMessage,
-    }))
+    }));
   }
 
   @UseGuards(JwtAuthGuard)
   @Query(() => DiscussionOutput, { nullable: true })
-  async discussion(@Args({ name: 'id', type: () => Int }) id: number): Promise<DiscussionOutput | null> {
-    const d = await this.discussionsService.findById(id)
-    if (!d) return null
+  async discussion(
+    @Args({ name: 'id', type: () => Int }) id: number,
+  ): Promise<DiscussionOutput | null> {
+    const d = await this.discussionsService.findById(id);
+    if (!d) return null;
     return {
       id: d.id,
       matrixRoomId: d.matrixRoomId,
@@ -90,14 +100,14 @@ export class DiscussionsResolver {
       buyer: d.buyer,
       seller: d.seller,
       hasUnread: false,
-    }
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Query(() => UnreadCountOutput)
   async unreadCount(@CurrentUser() user: any): Promise<UnreadCountOutput> {
-    const count = await this.discussionsService.getUnreadCount(user.id)
-    return { count }
+    const count = await this.discussionsService.getUnreadCount(user.id);
+    return { count };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -107,9 +117,12 @@ export class DiscussionsResolver {
     @Args({ name: 'dealId', type: () => Int }) dealId: number,
   ): Promise<DiscussionOutput> {
     // Check existing discussion
-    const existing = await this.discussionsService.findByDealAndBuyer(dealId, user.id)
+    const existing = await this.discussionsService.findByDealAndBuyer(
+      dealId,
+      user.id,
+    );
     if (existing) {
-      const d = await this.discussionsService.findById(existing.id)
+      const d = await this.discussionsService.findById(existing.id);
       return {
         id: d!.id,
         matrixRoomId: d!.matrixRoomId,
@@ -118,21 +131,24 @@ export class DiscussionsResolver {
         buyer: d!.buyer,
         seller: d!.seller,
         hasUnread: false,
-      }
+      };
     }
 
     // Get deal seller
-    const { prisma: db } = await import('@nextrade/database')
-    const deal = await db.deal.findUnique({ where: { id: dealId }, select: { userId: true } })
-    if (!deal) throw new Error('Deal not found')
+    const { prisma: db } = await import('@marketplace/database');
+    const deal = await db.deal.findUnique({
+      where: { id: dealId },
+      select: { userId: true },
+    });
+    if (!deal) throw new Error('Deal not found');
 
     const discussion = await this.discussionsService.create({
       dealId,
       buyerId: user.id,
       sellerId: deal.userId,
-    })
+    });
 
-    const d = await this.discussionsService.findById(discussion.id)
+    const d = await this.discussionsService.findById(discussion.id);
     return {
       id: d!.id,
       matrixRoomId: d!.matrixRoomId,
@@ -141,7 +157,7 @@ export class DiscussionsResolver {
       buyer: d!.buyer,
       seller: d!.seller,
       hasUnread: false,
-    }
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -150,7 +166,7 @@ export class DiscussionsResolver {
     @CurrentUser() user: any,
     @Args({ name: 'discussionId', type: () => Int }) discussionId: number,
   ): Promise<boolean> {
-    await this.discussionsService.markRead(discussionId, user.id)
-    return true
+    await this.discussionsService.markRead(discussionId, user.id);
+    return true;
   }
 }

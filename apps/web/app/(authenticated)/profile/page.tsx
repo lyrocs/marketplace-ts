@@ -5,7 +5,7 @@ import { useQuery, useMutation } from '@apollo/client/react'
 import { MY_PROFILE_QUERY, MY_STATS_QUERY, UPDATE_PROFILE_MUTATION, MY_DEALS_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { useToast } from '@/hooks/use-toast'
-import { Card, CardContent, Button, Input, Label, Avatar, AvatarFallback, AvatarImage, Badge, Skeleton } from '@nextrade/ui'
+import { Card, CardContent, Button, Input, Label, Avatar, AvatarFallback, AvatarImage, Badge, Skeleton } from '@marketplace/ui'
 import Link from 'next/link'
 
 export default function ProfilePage() {

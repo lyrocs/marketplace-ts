@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent } from '@nextrade/ui'
+import { Card, CardContent } from '@marketplace/ui'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
@@ -22,7 +22,7 @@ export default function AuthCallbackPage() {
 
     if (token) {
       // Store token in localStorage
-      localStorage.setItem('nextrade_token', token)
+      localStorage.setItem('marketplace_token', token)
 
       // Refresh auth state (this will trigger the ME_QUERY)
       if (refetch) {

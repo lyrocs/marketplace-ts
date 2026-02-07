@@ -26,7 +26,7 @@ import {
   Badge,
   Textarea,
   Checkbox,
-} from '@nextrade/ui'
+} from '@marketplace/ui'
 import { Plus, Trash2, Eye, Edit } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
 import Image from 'next/image'

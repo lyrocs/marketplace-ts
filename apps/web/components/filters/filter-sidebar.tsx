@@ -15,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@nextrade/ui'
+} from '@marketplace/ui'
 import { Search, X } from 'lucide-react'
 
 interface Spec {

@@ -6,8 +6,8 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'NexTrade - Marketplace',
-  description: 'Buy and sell products on NexTrade marketplace',
+  title: 'Marketplace - Marketplace',
+  description: 'Buy and sell products on Marketplace marketplace',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

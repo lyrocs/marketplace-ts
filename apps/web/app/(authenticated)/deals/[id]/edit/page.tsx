@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useQuery } from '@apollo/client/react'
 import { DEAL_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
-import { Skeleton } from '@nextrade/ui'
+import { Skeleton } from '@marketplace/ui'
 
 export default function EditDealPage() {
   const params = useParams()

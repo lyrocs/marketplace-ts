@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client/react'
 import { RECENT_DEALS_QUERY, ROOT_CATEGORIES_QUERY } from '@/graphql/queries'
 import { HeroSection } from '@/components/shared/hero-section'
 import { DealCard } from '@/components/cards/deal-card'
-import { Skeleton } from '@nextrade/ui'
+import { Skeleton } from '@marketplace/ui'
 import Link from 'next/link'
 
 export default function HomePage() {
@@ -19,48 +19,62 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Categories Section */}
-      <section className="container py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Browse Categories</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {categoriesLoading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-28 rounded-lg" />
-              ))
-            : categories.map((cat: any) => (
-                <Link
-                  key={cat.id}
-                  href={`/products/${cat.key}`}
-                  className="flex flex-col items-center justify-center gap-2 rounded-lg border bg-card p-4 text-center transition-shadow hover:shadow-md"
-                >
-                  <span className="text-2xl">{cat.image || '📂'}</span>
-                  <span className="text-sm font-medium">{cat.name}</span>
-                </Link>
-              ))}
+      <section className="bg-slate-50 py-16">
+        <div className="container">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold">Browse Categories</h2>
+              <p className="text-muted-foreground mt-1">Find products in your favorite category</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {categoriesLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-32 rounded-lg" />
+                ))
+              : categories.map((cat: any) => (
+                  <Link
+                    key={cat.id}
+                    href={`/products/${cat.key}`}
+                    className="group flex flex-col items-center justify-center gap-3 rounded-xl border-2 bg-white p-6 text-center transition-all hover:border-primary hover:shadow-lg"
+                  >
+                    {cat.image ? (
+                      <div className="h-12 w-12 flex items-center justify-center text-4xl">
+                        <img src={cat.image} alt={cat.name} className="h-full w-full object-contain" />
+                      </div>
+                    ) : (
+                      <span className="text-4xl">📂</span>
+                    )}
+                    <span className="text-sm font-semibold group-hover:text-primary transition-colors">{cat.name}</span>
+                  </Link>
+                ))}
+          </div>
         </div>
       </section>
 
       {/* Recent Deals Section */}
-      <section className="container py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Recent Deals</h2>
-          <Link href="/deals" className="text-sm text-primary hover:underline">
-            View all →
+      <section className="container py-16">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold">Latest Deals</h2>
+            <p className="text-muted-foreground mt-1">Fresh listings from our community</p>
+          </div>
+          <Link href="/deals" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+            View all <span>→</span>
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {dealsLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
+            ? Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="rounded-lg border overflow-hidden">
                   <Skeleton className="aspect-square" />
-                  <div className="p-3 space-y-2">
+                  <div className="p-4 space-y-2">
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-5 w-1/2" />
                   </div>
                 </div>
               ))
-            : recentDeals.map((deal: any) => <DealCard key={deal.id} deal={deal} />)}
+            : recentDeals.slice(0, 8).map((deal: any) => <DealCard key={deal.id} deal={deal} />)}
         </div>
       </section>
 
