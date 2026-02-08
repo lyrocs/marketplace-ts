@@ -11,6 +11,7 @@ import { prisma } from '@marketplace/database';
 import { UserRole, JwtPayload } from '@marketplace/types';
 import { UsersService } from '../users/users.service.js';
 import { MatrixService } from '../matrix/matrix.service.js';
+import { MailerService } from '../mailer/mailer.service.js';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
     private readonly matrixService: MatrixService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async validateLocalUser(email: string, password: string): Promise<any> {
@@ -158,27 +160,51 @@ export class AuthService {
   }
 
   async requestPasswordReset(email: string): Promise<any> {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      // Return success regardless to prevent email enumeration
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+
+      // Always return success to prevent email enumeration
+      if (!user) {
+        return { success: true };
+      }
+
+      // Generate token
+      const token = uuidv4();
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          token,
+          expiresAt,
+        },
+      });
+
+      // Generate reset URL
+      const frontendUrl =
+        this.configService.get<string>('FRONTEND_URL') ||
+        'http://localhost:3000';
+      const resetUrl = `${frontendUrl}/reset-password/${token}`;
+
+      // Send email
+      try {
+        await this.mailerService.sendPasswordResetEmail({
+          email: user.email,
+          userName: user.name || 'User',
+          resetUrl,
+          expiresIn: '1 hour',
+        });
+        console.log(`✓ Password reset email sent to: ${email}`);
+      } catch (emailError) {
+        console.error('Failed to send password reset email:', emailError);
+        // Don't throw - still return success to prevent email enumeration
+      }
+
       return { success: true };
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      return { success: true }; // Still return success
     }
-
-    const token = uuidv4();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await prisma.passwordResetToken.create({
-      data: {
-        userId: user.id,
-        token,
-        expiresAt,
-      },
-    });
-
-    // TODO: Send email with reset link
-    console.log(`Password reset token for ${email}: ${token}`);
-
-    return { success: true };
   }
 
   async resetPassword(token: string, newPassword: string): Promise<any> {

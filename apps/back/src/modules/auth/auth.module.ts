@@ -10,6 +10,7 @@ import { GoogleStrategy } from './google.strategy.js'
 import { FacebookStrategy } from './facebook.strategy.js'
 import { UsersModule } from '../users/users.module.js'
 import { MatrixModule } from '../matrix/matrix.module.js'
+import { MailerModule } from '../mailer/mailer.module.js'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MatrixModule } from '../matrix/matrix.module.js'
     PassportModule.register({ defaultStrategy: 'jwt' }),
     UsersModule,
     MatrixModule,
+    MailerModule,
   ],
   controllers: [AuthController],
   providers: [

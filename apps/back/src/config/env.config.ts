@@ -36,4 +36,5 @@ export const envValidation = Joi.object({
   SMTP_PORT: Joi.number().optional(),
   SMTP_USER: Joi.string().allow('').optional(),
   SMTP_PASS: Joi.string().allow('').optional(),
+  SMTP_FROM: Joi.string().email().allow('').optional(),
 }).options({ allowUnknown: true });

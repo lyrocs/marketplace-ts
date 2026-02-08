@@ -335,5 +335,6 @@ model DiscussionStatus {
   discussion Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([discussionId, userId])
   @@map("discussion_statuses")
 }
