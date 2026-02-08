@@ -102,20 +102,46 @@ export class DiscussionsService {
     return discussion;
   }
 
-  async setNewMessage(roomId: string, sender: string): Promise<any> {
-    // Find discussion by room ID
+  async setNewMessage(
+    roomId: string,
+    senderMatrixLogin: string,
+  ): Promise<any> {
+    // Find discussion by room ID with buyer and seller info
     const discussion = await prisma.discussion.findFirst({
       where: { matrixRoomId: roomId },
-    });
-    if (!discussion) return;
-
-    // Mark new message for all users except sender
-    await prisma.discussionStatus.updateMany({
-      where: {
-        discussionId: discussion.id,
-        NOT: { userId: sender },
+      include: {
+        buyer: { select: { id: true, matrixLogin: true } },
+        seller: { select: { id: true, matrixLogin: true } },
       },
-      data: { newMessage: true },
+    });
+
+    if (!discussion) {
+      console.warn(
+        `Discussion not found for Matrix room: ${roomId}`,
+      );
+      return;
+    }
+
+    // Determine target user (opposite of sender)
+    const targetUserId =
+      senderMatrixLogin === discussion.buyer.matrixLogin
+        ? discussion.sellerId
+        : discussion.buyerId;
+
+    // Update or create discussion status for target user
+    await prisma.discussionStatus.upsert({
+      where: {
+        discussionId_userId: {
+          discussionId: discussion.id,
+          userId: targetUserId,
+        },
+      },
+      update: { newMessage: true },
+      create: {
+        discussionId: discussion.id,
+        userId: targetUserId,
+        newMessage: true,
+      },
     });
   }
 

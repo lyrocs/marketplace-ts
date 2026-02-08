@@ -24,8 +24,9 @@ async function bootstrap() {
   try {
     const matrixService = app.get(MatrixService)
     await matrixService.start()
+    console.log('✓ Matrix service started')
   } catch (err) {
-    console.warn('Matrix service initialization skipped:', err)
+    console.warn('⚠ Matrix service failed to start:', err instanceof Error ? err.message : err)
   }
 
   const port = process.env.API_PORT || 3001
