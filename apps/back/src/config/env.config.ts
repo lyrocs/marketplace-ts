@@ -32,9 +32,16 @@ export const envValidation = Joi.object({
     .default('development'),
 
   // Email (optional)
+  EMAIL_PROVIDER: Joi.string().valid('smtp', 'resend').default('resend'),
+  EMAIL_FROM: Joi.string().email().allow('').optional(),
+
+  // SMTP (for EMAIL_PROVIDER=smtp)
   SMTP_HOST: Joi.string().allow('').optional(),
   SMTP_PORT: Joi.number().optional(),
   SMTP_USER: Joi.string().allow('').optional(),
   SMTP_PASS: Joi.string().allow('').optional(),
   SMTP_FROM: Joi.string().email().allow('').optional(),
+
+  // Resend (for EMAIL_PROVIDER=resend)
+  RESEND_API_KEY: Joi.string().allow('').optional(),
 }).options({ allowUnknown: true });

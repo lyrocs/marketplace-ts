@@ -30,7 +30,7 @@ import { MailerModule } from './modules/mailer/mailer.module.js'
       playground: process.env.NODE_ENV !== 'production',
       context: ({ req, res }: any) => ({ req, res }),
     }),
-    MailerModule,
+    MailerModule.forRoot(),
     AuthModule,
     UsersModule,
     ProductsModule,
