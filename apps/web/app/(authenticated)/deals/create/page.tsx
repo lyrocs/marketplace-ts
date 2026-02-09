@@ -229,10 +229,10 @@ export default function CreateDealPage() {
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <Label>Filter by Category</Label>
-                <Select value={selectedCategoryId?.toString() || ''} onValueChange={(v) => setSelectedCategoryId(v ? parseInt(v) : undefined)}>
+                <Select value={selectedCategoryId?.toString() || 'all'} onValueChange={(v) => setSelectedCategoryId(v === 'all' ? undefined : parseInt(v))}>
                   <SelectTrigger><SelectValue placeholder="All categories" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {(categoriesData?.categories || []).map((cat: any) => (
                       <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
                     ))}
@@ -267,7 +267,7 @@ export default function CreateDealPage() {
 
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <Button variant="outline" type="button" onClick={() => router.push('/deals/my')}>Cancel</Button>
+          <Button variant="outline" type="button" onClick={() => router.push('/deals')}>Cancel</Button>
           <div className="flex gap-3">
             <Button variant="outline" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Draft'}</Button>
             <Button type="button" onClick={handlePublish} disabled={saving}>Publish Deal</Button>
