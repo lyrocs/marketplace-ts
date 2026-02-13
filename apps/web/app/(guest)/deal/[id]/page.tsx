@@ -1,14 +1,11 @@
-'use client'
-
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import { useQuery, useMutation } from '@apollo/client/react'
-import Image from 'next/image'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { DEAL_QUERY, START_DISCUSSION_MUTATION } from '@/graphql/queries'
-import { Card, CardContent, Badge, Button, Avatar, AvatarFallback, AvatarImage, Skeleton } from '@marketplace/ui'
-import { MessageSquare, ChevronRight } from 'lucide-react'
-import { useAuth } from '@/hooks/use-auth'
+import { fetchGraphQL } from '@/lib/graphql-server'
+import { DEAL_QUERY } from '@/graphql/queries'
+import { ProductGallery } from '@/components/product/product-gallery'
+import { DealContactButton } from '@/components/deal/deal-contact-button'
+import { Card, CardContent, Badge, Avatar, AvatarFallback, AvatarImage } from '@marketplace/ui'
+import { ChevronRight } from 'lucide-react'
 
 const conditionLabels: Record<string, string> = {
   NEW: 'New',
@@ -18,87 +15,29 @@ const conditionLabels: Record<string, string> = {
   POOR: 'Poor',
 }
 
-export default function DealDetailPage() {
-  const params = useParams()
-  const dealId = parseInt(params.id as string)
-  const { user, isAuthenticated } = useAuth()
+export default async function DealDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const dealId = parseInt(id)
 
-  const { data, loading } = useQuery(DEAL_QUERY, { variables: { id: dealId } })
-  const [startDiscussion] = useMutation(START_DISCUSSION_MUTATION)
+  if (isNaN(dealId)) notFound()
 
+  const data = await fetchGraphQL(DEAL_QUERY, { id: dealId })
   const deal = data?.deal
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [discussionLoading, setDiscussionLoading] = useState(false)
 
-  if (loading) {
-    return (
-      <div className="container py-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <Skeleton className="aspect-video rounded-lg" />
-          </div>
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-6 w-1/3" />
-            <Skeleton className="h-40" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!deal) {
-    return (
-      <div className="container py-8">
-        <div className="flex h-64 items-center justify-center">
-          <p className="text-lg text-muted-foreground">Deal not found</p>
-        </div>
-      </div>
-    )
-  }
+  if (!deal) notFound()
 
   const images = deal.images || []
-  const isOwner = user?.id === deal.userId
-
-  const handleStartChat = async () => {
-    if (!isAuthenticated || isOwner) return
-    setDiscussionLoading(true)
-    try {
-      const { data: result } = await startDiscussion({ variables: { dealId } })
-      if (result?.startDiscussion) {
-        // Navigate to chat
-        window.location.href = `/chat/${result.startDiscussion.id}`
-      }
-    } finally {
-      setDiscussionLoading(false)
-    }
-  }
 
   return (
     <div className="container py-8">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Image Gallery */}
         <div className="lg:col-span-2 space-y-3">
-          <div className="aspect-video relative overflow-hidden rounded-lg border bg-muted">
-            {images[selectedImage] ? (
-              <Image src={images[selectedImage]} alt={deal.title || 'Deal'} fill className="object-cover" />
-            ) : (
-              <div className="flex h-full items-center justify-center text-6xl">🏷️</div>
-            )}
-          </div>
-          {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {images.map((img: string, i: number) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedImage(i)}
-                  className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded border-2 ${i === selectedImage ? 'border-primary' : 'border-transparent'}`}
-                >
-                  <Image src={img} alt={`Thumbnail ${i + 1}`} fill className="object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
+          <ProductGallery images={images} />
 
           {/* Products in Deal */}
           {deal.products && deal.products.length > 0 && (
@@ -178,12 +117,7 @@ export default function DealDetailPage() {
                 </div>
               </div>
 
-              {!isOwner && isAuthenticated && (
-                <Button className="w-full" onClick={handleStartChat} disabled={discussionLoading}>
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  {discussionLoading ? 'Opening...' : 'Contact Seller'}
-                </Button>
-              )}
+              <DealContactButton dealId={dealId} sellerId={deal.userId} />
             </CardContent>
           </Card>
 

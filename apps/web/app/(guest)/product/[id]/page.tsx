@@ -1,65 +1,37 @@
-'use client'
-
-import { useQuery } from '@apollo/client/react'
-import { useParams } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { fetchGraphQL } from '@/lib/graphql-server'
 import { PRODUCT_QUERY, CATEGORIES_QUERY } from '@/graphql/queries'
 import { ProductGallery } from '@/components/product/product-gallery'
 import { ShopList } from '@/components/product/shop-list'
 import { ProductBreadcrumb } from '@/components/product/product-breadcrumb'
 import { ProductSection } from '@/components/product/product-section'
-import { Skeleton } from '@marketplace/ui'
 
-export default function ProductDetailsPage() {
-  const params = useParams()
-  const productId = parseInt(params.id as string)
+export default async function ProductDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const productId = parseInt(id)
 
-  // Fetch product
-  const { data: productData, loading: productLoading } = useQuery(PRODUCT_QUERY, {
-    variables: { id: productId },
-    skip: !productId,
-  })
+  if (isNaN(productId)) notFound()
 
-  // Fetch categories for breadcrumb
-  const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
+  const [productData, categoriesData] = await Promise.all([
+    fetchGraphQL(PRODUCT_QUERY, { id: productId }),
+    fetchGraphQL(CATEGORIES_QUERY),
+  ])
 
   const product = productData?.product
+  if (!product) notFound()
+
   const categories = categoriesData?.categories || []
 
   // Find parent category for breadcrumb
   const parentCategory = categories.find(
-    (cat: any) => cat.id === product?.category?.parentId
+    (cat: any) => cat.id === product.category?.parentId
   )
 
-  const breadcrumb = product
-    ? `${parentCategory?.name || ''} / ${product.category?.name || ''} - ${product.brand?.name || ''}`
-    : ''
-
-  if (productLoading) {
-    return (
-      <main className="container mx-auto bg-slate-100/50 px-4 py-8 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-x-12">
-          <div className="space-y-8 lg:col-span-2">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-96 w-full" />
-            <Skeleton className="h-48 w-full" />
-          </div>
-          <div className="mt-8 lg:col-span-1 lg:mt-0">
-            <Skeleton className="h-64 w-full" />
-          </div>
-        </div>
-      </main>
-    )
-  }
-
-  if (!product) {
-    return (
-      <main className="container mx-auto bg-slate-100/50 px-4 py-8 md:py-12">
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold text-muted-foreground">Product not found</h1>
-        </div>
-      </main>
-    )
-  }
+  const breadcrumb = `${parentCategory?.name || ''} / ${product.category?.name || ''} - ${product.brand?.name || ''}`
 
   return (
     <main className="container mx-auto bg-slate-100/50 px-4 py-8 md:py-12">

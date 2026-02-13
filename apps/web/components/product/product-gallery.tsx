@@ -23,6 +23,7 @@ export function ProductGallery({
           alt="Main product image"
           fill
           className="object-cover"
+          unoptimized
           sizes="(max-width: 1024px) 100vw, 66vw"
           priority
         />
@@ -46,6 +47,7 @@ export function ProductGallery({
                   alt={`Product image ${index + 1}`}
                   fill
                   className="object-cover"
+                  unoptimized
                   sizes="80px"
                 />
               </div>
