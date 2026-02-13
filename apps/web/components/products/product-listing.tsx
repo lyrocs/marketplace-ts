@@ -50,7 +50,7 @@ export function ProductListing({ categoryKey, categories, brands, specTypes }: P
 
   // Resolve category from key if provided
   const currentCategory = categoryKey
-    ? categories.find((cat: any) => cat.key === categoryKey.toUpperCase())
+    ? categories.find((cat: any) => cat.key.toLowerCase() === categoryKey.toLowerCase())
     : undefined
 
   // Get category IDs to filter by (include subcategories if parent category)
