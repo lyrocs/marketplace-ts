@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Card className="overflow-hidden transition-shadow hover:shadow-md">
         <div className="aspect-square relative overflow-hidden bg-muted">
           {mainImage ? (
-            <Image src={mainImage} alt={product.name} fill className="object-cover" />
+            <Image src={mainImage} alt={product.name} fill className="object-cover" unoptimized />
           ) : (
             <div className="flex h-full items-center justify-center text-muted-foreground">
               <span className="text-4xl">📦</span>

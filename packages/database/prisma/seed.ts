@@ -228,6 +228,7 @@ async function main() {
       status: 'active',
       description: 'Apple MacBook Pro 16-inch with M3 Pro chip, ideal for professional workflows.',
       features: ['Liquid Retina XDR display', 'Up to 22h battery life', 'MagSafe charging', 'HDMI port', 'SD card slot'],
+      images: ['https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+16', 'https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+Side'],
     },
   })
 
@@ -239,6 +240,7 @@ async function main() {
       status: 'active',
       description: 'Ultra-thin and light laptop with the M3 chip.',
       features: ['Fanless design', 'Up to 18h battery life', 'MagSafe charging', '1080p webcam'],
+      images: ['https://placehold.co/800x600/c0c0c0/333333?text=MacBook+Air+15', 'https://placehold.co/800x600/c0c0c0/333333?text=MacBook+Air+Open'],
     },
   })
 
@@ -251,6 +253,7 @@ async function main() {
       status: 'active',
       description: 'Apple iPhone 15 Pro with A17 Pro chip and titanium design.',
       features: ['Titanium design', 'Action Button', 'USB-C', '48MP main camera', 'ProMotion display'],
+      images: ['https://placehold.co/800x600/2c2c3a/eaeaea?text=iPhone+15+Pro', 'https://placehold.co/800x600/2c2c3a/eaeaea?text=iPhone+15+Pro+Back'],
     },
   })
 
@@ -262,6 +265,7 @@ async function main() {
       status: 'active',
       description: 'Samsung Galaxy S24 Ultra with built-in S Pen and AI features.',
       features: ['S Pen included', '200MP camera', 'Galaxy AI', 'Titanium frame', 'QHD+ display'],
+      images: ['https://placehold.co/800x600/1a1a40/eaeaea?text=Galaxy+S24+Ultra', 'https://placehold.co/800x600/1a1a40/eaeaea?text=Galaxy+S24+S+Pen'],
     },
   })
 
@@ -274,6 +278,7 @@ async function main() {
       status: 'active',
       description: 'Premium over-ear headphones with Active Noise Cancellation.',
       features: ['Active Noise Cancellation', 'Spatial Audio', 'Digital Crown', 'Aluminium ear cups'],
+      images: ['https://placehold.co/800x600/e8e8e8/333333?text=AirPods+Max', 'https://placehold.co/800x600/e8e8e8/333333?text=AirPods+Max+Case'],
     },
   })
 
@@ -285,6 +290,7 @@ async function main() {
       status: 'active',
       description: 'Industry-leading noise cancelling headphones by Sony.',
       features: ['Auto NC Optimizer', 'Speak-to-Chat', 'Multipoint connection', '30h battery'],
+      images: ['https://placehold.co/800x600/2b2b2b/eaeaea?text=Sony+WH-1000XM5', 'https://placehold.co/800x600/2b2b2b/eaeaea?text=WH-1000XM5+Folded'],
     },
   })
 
@@ -297,6 +303,7 @@ async function main() {
       status: 'active',
       description: 'NVIDIA flagship GPU with Ada Lovelace architecture.',
       features: ['24 GB GDDR6X', 'DLSS 3', 'Ray Tracing', 'AV1 Encoder'],
+      images: ['https://placehold.co/800x600/76b900/ffffff?text=RTX+4090', 'https://placehold.co/800x600/76b900/ffffff?text=RTX+4090+Fans'],
     },
   })
 
@@ -308,6 +315,7 @@ async function main() {
       status: 'active',
       description: 'AMD flagship desktop processor with 16 cores and 32 threads.',
       features: ['16 cores / 32 threads', '5.7 GHz boost', 'AM5 Socket', '170W TDP'],
+      images: ['https://placehold.co/800x600/ed1c24/ffffff?text=Ryzen+9+7950X', 'https://placehold.co/800x600/ed1c24/ffffff?text=Ryzen+9+Box'],
     },
   })
 
@@ -319,6 +327,7 @@ async function main() {
       status: 'active',
       description: 'High-performance DDR5 memory kit.',
       features: ['DDR5-6000', 'Intel XMP 3.0', 'CL36', 'Aluminium heat spreader'],
+      images: ['https://placehold.co/800x600/f5d600/1a1a1a?text=Vengeance+DDR5', 'https://placehold.co/800x600/f5d600/1a1a1a?text=DDR5+Kit'],
     },
   })
 
@@ -330,6 +339,7 @@ async function main() {
       status: 'active',
       description: 'High-end custom-built gaming PC.',
       features: ['Custom build', 'Liquid cooling', 'RGB lighting'],
+      images: ['https://placehold.co/800x600/0f0f1a/00d4ff?text=Gaming+Desktop', 'https://placehold.co/800x600/0f0f1a/ff00ff?text=RGB+Interior'],
     },
   })
 
@@ -342,6 +352,7 @@ async function main() {
       status: 'active',
       description: 'Sony PS5 with disc drive.',
       features: ['4K gaming', 'Ray Tracing', 'DualSense controller', '825GB SSD'],
+      images: ['https://placehold.co/800x600/00439c/ffffff?text=PlayStation+5', 'https://placehold.co/800x600/00439c/ffffff?text=PS5+Controller'],
     },
   })
 
@@ -353,6 +364,7 @@ async function main() {
       status: 'active',
       description: 'Hybrid gaming console with 7-inch OLED screen.',
       features: ['7" OLED screen', 'Wide adjustable stand', '64GB internal storage', 'Enhanced audio'],
+      images: ['https://placehold.co/800x600/e60012/ffffff?text=Switch+OLED', 'https://placehold.co/800x600/e60012/ffffff?text=Switch+Dock'],
     },
   })
 
@@ -365,6 +377,7 @@ async function main() {
       status: 'active',
       description: 'Full-frame mirrorless camera for photo and video.',
       features: ['24.2 MP full-frame', '4K 60fps video', 'Up to 40fps burst', 'Dual card slots'],
+      images: ['https://placehold.co/800x600/1a1a1a/cc0000?text=Canon+EOS+R6+II', 'https://placehold.co/800x600/1a1a1a/cc0000?text=EOS+R6+Top'],
     },
   })
 
@@ -457,7 +470,7 @@ async function main() {
       location: 'Paris, France',
       title: 'MacBook Pro 16" M3 Pro - Like New',
       description: 'Selling my MacBook Pro 16" bought in March 2024. Pristine condition, always used with a case. Comes with original box and charger. AppleCare+ valid until March 2027.',
-      images: ['/uploads/deals/macbook-1.jpg', '/uploads/deals/macbook-2.jpg'],
+      images: ['https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+Used', 'https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+Box'],
       invoiceAvailable: true,
       sellingReason: 'Switching to a desktop setup for work.',
       canBeDelivered: true,
@@ -475,7 +488,7 @@ async function main() {
       location: 'Lyon, France',
       title: 'iPhone 15 Pro 256GB Midnight',
       description: 'iPhone 15 Pro in perfect working condition. Minor micro-scratches on the frame, screen is flawless with a screen protector since day one.',
-      images: ['/uploads/deals/iphone-1.jpg'],
+      images: ['https://placehold.co/800x600/2c2c3a/eaeaea?text=iPhone+15+Pro+Used'],
       invoiceAvailable: true,
       sellingReason: 'Upgrading to iPhone 16 Pro.',
       canBeDelivered: true,
@@ -493,7 +506,7 @@ async function main() {
       location: 'Marseille, France',
       title: 'PS5 + 2 Controllers + 5 Games',
       description: 'PlayStation 5 disc edition bundle. Includes 2 DualSense controllers (white + midnight black) and 5 games: Spider-Man 2, God of War Ragnarok, Horizon Forbidden West, Gran Turismo 7, and Ratchet & Clank.',
-      images: ['/uploads/deals/ps5-1.jpg', '/uploads/deals/ps5-2.jpg', '/uploads/deals/ps5-3.jpg'],
+      images: ['https://placehold.co/800x600/00439c/ffffff?text=PS5+Bundle', 'https://placehold.co/800x600/00439c/ffffff?text=PS5+Controllers', 'https://placehold.co/800x600/00439c/ffffff?text=PS5+Games'],
       invoiceAvailable: false,
       canBeDelivered: false,
       condition: DealCondition.GOOD,
@@ -510,7 +523,7 @@ async function main() {
       location: 'Bordeaux, France',
       title: 'Sony WH-1000XM5 - Barely Used',
       description: 'Sony noise cancelling headphones, bought 2 months ago. Selling because I prefer earbuds. Comes with original case, cable, and airplane adapter.',
-      images: ['/uploads/deals/sony-1.jpg'],
+      images: ['https://placehold.co/800x600/2b2b2b/eaeaea?text=Sony+XM5+Used'],
       invoiceAvailable: true,
       sellingReason: 'Prefer earbuds.',
       canBeDelivered: true,
@@ -528,7 +541,7 @@ async function main() {
       location: 'Paris, France',
       title: 'RTX 4090 Founders Edition',
       description: 'NVIDIA RTX 4090 FE, purchased in January 2024. Used for 3D rendering, never overclocked. Works perfectly.',
-      images: ['/uploads/deals/rtx4090-1.jpg'],
+      images: ['https://placehold.co/800x600/76b900/ffffff?text=RTX+4090+Used'],
       invoiceAvailable: true,
       sellingReason: 'Downgrading, this is overkill for my needs.',
       canBeDelivered: true,
@@ -547,6 +560,7 @@ async function main() {
       location: 'Lyon, France',
       title: 'Nintendo Switch OLED',
       description: 'Work in progress listing...',
+      images: ['https://placehold.co/800x600/e60012/ffffff?text=Switch+OLED+Used'],
       condition: DealCondition.FAIR,
     },
   })
@@ -561,7 +575,7 @@ async function main() {
       location: 'Marseille, France',
       title: 'AirPods Max Silver',
       description: 'Sold! AirPods Max in great condition.',
-      images: ['/uploads/deals/airpods-max-1.jpg'],
+      images: ['https://placehold.co/800x600/e8e8e8/333333?text=AirPods+Max+Sold'],
       invoiceAvailable: true,
       condition: DealCondition.GOOD,
     },

@@ -38,6 +38,7 @@ export function DealCard({ deal }: DealCardProps) {
               alt={deal.title || 'Deal'}
               fill
               className="object-cover transition-transform group-hover:scale-105"
+              unoptimized
             />
           ) : (
             <div className="flex h-full items-center justify-center text-muted-foreground">
