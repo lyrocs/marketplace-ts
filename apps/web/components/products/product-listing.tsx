@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { useQuery } from '@apollo/client/react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { SlidersHorizontal } from 'lucide-react'
 import { PRODUCTS_QUERY, DEALS_QUERY } from '@/graphql/queries'
 import { FilterSidebar } from '@/components/filters/filter-sidebar'
 import { ActiveFilters } from '@/components/filters/active-filters'
@@ -10,7 +12,16 @@ import { DealCard } from '@/components/cards/deal-card'
 import { PageBanner } from '@/components/shared/page-banner'
 import { ToggleSwitch } from '@/components/shared/toggle-switch'
 import { Pagination } from '@/components/shared/pagination'
-import { Skeleton } from '@marketplace/ui'
+import {
+  Skeleton,
+  Button,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  ScrollArea,
+} from '@marketplace/ui'
 
 interface ProductListingProps {
   categoryKey?: string
@@ -22,6 +33,7 @@ interface ProductListingProps {
 export function ProductListing({ categoryKey, categories, brands, specTypes }: ProductListingProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   const isDeal = searchParams.get('type') === 'deal'
   const page = parseInt(searchParams.get('page') || '1')
@@ -257,9 +269,41 @@ export function ProductListing({ categoryKey, categories, brands, specTypes }: P
         </div>
       )}
 
+      {/* Mobile filter sheet */}
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetContent side="left" className="w-3/4 sm:max-w-sm p-0">
+          <SheetHeader className="px-6 pt-6 pb-2">
+            <SheetTitle>Filters</SheetTitle>
+            <SheetDescription className="sr-only">Filter products by category, brand, price, and more</SheetDescription>
+          </SheetHeader>
+          <ScrollArea className="h-[calc(100vh-5rem)] px-6 pb-6">
+            <FilterSidebar
+              title=""
+              specs={specTypes}
+              selectedSpecIds={specIds || []}
+              categories={categories}
+              brands={brands}
+              currentCategoryId={currentCategory?.id ?? categoryId}
+              selectedBrandId={brandId}
+              searchValue={search || ''}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onFilterChange={(ids) => { handleFilterChange(ids); setFiltersOpen(false) }}
+              onSearchChange={(s) => { handleSearchChange(s); setFiltersOpen(false) }}
+              onCategoryChange={(id) => { handleCategoryChange(id); setFiltersOpen(false) }}
+              onBrandChange={(id) => { handleBrandChange(id); setFiltersOpen(false) }}
+              onPriceChange={(min, max) => { handlePriceChange(min, max); setFiltersOpen(false) }}
+              onSortChange={(by, order) => { handleSortChange(by, order); setFiltersOpen(false) }}
+            />
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-x-12 mt-6">
-        <aside className="lg:col-span-1">
+        <aside className="hidden lg:block lg:col-span-1">
           <FilterSidebar
             title="Filters"
             specs={specTypes}
@@ -283,6 +327,20 @@ export function ProductListing({ categoryKey, categories, brands, specTypes }: P
         </aside>
 
         <div className="mt-8 lg:col-span-2 xl:col-span-3 2xl:col-span-4 lg:mt-0">
+          {/* Mobile filter trigger */}
+          <Button
+            variant="outline"
+            className="lg:hidden mb-4"
+            onClick={() => setFiltersOpen(true)}
+          >
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            Filters
+            {activeFilters.length > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs">
+                {activeFilters.length}
+              </span>
+            )}
+          </Button>
           {!productsLoading && meta && (
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">
