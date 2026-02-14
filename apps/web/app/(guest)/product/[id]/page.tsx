@@ -34,7 +34,7 @@ export default async function ProductDetailsPage({
   const breadcrumb = `${parentCategory?.name || ''} / ${product.category?.name || ''} - ${product.brand?.name || ''}`
 
   return (
-    <main className="container mx-auto bg-slate-100/50 px-4 py-8 md:py-12">
+    <main className="container mx-auto bg-background px-4 py-8 md:py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-x-12">
         {/* Left Column - Product Details */}
         <div className="space-y-8 lg:col-span-2">

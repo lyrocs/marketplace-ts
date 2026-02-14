@@ -58,13 +58,11 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
         </div>
-        <CardContent className="pt-3 pb-4">
+        <CardContent className="pt-3 pb-4 flex flex-col">
           <h3 className="text-sm font-semibold truncate">{product.name}</h3>
-          {product.brand?.name && (
-            <p className="text-xs text-muted-foreground">{product.brand.name}</p>
-          )}
+          <p className="text-xs text-muted-foreground h-4 truncate">{product.brand?.name || '\u00A0'}</p>
 
-          <div className="mt-2 space-y-1">
+          <div className="mt-2 h-[2.75rem] flex flex-col justify-end">
             {hasShopPrice && (
               <div className="flex items-baseline justify-between">
                 <span className="text-xs text-muted-foreground">New</span>
