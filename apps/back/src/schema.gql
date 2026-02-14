@@ -227,6 +227,7 @@ type Query {
   specTypes: [SpecTypeGqlOutput!]!
   specsByType(specTypeId: Int!): [SpecGqlOutput!]!
   unreadCount: UnreadCountOutput!
+  userDeals(userId: String!): [DealOutput!]!
 }
 
 type ShopOutput {

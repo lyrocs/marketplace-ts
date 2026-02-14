@@ -106,6 +106,22 @@ export const PUBLIC_PROFILE_QUERY = gql`
   }
 `
 
+export const USER_DEALS_QUERY = gql`
+  query UserDeals($userId: String!) {
+    userDeals(userId: $userId) {
+      id
+      title
+      price
+      currency
+      images
+      condition
+      createdAt
+      seller { id name image }
+      products { productName categoryName }
+    }
+  }
+`
+
 export const UPDATE_PROFILE_MUTATION = gql`
   mutation UpdateProfile($name: String, $image: String) {
     updateProfile(name: $name, image: $image) {

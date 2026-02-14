@@ -205,6 +205,13 @@ export class DealsResolver {
     return deals.map(mapDeal)
   }
 
+  @Public()
+  @Query(() => [DealOutput])
+  async userDeals(@Args({ name: 'userId' }) userId: string): Promise<DealOutput[]> {
+    const deals = await this.dealsService.findPublishedByUser(userId)
+    return deals.map(mapDeal)
+  }
+
   @UseGuards(JwtAuthGuard)
   @Query(() => [DealOutput])
   async myDeals(@CurrentUser() user: any): Promise<DealOutput[]> {

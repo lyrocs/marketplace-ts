@@ -82,6 +82,21 @@ export class DealsService {
     });
   }
 
+  async findPublishedByUser(userId: string): Promise<any> {
+    return prisma.deal.findMany({
+      where: { userId, status: 'PUBLISHED' },
+      include: {
+        user: { select: { id: true, name: true, image: true } },
+        products: {
+          include: {
+            product: { include: { category: true, brand: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async search({
     title,
     categoryId,
