@@ -3,6 +3,7 @@ import { fetchGraphQL } from '@/lib/graphql-server'
 import { PRODUCT_QUERY, CATEGORIES_QUERY } from '@/graphql/queries'
 import { ProductGallery } from '@/components/product/product-gallery'
 import { ShopList } from '@/components/product/shop-list'
+import { ProductDeals } from '@/components/product/product-deals'
 import { ProductBreadcrumb } from '@/components/product/product-breadcrumb'
 import { ProductSection } from '@/components/product/product-section'
 
@@ -26,24 +27,33 @@ export default async function ProductDetailsPage({
 
   const categories = categoriesData?.categories || []
 
-  // Find parent category for breadcrumb
+  // Build breadcrumb items
   const parentCategory = categories.find(
     (cat: any) => cat.id === product.category?.parentId
   )
 
-  const breadcrumb = `${parentCategory?.name || ''} / ${product.category?.name || ''} - ${product.brand?.name || ''}`
+  const breadcrumbItems: { label: string; href: string }[] = []
+  if (parentCategory) {
+    breadcrumbItems.push({ label: parentCategory.name, href: `/products/${parentCategory.key}` })
+  }
+  if (product.category) {
+    breadcrumbItems.push({ label: product.category.name, href: `/products/${product.category.key}` })
+  }
+  if (product.brand) {
+    breadcrumbItems.push({ label: product.brand.name, href: `/products?brandId=${product.brand.id}` })
+  }
 
   return (
     <main className="container mx-auto bg-background px-4 py-8 md:py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-x-12">
         {/* Left Column - Product Details */}
         <div className="space-y-8 lg:col-span-2">
-          <ProductBreadcrumb breadcrumb={breadcrumb} title={product.name} />
+          <ProductBreadcrumb items={breadcrumbItems} title={product.name} />
 
           <ProductGallery images={product.images || []} />
 
           <ProductSection title="Description">
-            <p className="mt-4 leading-relaxed text-gray-700">
+            <p className="mt-4 leading-relaxed text-muted-foreground">
               {product.description || 'No description available'}
             </p>
           </ProductSection>
@@ -53,9 +63,9 @@ export default async function ProductDetailsPage({
             <ProductSection title="Specifications">
               <div className="mt-4 grid grid-cols-2 gap-4">
                 {product.specs.map((spec: any) => (
-                  <div key={spec.id} className="border rounded-lg p-3 bg-white">
-                    <dt className="text-sm font-medium text-gray-600">{spec.specType?.label}</dt>
-                    <dd className="mt-1 text-base font-semibold text-gray-900">{spec.value}</dd>
+                  <div key={spec.id} className="border border-border/50 rounded-lg p-3 bg-white/5">
+                    <dt className="text-sm font-medium text-muted-foreground">{spec.specType?.label}</dt>
+                    <dd className="mt-1 text-base font-semibold text-foreground font-mono">{spec.value}</dd>
                   </div>
                 ))}
               </div>
@@ -68,13 +78,13 @@ export default async function ProductDetailsPage({
               <div className="mt-6 space-y-6">
                 {product.features.map((feature: any) => (
                   <div key={feature.label}>
-                    <h3 className="mb-3 border-b pb-2 text-lg font-bold text-gray-800">
+                    <h3 className="mb-3 border-b border-border/50 pb-2 text-lg font-bold text-foreground">
                       {feature.label}
                     </h3>
                     <dl className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <dt className="text-gray-600">{feature.label}</dt>
-                        <dd className="font-semibold text-gray-800">{feature.value}</dd>
+                        <dt className="text-muted-foreground">{feature.label}</dt>
+                        <dd className="font-semibold text-foreground">{feature.value}</dd>
                       </div>
                     </dl>
                   </div>
@@ -84,10 +94,11 @@ export default async function ProductDetailsPage({
           )}
         </div>
 
-        {/* Right Column - Shops */}
+        {/* Right Column - Shops & Deals */}
         <div className="mt-8 lg:col-span-1 lg:mt-0">
           <div className="space-y-6 lg:sticky lg:top-28">
             <ShopList shops={product.shops || []} />
+            <ProductDeals deals={product.deals || []} />
           </div>
         </div>
       </div>
