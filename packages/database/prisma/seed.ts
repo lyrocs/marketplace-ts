@@ -600,7 +600,11 @@ async function main() {
       sellingReason: 'Upgraded to DJI O4.',
       canBeDelivered: true,
       condition: DealCondition.LIKE_NEW,
-      features: ['Original antenna', 'Coax cable included', 'Original box'],
+      features: [
+        { label: 'Includes', value: 'Original antenna' },
+        { label: 'Includes', value: 'Coax cable' },
+        { label: 'Includes', value: 'Original box' },
+      ],
     },
   })
 
@@ -618,7 +622,11 @@ async function main() {
       sellingReason: 'Switching to TX16S.',
       canBeDelivered: true,
       condition: DealCondition.GOOD,
-      features: ['Hard case included', 'Neck strap', 'No stick drift'],
+      features: [
+        { label: 'Includes', value: 'Hard case' },
+        { label: 'Includes', value: 'Neck strap' },
+        { label: 'Condition', value: 'No stick drift' },
+      ],
     },
   })
 
@@ -635,7 +643,11 @@ async function main() {
       invoiceAvailable: true,
       canBeDelivered: true,
       condition: DealCondition.LIKE_NEW,
-      features: ['Corrective lenses adapter', 'All original accessories', 'Original box'],
+      features: [
+        { label: 'Includes', value: 'Corrective lenses adapter' },
+        { label: 'Includes', value: 'All original accessories' },
+        { label: 'Includes', value: 'Original box' },
+      ],
     },
   })
 
@@ -652,7 +664,11 @@ async function main() {
       invoiceAvailable: false,
       canBeDelivered: true,
       condition: DealCondition.GOOD,
-      features: ['Set of 4', 'Bearings still smooth', 'No bell play'],
+      features: [
+        { label: 'Quantity', value: 'Set of 4' },
+        { label: 'Condition', value: 'Bearings still smooth' },
+        { label: 'Condition', value: 'No bell play' },
+      ],
     },
   })
 
@@ -670,7 +686,11 @@ async function main() {
       sellingReason: 'Changed build plans.',
       canBeDelivered: true,
       condition: DealCondition.NEW,
-      features: ['Never installed', 'All accessories included', 'Original packaging'],
+      features: [
+        { label: 'Condition', value: 'Never installed' },
+        { label: 'Includes', value: 'All accessories' },
+        { label: 'Includes', value: 'Original packaging' },
+      ],
     },
   })
 
