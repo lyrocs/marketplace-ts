@@ -34,7 +34,11 @@ export function DealContactButton({ dealId, sellerId }: DealContactButtonProps) 
   }
 
   return (
-    <Button className="w-full" onClick={handleStartChat} disabled={loading}>
+    <Button
+      className="w-full bg-gradient-to-r from-[hsl(185,100%,50%)] to-[hsl(270,95%,65%)] text-white hover:opacity-90 border-0 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.3)]"
+      onClick={handleStartChat}
+      disabled={loading}
+    >
       <MessageSquare className="mr-2 h-4 w-4" />
       {loading ? 'Opening...' : 'Contact Seller'}
     </Button>

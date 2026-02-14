@@ -24,16 +24,16 @@ export function ShopList({ shops, title = 'Available Shops' }: ShopListProps) {
 
   if (!shops || shops.length === 0) {
     return (
-      <div className="rounded-xl bg-white p-6 shadow-lg">
-        <h3 className="mb-4 text-lg font-bold text-gray-800">{title}</h3>
+      <div className="glass-card rounded-xl p-6">
+        <h3 className="mb-4 text-lg font-bold text-foreground font-heading">{title}</h3>
         <p className="text-sm text-muted-foreground">No shops available for this product</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-xl bg-white p-6 shadow-lg">
-      <h3 className="mb-4 text-lg font-bold text-gray-800">{title}</h3>
+    <div className="glass-card rounded-xl p-6">
+      <h3 className="mb-4 text-lg font-bold text-foreground font-heading">{title}</h3>
       <div className="space-y-3">
         {shops.map((shop) => (
           <Link
@@ -41,15 +41,15 @@ export function ShopList({ shops, title = 'Available Shops' }: ShopListProps) {
             href={shop.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between gap-4 rounded-lg border p-3 hover:bg-slate-50 transition-colors"
+            className="flex items-center justify-between gap-4 rounded-lg border border-border/50 p-3 hover:bg-white/5 transition-colors"
           >
             <div className="flex flex-col gap-1 min-w-0">
-              <span className="font-semibold text-slate-800 truncate">{shop.name}</span>
+              <span className="font-semibold text-foreground truncate">{shop.name}</span>
               <span
                 className={`w-fit rounded-full px-2 py-0.5 text-xs font-semibold ${
                   shop.available
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                    ? 'bg-[hsl(var(--neon-green)/0.15)] text-[hsl(var(--neon-green))] border border-[hsl(var(--neon-green)/0.3)]'
+                    : 'bg-[hsl(0,85%,55%,0.15)] text-[hsl(0,85%,55%)] border border-[hsl(0,85%,55%,0.3)]'
                 }`}
               >
                 {shop.available ? 'Available' : 'Not available'}
@@ -57,11 +57,11 @@ export function ShopList({ shops, title = 'Available Shops' }: ShopListProps) {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {shop.price != null && (
-                <p className="text-xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-primary font-mono">
                   {shop.price} {getCurrencySymbol(shop.currency)}
                 </p>
               )}
-              <ExternalLink className="h-4 w-4 text-slate-400" />
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
             </div>
           </Link>
         ))}

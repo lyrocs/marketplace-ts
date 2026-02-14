@@ -10,13 +10,13 @@ interface ProductGalleryProps {
 
 export function ProductGallery({
   images,
-  defaultImage = 'https://placehold.co/400x300/475569/white?text=Image',
+  defaultImage = 'https://placehold.co/400x300/161822/7c8599?text=Image',
 }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const productImages = images && images.length > 0 ? images : [defaultImage]
 
   return (
-    <div className="rounded-xl bg-white p-4 shadow-lg">
+    <div className="glass-card rounded-xl p-4">
       <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
         <Image
           src={productImages[selectedImageIndex]}
@@ -37,8 +37,8 @@ export function ProductGallery({
               onClick={() => setSelectedImageIndex(index)}
               className={`flex-shrink-0 rounded-lg border-2 transition-all ${
                 selectedImageIndex === index
-                  ? 'border-slate-600 ring-2 ring-slate-300'
-                  : 'border-transparent hover:border-slate-300'
+                  ? 'border-primary ring-2 ring-primary/30'
+                  : 'border-transparent hover:border-border'
               }`}
             >
               <div className="relative h-20 w-20 overflow-hidden rounded-lg">

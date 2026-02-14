@@ -17,14 +17,14 @@ export function Header() {
   const [categoriesOpen, setCategoriesOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl shadow-[0_1px_0_0_hsl(var(--neon-cyan)/0.1)]">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-primary">Marketplace</span>
+            <span className="text-xl font-bold text-gradient font-heading">Marketplace</span>
           </Link>
           <nav className="hidden md:flex items-center gap-4">
-            <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
               Home
             </Link>
 
@@ -35,19 +35,18 @@ export function Header() {
               onMouseLeave={() => setCategoriesOpen(false)}
             >
               <button
-                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               >
                 Categories
                 <ChevronDown className="h-3 w-3" />
               </button>
 
               {categoriesOpen && (
-                <div className="absolute left-0 top-full pt-2 w-[600px]">
-                  <div className="rounded-lg border bg-popover p-6 shadow-lg"
-                >
-                  <div className="grid grid-cols-2 gap-6">
+                <div className="absolute left-0 top-full pt-2 w-[750px]">
+                  <div className="glass-card rounded-xl border-white/10 p-4">
+                  <div className="grid grid-cols-3 gap-3">
                     {rootCategories.map((category: any) => (
-                      <div key={category.id} className="space-y-3">
+                      <div key={category.id} className="space-y-1.5">
                         <Link
                           href={`/products/${category.key.toLowerCase()}`}
                           className="flex items-center gap-2 font-semibold text-sm hover:text-primary transition-colors"
@@ -68,12 +67,12 @@ export function Header() {
                         </Link>
 
                         {category.children && category.children.length > 0 && (
-                          <div className="space-y-2 pl-8">
+                          <div className="space-y-0.5 pl-8">
                             {category.children.map((child: any) => (
                               <Link
                                 key={child.id}
                                 href={`/products/${child.key.toLowerCase()}`}
-                                className="group block"
+                                className="group block hover:bg-white/5 rounded-lg p-1.5 -ml-1.5 transition-colors"
                                 onClick={() => setCategoriesOpen(false)}
                               >
                                 <div className="flex items-start gap-2">
@@ -107,7 +106,7 @@ export function Header() {
                     ))}
                   </div>
 
-                    <div className="mt-6 pt-4 border-t">
+                    <div className="mt-6 pt-4 border-t border-border/50">
                       <Link
                         href="/products"
                         className="text-sm font-medium text-primary hover:underline"
@@ -121,7 +120,7 @@ export function Header() {
               )}
             </div>
 
-            <Link href="/products?type=deal" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/products?type=deal" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
               Deals
             </Link>
           </nav>
@@ -130,7 +129,7 @@ export function Header() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <>
-              <Link href="/chat" className="relative p-2 text-muted-foreground hover:text-foreground">
+              <Link href="/chat" className="relative p-2 text-muted-foreground hover:text-primary transition-colors">
                 <MessageSquare className="h-5 w-5" />
               </Link>
               <DropdownMenu>
@@ -176,10 +175,10 @@ export function Header() {
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 Sign In
               </Link>
-              <Link href="/register" className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+              <Link href="/register" className="inline-flex items-center rounded-md bg-gradient-to-r from-[hsl(185,100%,50%)] to-[hsl(270,95%,65%)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 transition-opacity">
                 Sign Up
               </Link>
             </div>

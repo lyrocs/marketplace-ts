@@ -11,6 +11,14 @@ export class ProductsService {
         brand: true,
         specs: { include: { spec: { include: { specType: true } } } },
         shops: true,
+        dealProducts: {
+          include: {
+            deal: {
+              include: { user: { select: { name: true } } },
+            },
+          },
+          where: { deal: { status: 'PUBLISHED' } },
+        },
       },
     });
 
@@ -20,6 +28,14 @@ export class ProductsService {
     return {
       ...product,
       specs: product.specs.map((ps: any) => ps.spec),
+      deals: (product as any).dealProducts.map((dp: any) => ({
+        id: dp.deal.id,
+        title: dp.deal.title,
+        price: dp.deal.price ? Number(dp.deal.price) : null,
+        currency: dp.deal.currency,
+        condition: dp.deal.condition,
+        sellerName: dp.deal.user?.name,
+      })),
     };
   }
 
@@ -96,6 +112,14 @@ export class ProductsService {
           brand: true,
           specs: { include: { spec: { include: { specType: true } } } },
           shops: true,
+          dealProducts: {
+            include: {
+              deal: {
+                include: { user: { select: { name: true } } },
+              },
+            },
+            where: { deal: { status: 'PUBLISHED' } },
+          },
         },
         skip: (page - 1) * limit,
         take: limit,
@@ -119,10 +143,18 @@ export class ProductsService {
       });
     }
 
-    // Transform specs from ProductSpec[] to Spec[]
+    // Transform specs and deals from relations
     const transformedProducts = products.map((p: any) => ({
       ...p,
       specs: p.specs.map((ps: any) => ps.spec),
+      deals: (p.dealProducts || []).map((dp: any) => ({
+        id: dp.deal.id,
+        title: dp.deal.title,
+        price: dp.deal.price ? Number(dp.deal.price) : null,
+        currency: dp.deal.currency,
+        condition: dp.deal.condition,
+        sellerName: dp.deal.user?.name,
+      })),
     }));
 
     return {

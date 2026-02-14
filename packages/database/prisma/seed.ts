@@ -44,7 +44,7 @@ async function main() {
   const alice = await prisma.user.create({
     data: {
       id: randomUUID(),
-      name: 'Alice Martin',
+      name: 'Alice FPV',
       email: 'alice@marketplace.dev',
       password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1u',
       role: UserRole.USER,
@@ -55,7 +55,7 @@ async function main() {
   const bob = await prisma.user.create({
     data: {
       id: randomUUID(),
-      name: 'Bob Dupont',
+      name: 'Bob Freestyle',
       email: 'bob@marketplace.dev',
       password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1u',
       role: UserRole.USER,
@@ -66,7 +66,7 @@ async function main() {
   const charlie = await prisma.user.create({
     data: {
       id: randomUUID(),
-      name: 'Charlie Nguyen',
+      name: 'Charlie Racer',
       email: 'charlie@marketplace.dev',
       password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1u',
       role: UserRole.USER,
@@ -77,7 +77,7 @@ async function main() {
   const diana = await prisma.user.create({
     data: {
       id: randomUUID(),
-      name: 'Diana Rossi',
+      name: 'Diana CineWhoop',
       email: 'diana@marketplace.dev',
       password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1u',
       role: UserRole.USER,
@@ -86,378 +86,503 @@ async function main() {
   })
 
   // =========================================================================
-  // CATEGORIES (hierarchical)
+  // CATEGORIES (FPV Drone hierarchy)
   // =========================================================================
   console.log('  Creating categories...')
 
-  const electronics = await prisma.category.create({
-    data: { name: 'Electronics', key: 'electronics', description: 'Electronic devices and gadgets' },
+  const frames = await prisma.category.create({
+    data: { name: 'Frames', key: 'frames', description: 'FPV drone frames — 5", 3", toothpick, cinewhoop, and more' },
+  })
+  const frames5inch = await prisma.category.create({
+    data: { name: '5" Frames', key: 'frames-5inch', description: '5-inch freestyle and racing frames', parentId: frames.id },
+  })
+  const frames3inch = await prisma.category.create({
+    data: { name: '3" Frames', key: 'frames-3inch', description: '3-inch micro frames', parentId: frames.id },
   })
 
-  const computers = await prisma.category.create({
-    data: { name: 'Computers', key: 'computers', description: 'Desktops, laptops and accessories', parentId: electronics.id },
+  const motors = await prisma.category.create({
+    data: { name: 'Motors', key: 'motors', description: 'Brushless motors for FPV drones' },
+  })
+  const motors2306 = await prisma.category.create({
+    data: { name: '2306 Motors', key: 'motors-2306', description: '2306 size motors for 5" builds', parentId: motors.id },
+  })
+  const motors1404 = await prisma.category.create({
+    data: { name: '1404 Motors', key: 'motors-1404', description: '1404 size motors for 3" builds', parentId: motors.id },
   })
 
-  const laptops = await prisma.category.create({
-    data: { name: 'Laptops', key: 'laptops', description: 'Portable computers', parentId: computers.id },
+  const escs = await prisma.category.create({
+    data: { name: 'ESCs', key: 'escs', description: 'Electronic Speed Controllers — 4-in-1 and individual' },
+  })
+  const escs4in1 = await prisma.category.create({
+    data: { name: '4-in-1 ESCs', key: 'escs-4in1', description: 'All-in-one ESC stacks', parentId: escs.id },
   })
 
-  const desktops = await prisma.category.create({
-    data: { name: 'Desktop PCs', key: 'desktops', description: 'Desktop computers', parentId: computers.id },
+  const fcs = await prisma.category.create({
+    data: { name: 'Flight Controllers', key: 'flight-controllers', description: 'F4/F7/H7 flight controllers' },
+  })
+  const fcsH7 = await prisma.category.create({
+    data: { name: 'H7 FCs', key: 'fcs-h7', description: 'H7 processor flight controllers', parentId: fcs.id },
   })
 
-  const components = await prisma.category.create({
-    data: { name: 'Components', key: 'components', description: 'PC components and parts', parentId: computers.id },
+  const vtx = await prisma.category.create({
+    data: { name: 'Video TX (VTX)', key: 'vtx', description: 'Video transmitters — analog, DJI, HDZero, Walksnail' },
+  })
+  const vtxDigital = await prisma.category.create({
+    data: { name: 'Digital VTX', key: 'vtx-digital', description: 'Digital video transmitters', parentId: vtx.id },
   })
 
-  const smartphones = await prisma.category.create({
-    data: { name: 'Smartphones', key: 'smartphones', description: 'Mobile phones', parentId: electronics.id },
+  const cameras = await prisma.category.create({
+    data: { name: 'Cameras', key: 'cameras', description: 'FPV cameras and action cameras' },
+  })
+  const camerasFPV = await prisma.category.create({
+    data: { name: 'FPV Cameras', key: 'cameras-fpv', description: 'Onboard FPV cameras', parentId: cameras.id },
   })
 
-  const audio = await prisma.category.create({
-    data: { name: 'Audio', key: 'audio', description: 'Headphones, speakers and audio equipment', parentId: electronics.id },
+  const goggles = await prisma.category.create({
+    data: { name: 'Goggles', key: 'goggles', description: 'FPV goggles — analog and digital' },
   })
 
-  const gaming = await prisma.category.create({
-    data: { name: 'Gaming', key: 'gaming', description: 'Gaming consoles and accessories' },
+  const radios = await prisma.category.create({
+    data: { name: 'Radios', key: 'radios', description: 'Radio transmitters and receivers' },
+  })
+  const radiosTX = await prisma.category.create({
+    data: { name: 'Transmitters', key: 'radios-tx', description: 'Radio transmitters', parentId: radios.id },
   })
 
-  const consoles = await prisma.category.create({
-    data: { name: 'Consoles', key: 'consoles', description: 'Gaming consoles', parentId: gaming.id },
+  const batteries = await prisma.category.create({
+    data: { name: 'Batteries', key: 'batteries', description: 'LiPo and Li-Ion batteries for FPV' },
+  })
+  const batteries6S = await prisma.category.create({
+    data: { name: '6S LiPo', key: 'batteries-6s', description: '6S LiPo packs', parentId: batteries.id },
   })
 
-  const photography = await prisma.category.create({
-    data: { name: 'Photography', key: 'photography', description: 'Cameras and photography equipment' },
+  const props = await prisma.category.create({
+    data: { name: 'Props', key: 'props', description: 'Propellers for FPV drones' },
   })
 
   // =========================================================================
-  // BRANDS
+  // BRANDS (FPV)
   // =========================================================================
   console.log('  Creating brands...')
 
-  const [apple, samsung, sony, nvidia, amd, intel, corsair, logitech, nintendo, canon] =
-    await Promise.all(
-      ['Apple', 'Samsung', 'Sony', 'NVIDIA', 'AMD', 'Intel', 'Corsair', 'Logitech', 'Nintendo', 'Canon'].map(
-        (name) => prisma.brand.create({ data: { name } }),
-      ),
-    )
+  const [
+    tbs, iflight, betafpv, geprc, diatone,
+    foxeer, caddx, runcam, dji, fatshark,
+    radiomaster, walksnail, emax, tmotor, ethix,
+    gopro, hdzero, hqprop, gemfan, cnhl,
+  ] = await Promise.all(
+    [
+      'TBS', 'iFlight', 'BetaFPV', 'GEPRC', 'Diatone',
+      'Foxeer', 'Caddx', 'RunCam', 'DJI', 'Fatshark',
+      'RadioMaster', 'Walksnail', 'EMAX', 'T-Motor', 'Ethix',
+      'GoPro', 'HDZero', 'HQProp', 'Gemfan', 'CNHL',
+    ].map((name) => prisma.brand.create({ data: { name } })),
+  )
 
   // =========================================================================
   // SPEC TYPES & SPECS
   // =========================================================================
   console.log('  Creating spec types and specs...')
 
-  const specStorage = await prisma.specType.create({ data: { key: 'storage', label: 'Storage' } })
-  const specRam = await prisma.specType.create({ data: { key: 'ram', label: 'RAM' } })
-  const specProcessor = await prisma.specType.create({ data: { key: 'processor', label: 'Processor' } })
-  const specScreenSize = await prisma.specType.create({ data: { key: 'screen_size', label: 'Screen Size' } })
-  const specColor = await prisma.specType.create({ data: { key: 'color', label: 'Color' } })
-  const specConnectivity = await prisma.specType.create({ data: { key: 'connectivity', label: 'Connectivity' } })
-  const specBattery = await prisma.specType.create({ data: { key: 'battery', label: 'Battery' } })
+  const specKV = await prisma.specType.create({ data: { key: 'kv_rating', label: 'KV Rating' } })
+  const specMotorSize = await prisma.specType.create({ data: { key: 'motor_size', label: 'Motor Size' } })
+  const specFrameSize = await prisma.specType.create({ data: { key: 'frame_size', label: 'Frame Size' } })
+  const specWeight = await prisma.specType.create({ data: { key: 'weight', label: 'Weight' } })
+  const specProtocol = await prisma.specType.create({ data: { key: 'protocol', label: 'Protocol' } })
+  const specCells = await prisma.specType.create({ data: { key: 'battery_cells', label: 'Battery Cells' } })
+  const specCapacity = await prisma.specType.create({ data: { key: 'capacity', label: 'Capacity' } })
   const specResolution = await prisma.specType.create({ data: { key: 'resolution', label: 'Resolution' } })
+  const specFOV = await prisma.specType.create({ data: { key: 'fov', label: 'FOV' } })
 
   // Link spec types to categories
   await prisma.categorySpecType.createMany({
     data: [
-      { categoryId: laptops.id, specTypeId: specStorage.id },
-      { categoryId: laptops.id, specTypeId: specRam.id },
-      { categoryId: laptops.id, specTypeId: specProcessor.id },
-      { categoryId: laptops.id, specTypeId: specScreenSize.id },
-      { categoryId: laptops.id, specTypeId: specColor.id },
-      { categoryId: smartphones.id, specTypeId: specStorage.id },
-      { categoryId: smartphones.id, specTypeId: specRam.id },
-      { categoryId: smartphones.id, specTypeId: specColor.id },
-      { categoryId: smartphones.id, specTypeId: specScreenSize.id },
-      { categoryId: smartphones.id, specTypeId: specBattery.id },
-      { categoryId: audio.id, specTypeId: specConnectivity.id },
-      { categoryId: audio.id, specTypeId: specColor.id },
-      { categoryId: audio.id, specTypeId: specBattery.id },
-      { categoryId: desktops.id, specTypeId: specStorage.id },
-      { categoryId: desktops.id, specTypeId: specRam.id },
-      { categoryId: desktops.id, specTypeId: specProcessor.id },
-      { categoryId: components.id, specTypeId: specStorage.id },
-      { categoryId: components.id, specTypeId: specRam.id },
-      { categoryId: photography.id, specTypeId: specResolution.id },
-      { categoryId: photography.id, specTypeId: specColor.id },
+      { categoryId: motors.id, specTypeId: specKV.id },
+      { categoryId: motors.id, specTypeId: specMotorSize.id },
+      { categoryId: motors.id, specTypeId: specWeight.id },
+      { categoryId: motors2306.id, specTypeId: specKV.id },
+      { categoryId: motors2306.id, specTypeId: specMotorSize.id },
+      { categoryId: motors1404.id, specTypeId: specKV.id },
+      { categoryId: motors1404.id, specTypeId: specMotorSize.id },
+      { categoryId: frames.id, specTypeId: specFrameSize.id },
+      { categoryId: frames.id, specTypeId: specWeight.id },
+      { categoryId: frames5inch.id, specTypeId: specFrameSize.id },
+      { categoryId: frames5inch.id, specTypeId: specWeight.id },
+      { categoryId: frames3inch.id, specTypeId: specFrameSize.id },
+      { categoryId: escs.id, specTypeId: specProtocol.id },
+      { categoryId: escs4in1.id, specTypeId: specProtocol.id },
+      { categoryId: fcs.id, specTypeId: specProtocol.id },
+      { categoryId: vtx.id, specTypeId: specProtocol.id },
+      { categoryId: vtxDigital.id, specTypeId: specProtocol.id },
+      { categoryId: goggles.id, specTypeId: specResolution.id },
+      { categoryId: goggles.id, specTypeId: specFOV.id },
+      { categoryId: radios.id, specTypeId: specProtocol.id },
+      { categoryId: radiosTX.id, specTypeId: specProtocol.id },
+      { categoryId: batteries.id, specTypeId: specCells.id },
+      { categoryId: batteries.id, specTypeId: specCapacity.id },
+      { categoryId: batteries6S.id, specTypeId: specCells.id },
+      { categoryId: batteries6S.id, specTypeId: specCapacity.id },
+      { categoryId: cameras.id, specTypeId: specResolution.id },
+      { categoryId: cameras.id, specTypeId: specFOV.id },
+      { categoryId: camerasFPV.id, specTypeId: specResolution.id },
+      { categoryId: camerasFPV.id, specTypeId: specFOV.id },
     ],
   })
 
   // Create spec values
   const specs = await Promise.all([
-    prisma.spec.create({ data: { specTypeId: specStorage.id, value: '128 GB' } }),    // 0
-    prisma.spec.create({ data: { specTypeId: specStorage.id, value: '256 GB' } }),    // 1
-    prisma.spec.create({ data: { specTypeId: specStorage.id, value: '512 GB' } }),    // 2
-    prisma.spec.create({ data: { specTypeId: specStorage.id, value: '1 TB' } }),      // 3
-    prisma.spec.create({ data: { specTypeId: specRam.id, value: '8 GB' } }),          // 4
-    prisma.spec.create({ data: { specTypeId: specRam.id, value: '16 GB' } }),         // 5
-    prisma.spec.create({ data: { specTypeId: specRam.id, value: '32 GB' } }),         // 6
-    prisma.spec.create({ data: { specTypeId: specRam.id, value: '64 GB' } }),         // 7
-    prisma.spec.create({ data: { specTypeId: specProcessor.id, value: 'Apple M3' } }),        // 8
-    prisma.spec.create({ data: { specTypeId: specProcessor.id, value: 'Apple M3 Pro' } }),    // 9
-    prisma.spec.create({ data: { specTypeId: specProcessor.id, value: 'Intel Core i7-14700K' } }), // 10
-    prisma.spec.create({ data: { specTypeId: specProcessor.id, value: 'AMD Ryzen 9 7950X' } }),    // 11
-    prisma.spec.create({ data: { specTypeId: specScreenSize.id, value: '6.1"' } }),   // 12
-    prisma.spec.create({ data: { specTypeId: specScreenSize.id, value: '6.7"' } }),   // 13
-    prisma.spec.create({ data: { specTypeId: specScreenSize.id, value: '14"' } }),    // 14
-    prisma.spec.create({ data: { specTypeId: specScreenSize.id, value: '16"' } }),    // 15
-    prisma.spec.create({ data: { specTypeId: specColor.id, value: 'Space Black' } }),   // 16
-    prisma.spec.create({ data: { specTypeId: specColor.id, value: 'Silver' } }),        // 17
-    prisma.spec.create({ data: { specTypeId: specColor.id, value: 'Midnight' } }),      // 18
-    prisma.spec.create({ data: { specTypeId: specColor.id, value: 'White' } }),         // 19
-    prisma.spec.create({ data: { specTypeId: specConnectivity.id, value: 'Bluetooth 5.3' } }),  // 20
-    prisma.spec.create({ data: { specTypeId: specConnectivity.id, value: 'Wired (3.5mm)' } }), // 21
-    prisma.spec.create({ data: { specTypeId: specConnectivity.id, value: 'USB-C' } }),         // 22
-    prisma.spec.create({ data: { specTypeId: specBattery.id, value: '20h' } }),         // 23
-    prisma.spec.create({ data: { specTypeId: specBattery.id, value: '30h' } }),         // 24
-    prisma.spec.create({ data: { specTypeId: specBattery.id, value: '4422 mAh' } }),   // 25
-    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '45 MP' } }),    // 26
-    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '24.2 MP' } }), // 27
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '1750KV' } }),        // 0
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '1950KV' } }),        // 1
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '2450KV' } }),        // 2
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '3600KV' } }),        // 3
+    prisma.spec.create({ data: { specTypeId: specMotorSize.id, value: '2306' } }),   // 4
+    prisma.spec.create({ data: { specTypeId: specMotorSize.id, value: '2207' } }),   // 5
+    prisma.spec.create({ data: { specTypeId: specMotorSize.id, value: '1404' } }),   // 6
+    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '5"' } }),     // 7
+    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '3"' } }),     // 8
+    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '7"' } }),     // 9
+    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '30g' } }),       // 10
+    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '33g' } }),       // 11
+    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '105g' } }),      // 12
+    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '120g' } }),      // 13
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'ELRS' } }),    // 14
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'Crossfire' } }),// 15
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'DJI O3' } }),  // 16
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'HDZero' } }),  // 17
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'Walksnail' } }),// 18
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'BLHeli_32' } }),// 19
+    prisma.spec.create({ data: { specTypeId: specCells.id, value: '4S' } }),         // 20
+    prisma.spec.create({ data: { specTypeId: specCells.id, value: '6S' } }),         // 21
+    prisma.spec.create({ data: { specTypeId: specCapacity.id, value: '1100mAh' } }), // 22
+    prisma.spec.create({ data: { specTypeId: specCapacity.id, value: '1300mAh' } }), // 23
+    prisma.spec.create({ data: { specTypeId: specCapacity.id, value: '1550mAh' } }), // 24
+    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '1080p' } }), // 25
+    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '720p 100fps' } }),// 26
+    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '540p' } }),  // 27
+    prisma.spec.create({ data: { specTypeId: specFOV.id, value: '155°' } }),         // 28
+    prisma.spec.create({ data: { specTypeId: specFOV.id, value: '170°' } }),         // 29
+    prisma.spec.create({ data: { specTypeId: specFOV.id, value: '50°' } }),          // 30
   ])
 
   // =========================================================================
-  // PRODUCTS
+  // PRODUCTS (FPV Drone Gear)
   // =========================================================================
   console.log('  Creating products...')
 
-  // --- Laptops ---
-  const macbookPro16 = await prisma.product.create({
+  // --- Frames ---
+  const chimera5 = await prisma.product.create({
     data: {
-      name: 'MacBook Pro 16" M3 Pro',
-      categoryId: laptops.id,
-      brandId: apple.id,
+      name: 'iFlight Chimera5 Pro Frame',
+      categoryId: frames5inch.id,
+      brandId: iflight.id,
       status: 'active',
-      description: 'Apple MacBook Pro 16-inch with M3 Pro chip, ideal for professional workflows.',
-      features: ['Liquid Retina XDR display', 'Up to 22h battery life', 'MagSafe charging', 'HDMI port', 'SD card slot'],
-      images: ['https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+16', 'https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+Side'],
+      description: 'Premium 5-inch freestyle frame with carbon fiber construction. Dead cat geometry for propeller-free camera view.',
+      features: ['6mm arm thickness', 'Dead cat geometry', 'GoPro mount included', 'Fits 20x20 & 30.5x30.5 stacks'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=Chimera5+Frame', 'https://placehold.co/800x600/0f1117/00e5ff?text=Chimera5+Top'],
     },
   })
 
-  const macbookAir = await prisma.product.create({
+  const mark5 = await prisma.product.create({
     data: {
-      name: 'MacBook Air 15" M3',
-      categoryId: laptops.id,
-      brandId: apple.id,
+      name: 'GEPRC Mark5 HD Frame Kit',
+      categoryId: frames5inch.id,
+      brandId: geprc.id,
       status: 'active',
-      description: 'Ultra-thin and light laptop with the M3 chip.',
-      features: ['Fanless design', 'Up to 18h battery life', 'MagSafe charging', '1080p webcam'],
-      images: ['https://placehold.co/800x600/c0c0c0/333333?text=MacBook+Air+15', 'https://placehold.co/800x600/c0c0c0/333333?text=MacBook+Air+Open'],
+      description: 'True-X 5" frame designed for DJI O3 Air Unit. 5mm arms with reinforced motor mounts.',
+      features: ['True-X geometry', 'DJI O3 ready', '5mm arms', 'TPU camera mount included'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Mark5+Frame', 'https://placehold.co/800x600/0f1117/a855f7?text=Mark5+Arms'],
     },
   })
 
-  // --- Smartphones ---
-  const iphone15Pro = await prisma.product.create({
+  // --- Motors ---
+  const xing2306 = await prisma.product.create({
     data: {
-      name: 'iPhone 15 Pro',
-      categoryId: smartphones.id,
-      brandId: apple.id,
+      name: 'iFlight XING2 2306 1750KV',
+      categoryId: motors2306.id,
+      brandId: iflight.id,
       status: 'active',
-      description: 'Apple iPhone 15 Pro with A17 Pro chip and titanium design.',
-      features: ['Titanium design', 'Action Button', 'USB-C', '48MP main camera', 'ProMotion display'],
-      images: ['https://placehold.co/800x600/2c2c3a/eaeaea?text=iPhone+15+Pro', 'https://placehold.co/800x600/2c2c3a/eaeaea?text=iPhone+15+Pro+Back'],
+      description: 'High-performance 2306 motor for 6S 5-inch builds. Titanium alloy shaft with Japanese bearings.',
+      features: ['Titanium shaft', 'N52H magnets', 'Japanese NSK bearings', '7075 aluminium bell'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=XING2+2306', 'https://placehold.co/800x600/0f1117/00e5ff?text=XING2+Close'],
     },
   })
 
-  const galaxyS24 = await prisma.product.create({
+  const ethixStout = await prisma.product.create({
     data: {
-      name: 'Galaxy S24 Ultra',
-      categoryId: smartphones.id,
-      brandId: samsung.id,
+      name: 'Ethix Stout V4 2306 1750KV',
+      categoryId: motors2306.id,
+      brandId: ethix.id,
       status: 'active',
-      description: 'Samsung Galaxy S24 Ultra with built-in S Pen and AI features.',
-      features: ['S Pen included', '200MP camera', 'Galaxy AI', 'Titanium frame', 'QHD+ display'],
-      images: ['https://placehold.co/800x600/1a1a40/eaeaea?text=Galaxy+S24+Ultra', 'https://placehold.co/800x600/1a1a40/eaeaea?text=Galaxy+S24+S+Pen'],
+      description: 'Mr Steele signature motor. Optimized for smooth freestyle with incredible low-end torque.',
+      features: ['Unibell design', 'Single strand windings', 'Prop washer included', '33g weight'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Ethix+Stout', 'https://placehold.co/800x600/0f1117/a855f7?text=Stout+V4'],
     },
   })
 
-  // --- Audio ---
-  const airpodsMax = await prisma.product.create({
+  const emax1404 = await prisma.product.create({
     data: {
-      name: 'AirPods Max',
-      categoryId: audio.id,
-      brandId: apple.id,
+      name: 'EMAX RS1404 3600KV',
+      categoryId: motors1404.id,
+      brandId: emax.id,
       status: 'active',
-      description: 'Premium over-ear headphones with Active Noise Cancellation.',
-      features: ['Active Noise Cancellation', 'Spatial Audio', 'Digital Crown', 'Aluminium ear cups'],
-      images: ['https://placehold.co/800x600/e8e8e8/333333?text=AirPods+Max', 'https://placehold.co/800x600/e8e8e8/333333?text=AirPods+Max+Case'],
+      description: 'Lightweight 1404 motor for 3-inch micro quads. Bell designed for minimal drag.',
+      features: ['Open bottom bell', '9.5g weight', 'CW thread shaft', 'Fits 3" props'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=EMAX+1404'],
     },
   })
 
-  const sonyWH1000 = await prisma.product.create({
+  // --- ESCs ---
+  const speedyBee = await prisma.product.create({
     data: {
-      name: 'WH-1000XM5',
-      categoryId: audio.id,
-      brandId: sony.id,
+      name: 'SpeedyBee F405 V4 55A 4-in-1 Stack',
+      categoryId: escs4in1.id,
       status: 'active',
-      description: 'Industry-leading noise cancelling headphones by Sony.',
-      features: ['Auto NC Optimizer', 'Speak-to-Chat', 'Multipoint connection', '30h battery'],
-      images: ['https://placehold.co/800x600/2b2b2b/eaeaea?text=Sony+WH-1000XM5', 'https://placehold.co/800x600/2b2b2b/eaeaea?text=WH-1000XM5+Folded'],
+      description: 'F405 flight controller + 55A BLHeli_32 4-in-1 ESC stack. Bluetooth configuration via app.',
+      features: ['F405 processor', '55A continuous', 'BLHeli_32', 'Bluetooth config', 'Barometer onboard'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=SpeedyBee+Stack', 'https://placehold.co/800x600/0f1117/a855f7?text=SpeedyBee+Side'],
     },
   })
 
-  // --- Components ---
-  const rtx4090 = await prisma.product.create({
+  // --- Flight Controllers ---
+  const diatoneH7 = await prisma.product.create({
     data: {
-      name: 'GeForce RTX 4090',
-      categoryId: components.id,
-      brandId: nvidia.id,
+      name: 'Diatone Mamba H743 MK4',
+      categoryId: fcsH7.id,
+      brandId: diatone.id,
       status: 'active',
-      description: 'NVIDIA flagship GPU with Ada Lovelace architecture.',
-      features: ['24 GB GDDR6X', 'DLSS 3', 'Ray Tracing', 'AV1 Encoder'],
-      images: ['https://placehold.co/800x600/76b900/ffffff?text=RTX+4090', 'https://placehold.co/800x600/76b900/ffffff?text=RTX+4090+Fans'],
+      description: 'H7 flight controller with dual gyro. 9 UARTs, 128MB flash for blackbox.',
+      features: ['STM32H743', 'Dual ICM42688P gyro', '9 UARTs', '128MB blackbox flash', '30.5x30.5 mount'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=Mamba+H743'],
     },
   })
 
-  const ryzen9 = await prisma.product.create({
+  // --- VTX ---
+  const djiO3 = await prisma.product.create({
     data: {
-      name: 'Ryzen 9 7950X',
-      categoryId: components.id,
-      brandId: amd.id,
+      name: 'DJI O3 Air Unit',
+      categoryId: vtxDigital.id,
+      brandId: dji.id,
       status: 'active',
-      description: 'AMD flagship desktop processor with 16 cores and 32 threads.',
-      features: ['16 cores / 32 threads', '5.7 GHz boost', 'AM5 Socket', '170W TDP'],
-      images: ['https://placehold.co/800x600/ed1c24/ffffff?text=Ryzen+9+7950X', 'https://placehold.co/800x600/ed1c24/ffffff?text=Ryzen+9+Box'],
+      description: 'DJI digital FPV system with 1080p recording and ultra-low latency transmission.',
+      features: ['1080p/100fps recording', '10km range', '< 28ms latency', 'Built-in camera', 'OSD via Betaflight'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=DJI+O3', 'https://placehold.co/800x600/0f1117/00e5ff?text=O3+Camera'],
     },
   })
 
-  const corsairRam = await prisma.product.create({
+  const walksnailAvatar = await prisma.product.create({
     data: {
-      name: 'Vengeance DDR5 32GB (2x16GB)',
-      categoryId: components.id,
-      brandId: corsair.id,
+      name: 'Walksnail Avatar HD V2',
+      categoryId: vtxDigital.id,
+      brandId: walksnail.id,
       status: 'active',
-      description: 'High-performance DDR5 memory kit.',
-      features: ['DDR5-6000', 'Intel XMP 3.0', 'CL36', 'Aluminium heat spreader'],
-      images: ['https://placehold.co/800x600/f5d600/1a1a1a?text=Vengeance+DDR5', 'https://placehold.co/800x600/f5d600/1a1a1a?text=DDR5+Kit'],
+      description: 'Walksnail digital VTX with gyroflow support and 1080p recording.',
+      features: ['1080p recording', 'Gyroflow stabilization', '1200mW output', 'Built-in camera', '< 22ms latency'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Walksnail+V2'],
     },
   })
 
-  // --- Desktop ---
-  const customDesktop = await prisma.product.create({
+  const hdzeroVTX = await prisma.product.create({
     data: {
-      name: 'Custom Gaming Desktop',
-      categoryId: desktops.id,
+      name: 'HDZero Freestyle V2 VTX',
+      categoryId: vtxDigital.id,
+      brandId: hdzero.id,
       status: 'active',
-      description: 'High-end custom-built gaming PC.',
-      features: ['Custom build', 'Liquid cooling', 'RGB lighting'],
-      images: ['https://placehold.co/800x600/0f0f1a/00d4ff?text=Gaming+Desktop', 'https://placehold.co/800x600/0f0f1a/ff00ff?text=RGB+Interior'],
+      description: 'Ultra-low-latency digital VTX. 720p/100fps with < 4ms glass-to-glass latency.',
+      features: ['720p/100fps', '< 4ms latency', '1W output', 'Analog fallback', 'Open source'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=HDZero+V2'],
     },
   })
 
-  // --- Consoles ---
-  const ps5 = await prisma.product.create({
+  // --- Cameras ---
+  const foxeerRazer = await prisma.product.create({
     data: {
-      name: 'PlayStation 5',
-      categoryId: consoles.id,
-      brandId: sony.id,
+      name: 'Foxeer Razer Mini',
+      categoryId: camerasFPV.id,
+      brandId: foxeer.id,
       status: 'active',
-      description: 'Sony PS5 with disc drive.',
-      features: ['4K gaming', 'Ray Tracing', 'DualSense controller', '825GB SSD'],
-      images: ['https://placehold.co/800x600/00439c/ffffff?text=PlayStation+5', 'https://placehold.co/800x600/00439c/ffffff?text=PS5+Controller'],
+      description: 'Compact analog FPV camera with excellent low-light performance. 1200TVL CMOS sensor.',
+      features: ['1200TVL', '2.1mm lens', '4:3 / 16:9 switchable', 'Wide voltage 5-40V', 'OSD menu'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Foxeer+Razer'],
     },
   })
 
-  const switchOLED = await prisma.product.create({
+  // --- Goggles ---
+  const djiGoggles3 = await prisma.product.create({
     data: {
-      name: 'Nintendo Switch OLED',
-      categoryId: consoles.id,
-      brandId: nintendo.id,
+      name: 'DJI Goggles 3',
+      categoryId: goggles.id,
+      brandId: dji.id,
       status: 'active',
-      description: 'Hybrid gaming console with 7-inch OLED screen.',
-      features: ['7" OLED screen', 'Wide adjustable stand', '64GB internal storage', 'Enhanced audio'],
-      images: ['https://placehold.co/800x600/e60012/ffffff?text=Switch+OLED', 'https://placehold.co/800x600/e60012/ffffff?text=Switch+Dock'],
+      description: 'Lightweight FPV goggles with micro-OLED screens. Works with DJI O3 and O4 systems.',
+      features: ['Micro-OLED 1080p', 'Diopter adjustment -8 to +2', 'Head tracking', '290g weight', 'USB-C charging'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=DJI+Goggles+3', 'https://placehold.co/800x600/0f1117/00e5ff?text=Goggles+3+Side'],
     },
   })
 
-  // --- Photography ---
-  const canonR6 = await prisma.product.create({
+  const fatsharkRecon = await prisma.product.create({
     data: {
-      name: 'EOS R6 Mark II',
-      categoryId: photography.id,
-      brandId: canon.id,
+      name: 'Fatshark Recon HD',
+      categoryId: goggles.id,
+      brandId: fatshark.id,
       status: 'active',
-      description: 'Full-frame mirrorless camera for photo and video.',
-      features: ['24.2 MP full-frame', '4K 60fps video', 'Up to 40fps burst', 'Dual card slots'],
-      images: ['https://placehold.co/800x600/1a1a1a/cc0000?text=Canon+EOS+R6+II', 'https://placehold.co/800x600/1a1a1a/cc0000?text=EOS+R6+Top'],
+      description: 'Entry-level HD goggles compatible with HDZero and Walksnail digital systems.',
+      features: ['1280x720 LCD', 'DVR built-in', 'HDMI input', 'Analog + Digital', '3S battery powered'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Fatshark+Recon'],
+    },
+  })
+
+  // --- Radios ---
+  const zorro = await prisma.product.create({
+    data: {
+      name: 'RadioMaster Zorro ELRS',
+      categoryId: radiosTX.id,
+      brandId: radiomaster.id,
+      status: 'active',
+      description: 'Compact gamepad-style radio with built-in ELRS module. Perfect for travel.',
+      features: ['ExpressLRS built-in', 'Gamepad form factor', 'Color LCD', 'Nano size', 'EdgeTX firmware'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=Zorro+ELRS', 'https://placehold.co/800x600/0f1117/00e5ff?text=Zorro+Back'],
+    },
+  })
+
+  const tx16s = await prisma.product.create({
+    data: {
+      name: 'RadioMaster TX16S MKII ELRS',
+      categoryId: radiosTX.id,
+      brandId: radiomaster.id,
+      status: 'active',
+      description: 'Full-size radio transmitter with hall gimbals and ELRS module. The gold standard for FPV.',
+      features: ['Hall effect gimbals', 'ELRS 1W module', '4.3" color touchscreen', 'EdgeTX', '6000mAh battery'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=TX16S+MKII'],
+    },
+  })
+
+  // --- Batteries ---
+  const cnhl6S = await prisma.product.create({
+    data: {
+      name: 'CNHL Black Series 1300mAh 6S 100C',
+      categoryId: batteries6S.id,
+      brandId: cnhl.id,
+      status: 'active',
+      description: 'High-discharge 6S LiPo for 5-inch freestyle. Consistent punch throughout the pack.',
+      features: ['100C discharge', 'XT60 connector', '210g weight', 'HV compatible'],
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=CNHL+6S+1300'],
+    },
+  })
+
+  // --- Props ---
+  const hqS5 = await prisma.product.create({
+    data: {
+      name: 'HQProp Ethix S5 Light Grey',
+      categoryId: props.id,
+      brandId: hqprop.id,
+      status: 'active',
+      description: 'Ethix S5 prop designed by Mr Steele. Smooth, responsive, and incredibly durable polycarbonate.',
+      features: ['5x4x3 triblade', 'Polycarbonate', 'Balanced out of box', '4 sets (16 props)'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=HQ+Ethix+S5'],
     },
   })
 
   // =========================================================================
-  // PRODUCT SPECS (linking products to spec values)
+  // PRODUCT SPECS
   // =========================================================================
   console.log('  Linking product specs...')
 
   await prisma.productSpec.createMany({
     data: [
-      // MacBook Pro 16: 512GB, 18GB RAM, M3 Pro, 16", Space Black
-      { productId: macbookPro16.id, specId: specs[2].id },
-      { productId: macbookPro16.id, specId: specs[5].id },
-      { productId: macbookPro16.id, specId: specs[9].id },
-      { productId: macbookPro16.id, specId: specs[15].id },
-      { productId: macbookPro16.id, specId: specs[16].id },
-      // MacBook Air: 256GB, 8GB RAM, M3, Silver
-      { productId: macbookAir.id, specId: specs[1].id },
-      { productId: macbookAir.id, specId: specs[4].id },
-      { productId: macbookAir.id, specId: specs[8].id },
-      { productId: macbookAir.id, specId: specs[17].id },
-      // iPhone 15 Pro: 256GB, 6.1", Midnight
-      { productId: iphone15Pro.id, specId: specs[1].id },
-      { productId: iphone15Pro.id, specId: specs[12].id },
-      { productId: iphone15Pro.id, specId: specs[18].id },
-      // Galaxy S24 Ultra: 512GB, 6.7"
-      { productId: galaxyS24.id, specId: specs[2].id },
-      { productId: galaxyS24.id, specId: specs[13].id },
-      // AirPods Max: Bluetooth, 20h, White
-      { productId: airpodsMax.id, specId: specs[20].id },
-      { productId: airpodsMax.id, specId: specs[23].id },
-      { productId: airpodsMax.id, specId: specs[19].id },
-      // Sony WH-1000XM5: Bluetooth, 30h, Space Black
-      { productId: sonyWH1000.id, specId: specs[20].id },
-      { productId: sonyWH1000.id, specId: specs[24].id },
-      { productId: sonyWH1000.id, specId: specs[16].id },
-      // Corsair RAM: 32GB
-      { productId: corsairRam.id, specId: specs[6].id },
-      // Canon R6 II: 24.2 MP
-      { productId: canonR6.id, specId: specs[27].id },
+      // Chimera5: 5" frame, 120g
+      { productId: chimera5.id, specId: specs[7].id },
+      { productId: chimera5.id, specId: specs[13].id },
+      // Mark5: 5" frame, 105g
+      { productId: mark5.id, specId: specs[7].id },
+      { productId: mark5.id, specId: specs[12].id },
+      // XING2 2306: 1750KV, 2306, 33g
+      { productId: xing2306.id, specId: specs[0].id },
+      { productId: xing2306.id, specId: specs[4].id },
+      { productId: xing2306.id, specId: specs[11].id },
+      // Ethix Stout: 1750KV, 2306, 33g
+      { productId: ethixStout.id, specId: specs[0].id },
+      { productId: ethixStout.id, specId: specs[4].id },
+      { productId: ethixStout.id, specId: specs[11].id },
+      // EMAX 1404: 3600KV, 1404
+      { productId: emax1404.id, specId: specs[3].id },
+      { productId: emax1404.id, specId: specs[6].id },
+      // SpeedyBee: BLHeli_32
+      { productId: speedyBee.id, specId: specs[19].id },
+      // DJI O3: DJI O3 protocol, 1080p, 155° FOV
+      { productId: djiO3.id, specId: specs[16].id },
+      { productId: djiO3.id, specId: specs[25].id },
+      { productId: djiO3.id, specId: specs[28].id },
+      // Walksnail: Walksnail protocol, 1080p
+      { productId: walksnailAvatar.id, specId: specs[18].id },
+      { productId: walksnailAvatar.id, specId: specs[25].id },
+      // HDZero: HDZero protocol, 720p 100fps
+      { productId: hdzeroVTX.id, specId: specs[17].id },
+      { productId: hdzeroVTX.id, specId: specs[26].id },
+      // Foxeer Razer: 170° FOV
+      { productId: foxeerRazer.id, specId: specs[29].id },
+      // DJI Goggles 3: 1080p, 50° FOV
+      { productId: djiGoggles3.id, specId: specs[25].id },
+      { productId: djiGoggles3.id, specId: specs[30].id },
+      // Zorro: ELRS
+      { productId: zorro.id, specId: specs[14].id },
+      // TX16S: ELRS
+      { productId: tx16s.id, specId: specs[14].id },
+      // CNHL 6S: 6S, 1300mAh
+      { productId: cnhl6S.id, specId: specs[21].id },
+      { productId: cnhl6S.id, specId: specs[23].id },
     ],
   })
 
   // =========================================================================
-  // PRODUCT COMPONENTS (desktop = gpu + cpu + ram)
+  // PRODUCT COMPONENTS (stack = FC + ESC)
   // =========================================================================
   console.log('  Creating product components...')
 
   await prisma.productComponent.createMany({
     data: [
-      { parentId: customDesktop.id, componentId: rtx4090.id },
-      { parentId: customDesktop.id, componentId: ryzen9.id },
-      { parentId: customDesktop.id, componentId: corsairRam.id },
+      { parentId: speedyBee.id, componentId: diatoneH7.id },
     ],
   })
 
   // =========================================================================
-  // SHOPS (external retailers)
+  // SHOPS (FPV retailers)
   // =========================================================================
   console.log('  Creating shops...')
 
   await prisma.shop.createMany({
     data: [
-      { productId: macbookPro16.id, name: 'Apple Store', url: 'https://apple.com/shop/macbook-pro', price: 2499, currency: 'EUR', available: true },
-      { productId: macbookPro16.id, name: 'Amazon', url: 'https://amazon.fr/dp/macbookpro16', price: 2399, currency: 'EUR', available: true },
-      { productId: macbookAir.id, name: 'Apple Store', url: 'https://apple.com/shop/macbook-air', price: 1499, currency: 'EUR', available: true },
-      { productId: iphone15Pro.id, name: 'Apple Store', url: 'https://apple.com/shop/iphone-15-pro', price: 1199, currency: 'EUR', available: true },
-      { productId: iphone15Pro.id, name: 'Fnac', url: 'https://fnac.com/iphone-15-pro', price: 1179, currency: 'EUR', available: true },
-      { productId: galaxyS24.id, name: 'Samsung Store', url: 'https://samsung.com/galaxy-s24-ultra', price: 1469, currency: 'EUR', available: true },
-      { productId: airpodsMax.id, name: 'Apple Store', url: 'https://apple.com/shop/airpods-max', price: 579, currency: 'EUR', available: true },
-      { productId: sonyWH1000.id, name: 'Amazon', url: 'https://amazon.fr/dp/wh1000xm5', price: 299, currency: 'EUR', available: true },
-      { productId: rtx4090.id, name: 'LDLC', url: 'https://ldlc.com/rtx-4090', price: 1799, currency: 'EUR', available: false },
-      { productId: ps5.id, name: 'Amazon', url: 'https://amazon.fr/dp/ps5', price: 549, currency: 'EUR', available: true },
-      { productId: switchOLED.id, name: 'Fnac', url: 'https://fnac.com/switch-oled', price: 349, currency: 'EUR', available: true },
-      { productId: canonR6.id, name: 'Amazon', url: 'https://amazon.fr/dp/eos-r6-ii', price: 2499, currency: 'EUR', available: true },
+      { productId: chimera5.id, name: 'GetFPV', url: 'https://getfpv.com/chimera5-pro', price: 49.99, currency: 'USD', available: true },
+      { productId: chimera5.id, name: 'RaceDayQuads', url: 'https://racedayquads.com/chimera5', price: 47.99, currency: 'USD', available: true },
+      { productId: mark5.id, name: 'GetFPV', url: 'https://getfpv.com/mark5-hd', price: 54.99, currency: 'USD', available: true },
+      { productId: mark5.id, name: 'Drone-FPV-Racer', url: 'https://drone-fpv-racer.com/mark5', price: 49.90, currency: 'EUR', available: true },
+      { productId: xing2306.id, name: 'GetFPV', url: 'https://getfpv.com/xing2-2306', price: 17.99, currency: 'USD', available: true },
+      { productId: xing2306.id, name: 'iFlight Store', url: 'https://iflight.com/xing2-2306', price: 15.99, currency: 'USD', available: true },
+      { productId: ethixStout.id, name: 'GetFPV', url: 'https://getfpv.com/ethix-stout-v4', price: 22.99, currency: 'USD', available: true },
+      { productId: ethixStout.id, name: 'Drone-FPV-Racer', url: 'https://drone-fpv-racer.com/ethix-stout', price: 20.90, currency: 'EUR', available: true },
+      { productId: emax1404.id, name: 'RaceDayQuads', url: 'https://racedayquads.com/emax-1404', price: 13.99, currency: 'USD', available: true },
+      { productId: speedyBee.id, name: 'GetFPV', url: 'https://getfpv.com/speedybee-f405-v4', price: 69.99, currency: 'USD', available: true },
+      { productId: diatoneH7.id, name: 'GetFPV', url: 'https://getfpv.com/mamba-h743', price: 44.99, currency: 'USD', available: true },
+      { productId: djiO3.id, name: 'GetFPV', url: 'https://getfpv.com/dji-o3', price: 229.00, currency: 'USD', available: true },
+      { productId: djiO3.id, name: 'DJI Store', url: 'https://store.dji.com/o3-air-unit', price: 229.00, currency: 'USD', available: true },
+      { productId: walksnailAvatar.id, name: 'GetFPV', url: 'https://getfpv.com/walksnail-avatar-v2', price: 119.99, currency: 'USD', available: true },
+      { productId: hdzeroVTX.id, name: 'GetFPV', url: 'https://getfpv.com/hdzero-freestyle-v2', price: 69.99, currency: 'USD', available: true },
+      { productId: hdzeroVTX.id, name: 'RaceDayQuads', url: 'https://racedayquads.com/hdzero-v2', price: 69.99, currency: 'USD', available: true },
+      { productId: foxeerRazer.id, name: 'RaceDayQuads', url: 'https://racedayquads.com/foxeer-razer', price: 19.99, currency: 'USD', available: true },
+      { productId: djiGoggles3.id, name: 'DJI Store', url: 'https://store.dji.com/goggles-3', price: 449.00, currency: 'USD', available: true },
+      { productId: djiGoggles3.id, name: 'GetFPV', url: 'https://getfpv.com/dji-goggles-3', price: 449.00, currency: 'USD', available: false },
+      { productId: fatsharkRecon.id, name: 'GetFPV', url: 'https://getfpv.com/fatshark-recon-hd', price: 159.99, currency: 'USD', available: true },
+      { productId: zorro.id, name: 'GetFPV', url: 'https://getfpv.com/zorro-elrs', price: 99.99, currency: 'USD', available: true },
+      { productId: zorro.id, name: 'RadioMaster Store', url: 'https://radiomasterrc.com/zorro', price: 89.99, currency: 'USD', available: true },
+      { productId: tx16s.id, name: 'RadioMaster Store', url: 'https://radiomasterrc.com/tx16s-mkii', price: 199.99, currency: 'USD', available: true },
+      { productId: tx16s.id, name: 'GetFPV', url: 'https://getfpv.com/tx16s-mkii-elrs', price: 209.99, currency: 'USD', available: true },
+      { productId: cnhl6S.id, name: 'CNHL Store', url: 'https://chinahobbyline.com/6s-1300', price: 24.99, currency: 'USD', available: true },
+      { productId: hqS5.id, name: 'GetFPV', url: 'https://getfpv.com/hqprop-ethix-s5', price: 3.49, currency: 'USD', available: true },
+      { productId: hqS5.id, name: 'RaceDayQuads', url: 'https://racedayquads.com/ethix-s5', price: 3.49, currency: 'USD', available: true },
     ],
   })
 
   // =========================================================================
-  // DEALS (marketplace listings)
+  // DEALS (FPV marketplace listings)
   // =========================================================================
   console.log('  Creating deals...')
 
@@ -465,17 +590,17 @@ async function main() {
     data: {
       userId: alice.id,
       status: DealStatus.PUBLISHED,
-      price: 1800,
-      currency: 'EUR',
-      location: 'Paris, France',
-      title: 'MacBook Pro 16" M3 Pro - Like New',
-      description: 'Selling my MacBook Pro 16" bought in March 2024. Pristine condition, always used with a case. Comes with original box and charger. AppleCare+ valid until March 2027.',
-      images: ['https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+Used', 'https://placehold.co/800x600/1a1a2e/eaeaea?text=MacBook+Pro+Box'],
+      price: 180,
+      currency: 'USD',
+      location: 'Los Angeles, CA',
+      title: 'DJI O3 Air Unit — Like New',
+      description: 'Selling my DJI O3 Air Unit, bought 3 months ago. Works perfectly, upgraded to the O4 system. Comes with antenna and coax cable.',
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=DJI+O3+Used', 'https://placehold.co/800x600/0f1117/00e5ff?text=O3+Box'],
       invoiceAvailable: true,
-      sellingReason: 'Switching to a desktop setup for work.',
+      sellingReason: 'Upgraded to DJI O4.',
       canBeDelivered: true,
       condition: DealCondition.LIKE_NEW,
-      features: ['AppleCare+ until 2027', 'Original box included', '42 battery cycles'],
+      features: ['Original antenna', 'Coax cable included', 'Original box'],
     },
   })
 
@@ -483,17 +608,17 @@ async function main() {
     data: {
       userId: bob.id,
       status: DealStatus.PUBLISHED,
-      price: 850,
-      currency: 'EUR',
-      location: 'Lyon, France',
-      title: 'iPhone 15 Pro 256GB Midnight',
-      description: 'iPhone 15 Pro in perfect working condition. Minor micro-scratches on the frame, screen is flawless with a screen protector since day one.',
-      images: ['https://placehold.co/800x600/2c2c3a/eaeaea?text=iPhone+15+Pro+Used'],
-      invoiceAvailable: true,
-      sellingReason: 'Upgrading to iPhone 16 Pro.',
+      price: 120,
+      currency: 'USD',
+      location: 'Austin, TX',
+      title: 'RadioMaster Zorro ELRS + Case',
+      description: 'RadioMaster Zorro with ELRS, used for 6 months. Includes hard case and neck strap. Gimbals are smooth, no stick drift.',
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Zorro+Used'],
+      invoiceAvailable: false,
+      sellingReason: 'Switching to TX16S.',
       canBeDelivered: true,
       condition: DealCondition.GOOD,
-      features: ['Screen protector installed', 'Case included', 'Battery health 94%'],
+      features: ['Hard case included', 'Neck strap', 'No stick drift'],
     },
   })
 
@@ -501,16 +626,16 @@ async function main() {
     data: {
       userId: charlie.id,
       status: DealStatus.PUBLISHED,
-      price: 420,
-      currency: 'EUR',
-      location: 'Marseille, France',
-      title: 'PS5 + 2 Controllers + 5 Games',
-      description: 'PlayStation 5 disc edition bundle. Includes 2 DualSense controllers (white + midnight black) and 5 games: Spider-Man 2, God of War Ragnarok, Horizon Forbidden West, Gran Turismo 7, and Ratchet & Clank.',
-      images: ['https://placehold.co/800x600/00439c/ffffff?text=PS5+Bundle', 'https://placehold.co/800x600/00439c/ffffff?text=PS5+Controllers', 'https://placehold.co/800x600/00439c/ffffff?text=PS5+Games'],
-      invoiceAvailable: false,
-      canBeDelivered: false,
-      condition: DealCondition.GOOD,
-      features: ['2 controllers', '5 games included', 'All cables included'],
+      price: 350,
+      currency: 'USD',
+      location: 'Miami, FL',
+      title: 'DJI Goggles 3 — Mint Condition',
+      description: 'DJI Goggles 3 in mint condition. Only used 5 times for cinematic flights. Comes with corrective lenses adapter and all original accessories.',
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=Goggles+3+Used', 'https://placehold.co/800x600/0f1117/00e5ff?text=Goggles+3+Lenses'],
+      invoiceAvailable: true,
+      canBeDelivered: true,
+      condition: DealCondition.LIKE_NEW,
+      features: ['Corrective lenses adapter', 'All original accessories', 'Original box'],
     },
   })
 
@@ -518,17 +643,16 @@ async function main() {
     data: {
       userId: diana.id,
       status: DealStatus.PUBLISHED,
-      price: 200,
-      currency: 'EUR',
-      location: 'Bordeaux, France',
-      title: 'Sony WH-1000XM5 - Barely Used',
-      description: 'Sony noise cancelling headphones, bought 2 months ago. Selling because I prefer earbuds. Comes with original case, cable, and airplane adapter.',
-      images: ['https://placehold.co/800x600/2b2b2b/eaeaea?text=Sony+XM5+Used'],
-      invoiceAvailable: true,
-      sellingReason: 'Prefer earbuds.',
+      price: 25,
+      currency: 'USD',
+      location: 'Denver, CO',
+      title: '4x Ethix Stout V4 Motors — Used',
+      description: 'Set of 4 Ethix Stout V4 2306 motors. Around 50 flights on them. Bearings are still smooth, no bell play. One motor has a small scratch on the bell.',
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Stout+Motors+Used'],
+      invoiceAvailable: false,
       canBeDelivered: true,
-      condition: DealCondition.LIKE_NEW,
-      features: ['Original case', 'All accessories included'],
+      condition: DealCondition.GOOD,
+      features: ['Set of 4', 'Bearings still smooth', 'No bell play'],
     },
   })
 
@@ -536,17 +660,17 @@ async function main() {
     data: {
       userId: alice.id,
       status: DealStatus.PUBLISHED,
-      price: 1350,
-      currency: 'EUR',
-      location: 'Paris, France',
-      title: 'RTX 4090 Founders Edition',
-      description: 'NVIDIA RTX 4090 FE, purchased in January 2024. Used for 3D rendering, never overclocked. Works perfectly.',
-      images: ['https://placehold.co/800x600/76b900/ffffff?text=RTX+4090+Used'],
+      price: 55,
+      currency: 'USD',
+      location: 'Los Angeles, CA',
+      title: 'SpeedyBee F405 V4 Stack — New Open Box',
+      description: 'Brand new SpeedyBee F405 V4 stack, opened to verify contents but never installed. Changed my build plans.',
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=SpeedyBee+Used'],
       invoiceAvailable: true,
-      sellingReason: 'Downgrading, this is overkill for my needs.',
+      sellingReason: 'Changed build plans.',
       canBeDelivered: true,
-      condition: DealCondition.GOOD,
-      features: ['Never overclocked', 'Original box'],
+      condition: DealCondition.NEW,
+      features: ['Never installed', 'All accessories included', 'Original packaging'],
     },
   })
 
@@ -555,12 +679,12 @@ async function main() {
     data: {
       userId: bob.id,
       status: DealStatus.DRAFT,
-      price: 250,
-      currency: 'EUR',
-      location: 'Lyon, France',
-      title: 'Nintendo Switch OLED',
+      price: 80,
+      currency: 'USD',
+      location: 'Austin, TX',
+      title: 'Walksnail Avatar V2 VTX',
       description: 'Work in progress listing...',
-      images: ['https://placehold.co/800x600/e60012/ffffff?text=Switch+OLED+Used'],
+      images: ['https://placehold.co/800x600/0f1117/a855f7?text=Walksnail+Used'],
       condition: DealCondition.FAIR,
     },
   })
@@ -570,13 +694,13 @@ async function main() {
     data: {
       userId: charlie.id,
       status: DealStatus.SOLD,
-      price: 350,
-      currency: 'EUR',
-      location: 'Marseille, France',
-      title: 'AirPods Max Silver',
-      description: 'Sold! AirPods Max in great condition.',
-      images: ['https://placehold.co/800x600/e8e8e8/333333?text=AirPods+Max+Sold'],
-      invoiceAvailable: true,
+      price: 60,
+      currency: 'USD',
+      location: 'Miami, FL',
+      title: 'GEPRC Mark5 Frame — Good Condition',
+      description: 'Sold! GEPRC Mark5 frame in good condition.',
+      images: ['https://placehold.co/800x600/0f1117/00e5ff?text=Mark5+Sold'],
+      invoiceAvailable: false,
       condition: DealCondition.GOOD,
     },
   })
@@ -586,35 +710,35 @@ async function main() {
     data: {
       userId: diana.id,
       status: DealStatus.DECLINED,
-      price: 50,
-      currency: 'EUR',
-      location: 'Bordeaux, France',
-      title: 'Broken iPhone',
-      description: 'iPhone with cracked screen.',
+      price: 10,
+      currency: 'USD',
+      location: 'Denver, CO',
+      title: 'Broken ESC',
+      description: 'ESC with blown FET.',
       condition: DealCondition.POOR,
-      reasonDeclined: 'Listing does not meet quality standards. Missing images and details about the damage.',
+      reasonDeclined: 'Listing does not meet quality standards. Non-functional electronics should include detailed damage description and photos.',
     },
   })
 
   // =========================================================================
-  // DEAL PRODUCTS (link deals to products)
+  // DEAL PRODUCTS
   // =========================================================================
   console.log('  Linking deal products...')
 
   await prisma.dealProduct.createMany({
     data: [
-      { dealId: deal1.id, productId: macbookPro16.id, quantity: 1 },
-      { dealId: deal2.id, productId: iphone15Pro.id, quantity: 1 },
-      { dealId: deal3.id, productId: ps5.id, quantity: 1 },
-      { dealId: deal4.id, productId: sonyWH1000.id, quantity: 1 },
-      { dealId: deal5.id, productId: rtx4090.id, quantity: 1 },
-      { dealId: deal6.id, productId: switchOLED.id, quantity: 1 },
-      { dealId: deal7.id, productId: airpodsMax.id, quantity: 1 },
+      { dealId: deal1.id, productId: djiO3.id, quantity: 1 },
+      { dealId: deal2.id, productId: zorro.id, quantity: 1 },
+      { dealId: deal3.id, productId: djiGoggles3.id, quantity: 1 },
+      { dealId: deal4.id, productId: ethixStout.id, quantity: 4 },
+      { dealId: deal5.id, productId: speedyBee.id, quantity: 1 },
+      { dealId: deal6.id, productId: walksnailAvatar.id, quantity: 1 },
+      { dealId: deal7.id, productId: mark5.id, quantity: 1 },
     ],
   })
 
   // =========================================================================
-  // DISCUSSIONS (buyer-seller conversations)
+  // DISCUSSIONS
   // =========================================================================
   console.log('  Creating discussions...')
 
@@ -655,22 +779,18 @@ async function main() {
   })
 
   // =========================================================================
-  // DISCUSSION STATUSES (read/unread tracking)
+  // DISCUSSION STATUSES
   // =========================================================================
   console.log('  Creating discussion statuses...')
 
   await prisma.discussionStatus.createMany({
     data: [
-      // Discussion 1: Bob has a new message from Alice
       { discussionId: discussion1.id, userId: bob.id, newMessage: true },
       { discussionId: discussion1.id, userId: alice.id, newMessage: false },
-      // Discussion 2: Alice has a new message from Charlie
       { discussionId: discussion2.id, userId: charlie.id, newMessage: false },
       { discussionId: discussion2.id, userId: alice.id, newMessage: true },
-      // Discussion 3: Both read
       { discussionId: discussion3.id, userId: diana.id, newMessage: false },
       { discussionId: discussion3.id, userId: bob.id, newMessage: false },
-      // Discussion 4: Charlie has unread
       { discussionId: discussion4.id, userId: charlie.id, newMessage: true },
       { discussionId: discussion4.id, userId: alice.id, newMessage: false },
     ],
@@ -679,20 +799,20 @@ async function main() {
   console.log('✅ Seed completed successfully!')
   console.log(`
     Summary:
-    - 5 users (1 admin + 4 regular)
-    - 10 categories (hierarchical)
-    - 10 brands
-    - 8 spec types with 28 spec values
-    - 13 products with specs, shops, and components
+    - 5 users (1 admin + 4 pilots)
+    - 10 root categories + subcategories (FPV drone gear)
+    - 20 brands (FPV-specific)
+    - 9 spec types with 31 spec values
+    - 18 products with specs, shops, and components
     - 8 deals (5 published, 1 draft, 1 sold, 1 declined)
     - 4 discussions with statuses
 
     Demo accounts (password: "password"):
     - admin@marketplace.dev (Admin)
-    - alice@marketplace.dev
-    - bob@marketplace.dev
-    - charlie@marketplace.dev
-    - diana@marketplace.dev
+    - alice@marketplace.dev (Alice FPV)
+    - bob@marketplace.dev (Bob Freestyle)
+    - charlie@marketplace.dev (Charlie Racer)
+    - diana@marketplace.dev (Diana CineWhoop)
   `)
 }
 

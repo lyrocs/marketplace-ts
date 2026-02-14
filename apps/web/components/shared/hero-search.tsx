@@ -9,7 +9,7 @@ interface HeroSearchProps {
   placeholder?: string
 }
 
-export function HeroSearch({ placeholder = 'Search for products, deals, or brands...' }: HeroSearchProps) {
+export function HeroSearch({ placeholder = 'Search for frames, motors, goggles, radios...' }: HeroSearchProps) {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -28,7 +28,7 @@ export function HeroSearch({ placeholder = 'Search for products, deals, or brand
           placeholder={placeholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-12 pl-12 pr-4 text-base shadow-lg"
+          className="h-12 pl-12 pr-4 text-base bg-secondary/80 border-border focus:border-primary shadow-lg"
         />
         <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
       </div>

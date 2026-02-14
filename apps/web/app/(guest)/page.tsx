@@ -12,12 +12,12 @@ import type { Metadata } from 'next'
 
 // SEO Metadata
 export const metadata: Metadata = {
-  title: 'Marketplace - Buy & Sell Tech Products',
-  description: 'Your trusted marketplace for buying and selling quality tech products. Browse thousands of deals from verified sellers.',
-  keywords: ['tech marketplace', 'buy tech', 'sell electronics', 'gadgets', 'deals'],
+  title: 'Marketplace — FPV Drone Gear',
+  description: 'The marketplace built for FPV pilots. Browse frames, motors, ESCs, goggles, radios, and more. Compare prices and trade with the community.',
+  keywords: ['fpv drone', 'fpv marketplace', 'drone gear', 'fpv motors', 'fpv frames', 'fpv goggles', 'drone deals'],
   openGraph: {
-    title: 'Marketplace - Buy & Sell Tech Products',
-    description: 'Your trusted marketplace for buying and selling quality tech products.',
+    title: 'Marketplace — FPV Drone Gear',
+    description: 'The marketplace built for FPV pilots. Browse gear, compare prices, and trade with the community.',
     type: 'website',
   },
 }
@@ -42,9 +42,6 @@ export default async function HomePage() {
     <div>
       {/* Hero Section with Search */}
       <HeroSection
-        title="Buy & Sell Tech Products"
-        description="Your trusted marketplace for buying and selling quality tech products."
-        backgroundImage="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1920&q=80"
         isAuthenticated={isAuthenticated}
       />
 
@@ -55,14 +52,14 @@ export default async function HomePage() {
             href="/deals"
             icon={<Users className="h-12 w-12" />}
             title="Explore Deals"
-            description="Browse thousands of tech deals from verified sellers in our community marketplace."
+            description="Browse FPV gear deals from verified pilots in our community marketplace."
             linkText="Browse All Deals"
           />
           <FeatureCard
             href="/products"
             icon={<Store className="h-12 w-12" />}
             title="Explore Products"
-            description="Discover our extensive catalog of tech products with detailed specifications and reviews."
+            description="Discover our catalog of FPV components with detailed specs and price comparisons."
             linkText="View Product Catalog"
           />
         </section>
@@ -71,8 +68,8 @@ export default async function HomePage() {
         <section className="mt-20">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold">Browse Categories</h2>
-              <p className="text-muted-foreground mt-1">Find products in your favorite category</p>
+              <h2 className="text-3xl font-bold font-heading">Browse Categories</h2>
+              <p className="text-muted-foreground mt-1">Find the parts you need for your next build</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -80,7 +77,7 @@ export default async function HomePage() {
               <Link
                 key={cat.id}
                 href={`/products/${cat.key}`}
-                className="group flex flex-col items-center justify-center gap-3 rounded-xl border-2 bg-white p-6 text-center transition-all hover:border-primary hover:shadow-lg"
+                className="group flex flex-col items-center justify-center gap-3 rounded-xl glass-card glow-border p-6 text-center transition-all"
               >
                 {cat.image ? (
                   <div className="h-12 w-12 flex items-center justify-center text-4xl">
@@ -99,8 +96,8 @@ export default async function HomePage() {
         <section className="mt-20">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold">Latest Deals</h2>
-              <p className="text-muted-foreground mt-1">Fresh listings from our community</p>
+              <h2 className="text-3xl font-bold font-heading">Latest Deals</h2>
+              <p className="text-muted-foreground mt-1">Fresh listings from the FPV community</p>
             </div>
             <Link href="/deals" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
               View all <span>→</span>
@@ -114,25 +111,25 @@ export default async function HomePage() {
         </section>
 
         {/* Trust & Security Section */}
-        <section className="mt-20 rounded-xl bg-white p-8 shadow-lg md:p-12">
+        <section className="mt-20 rounded-xl glass-card p-8 md:p-12">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-bold text-gray-800">Why Choose Us?</h2>
-            <p className="mt-2 text-gray-600">Trade with confidence on a platform built for tech enthusiasts</p>
+            <h2 className="text-3xl font-bold text-foreground font-heading">Built for FPV Pilots</h2>
+            <p className="mt-2 text-muted-foreground">Trade with confidence on a platform designed for the FPV community</p>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 text-center md:grid-cols-3">
             <FeatureIcon
               icon={<ShieldCheck className="h-12 w-12" />}
-              title="Verified Users"
+              title="Verified Pilots"
               description="All sellers are verified to ensure safe and trustworthy transactions."
             />
             <FeatureIcon
               icon={<BookOpen className="h-12 w-12" />}
-              title="Product Catalog"
-              description="Extensive database of tech products with detailed specifications."
+              title="Gear Database"
+              description="Extensive database of FPV components with detailed specifications."
             />
             <FeatureIcon
               icon={<MessageCircle className="h-12 w-12" />}
-              title="Direct Contact"
+              title="Direct Chat"
               description="Built-in messaging to communicate directly with buyers and sellers."
             />
           </div>
@@ -140,27 +137,27 @@ export default async function HomePage() {
 
         {/* CTA Section */}
         <CTASection
-          title="Start Selling Today"
-          description="Join thousands of sellers and turn your unused tech into cash. Create your first listing in minutes!"
+          title="Start Selling Your Gear"
+          description="Join the FPV community marketplace. List your used gear and find it a new home!"
           buttonText="Create a Deal"
           buttonHref="/deals/create"
         />
       </div>
 
       {/* Stats Banner */}
-      <section className="bg-muted/50">
+      <section className="border-t border-border/50 bg-card/30">
         <div className="container py-12">
           <div className="grid grid-cols-1 gap-6 text-center sm:grid-cols-3">
             <div>
-              <p className="text-3xl font-bold text-primary">10K+</p>
+              <p className="text-3xl font-bold text-primary font-mono">10K+</p>
               <p className="text-sm text-muted-foreground mt-1">Active Listings</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-primary">5K+</p>
-              <p className="text-sm text-muted-foreground mt-1">Happy Sellers</p>
+              <p className="text-3xl font-bold text-primary font-mono">5K+</p>
+              <p className="text-sm text-muted-foreground mt-1">FPV Pilots</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-primary">25K+</p>
+              <p className="text-3xl font-bold text-primary font-mono">25K+</p>
               <p className="text-sm text-muted-foreground mt-1">Completed Trades</p>
             </div>
           </div>

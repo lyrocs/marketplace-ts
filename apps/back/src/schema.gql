@@ -162,12 +162,22 @@ type PaginationMetaOutput {
   totalPages: Int!
 }
 
+type ProductDealOutput {
+  condition: String
+  currency: String
+  id: Int!
+  price: Float
+  sellerName: String
+  title: String
+}
+
 type ProductOutput {
   brand: BrandOutput
   brandId: Int
   category: CategoryOutput
   categoryId: Float!
   createdAt: DateTime!
+  deals: [ProductDealOutput!]!
   description: String
   id: Int!
   images: [String!]!

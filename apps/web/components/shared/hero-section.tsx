@@ -11,54 +11,47 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({
-  title = 'Buy & Sell Tech Products',
-  description = 'Your trusted marketplace for buying and selling quality tech products.',
-  backgroundImage = 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1920&q=80',
+  title = 'Find Your Next FPV Setup',
+  description = 'The marketplace built for FPV pilots. Browse gear, compare prices, and trade with the community.',
   searchPlaceholder,
   isAuthenticated = false,
 }: HeroSectionProps) {
   return (
     <div className="relative flex min-h-[60vh] flex-col items-center justify-center px-4 text-center overflow-hidden">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url('${backgroundImage}')`,
-        }}
-      />
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-slate-900/60" />
+      {/* Dark base + grid pattern */}
+      <div className="absolute inset-0 bg-background" />
+      <div className="absolute inset-0 bg-grid opacity-[0.05]" />
 
-      {/* Decorative Blurs (fallback if no image) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
-      </div>
+      {/* Floating gradient orbs */}
+      <div className="absolute top-1/4 right-1/4 h-80 w-80 rounded-full bg-[hsl(185,100%,50%)] opacity-15 blur-[120px] animate-float" />
+      <div className="absolute bottom-1/4 left-1/4 h-80 w-80 rounded-full bg-[hsl(270,95%,65%)] opacity-15 blur-[120px] animate-float [animation-delay:3s]" />
 
       {/* Content */}
       <div className="relative z-10 max-w-3xl">
-        <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl">{title}</h1>
-        <p className="mt-4 text-lg text-white/90 md:text-xl">{description}</p>
+        <h1 className="font-heading text-5xl font-extrabold tracking-tight md:text-7xl">
+          Find Your Next <span className="text-gradient">FPV Setup</span>
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground md:text-xl">{description}</p>
 
-        {/* Search Bar - Client Component */}
+        {/* Search Bar */}
         <HeroSearch placeholder={searchPlaceholder} />
 
         {/* Action Buttons */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
           <Link href="/deals">
-            <Button size="lg" variant="outline" className="border-white/50 bg-white/10 text-white hover:bg-white/20">
+            <Button size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50">
               Browse Deals
             </Button>
           </Link>
           {isAuthenticated ? (
             <Link href="/deals/create">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button size="lg" className="bg-gradient-to-r from-[hsl(185,100%,50%)] to-[hsl(270,95%,65%)] text-white hover:opacity-90 border-0">
                 Sell an Item
               </Button>
             </Link>
           ) : (
             <Link href="/register">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button size="lg" className="bg-gradient-to-r from-[hsl(185,100%,50%)] to-[hsl(270,95%,65%)] text-white hover:opacity-90 border-0">
                 Get Started
               </Button>
             </Link>

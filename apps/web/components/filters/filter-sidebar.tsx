@@ -121,7 +121,7 @@ export function FilterSidebar({
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+      <h3 className="text-xl font-bold text-foreground font-heading">{title}</h3>
 
       {/* Search */}
       <Card>
@@ -269,7 +269,7 @@ export function FilterSidebar({
 
       {/* Clear Filters */}
       {hasActiveFilters && (
-        <Button variant="outline" onClick={handleReset} className="w-full">
+        <Button variant="outline" onClick={handleReset} className="w-full hover:border-primary/50 hover:text-primary">
           <X className="h-4 w-4 mr-2" />
           Clear Filters ({selectedSpecIds.length})
         </Button>

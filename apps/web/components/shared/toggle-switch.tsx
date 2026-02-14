@@ -18,14 +18,14 @@ export function ToggleSwitch({
   onClickRight,
 }: ToggleSwitchProps) {
   return (
-    <div className="inline-flex rounded-lg border border-border bg-background p-1">
+    <div className="inline-flex rounded-lg border border-border bg-secondary/50 p-1">
       <button
         type="button"
         onClick={onClickLeft}
         className={cn(
           'rounded-md px-4 py-2 text-sm font-medium transition-all',
           isLeftActive
-            ? 'bg-primary text-primary-foreground shadow-sm'
+            ? 'bg-primary text-primary-foreground shadow-[0_0_10px_hsl(var(--neon-cyan)/0.3)]'
             : 'text-muted-foreground hover:text-foreground'
         )}
       >
@@ -37,7 +37,7 @@ export function ToggleSwitch({
         className={cn(
           'rounded-md px-4 py-2 text-sm font-medium transition-all',
           !isLeftActive
-            ? 'bg-primary text-primary-foreground shadow-sm'
+            ? 'bg-primary text-primary-foreground shadow-[0_0_10px_hsl(var(--neon-cyan)/0.3)]'
             : 'text-muted-foreground hover:text-foreground'
         )}
       >

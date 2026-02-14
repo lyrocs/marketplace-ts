@@ -86,6 +86,27 @@ export class BrandOutput {
 }
 
 @ObjectType()
+export class ProductDealOutput {
+  @Field(() => Int)
+  id: number
+
+  @Field({ nullable: true })
+  title?: string
+
+  @Field(() => Float, { nullable: true })
+  price?: number
+
+  @Field({ nullable: true })
+  currency?: string
+
+  @Field({ nullable: true })
+  condition?: string
+
+  @Field({ nullable: true })
+  sellerName?: string
+}
+
+@ObjectType()
 export class ProductOutput {
   @Field(() => Int)
   id: number
@@ -119,6 +140,9 @@ export class ProductOutput {
 
   @Field(() => [SpecOutput], { defaultValue: [] })
   specs: SpecOutput[]
+
+  @Field(() => [ProductDealOutput], { defaultValue: [] })
+  deals: ProductDealOutput[]
 
   @Field()
   createdAt: Date

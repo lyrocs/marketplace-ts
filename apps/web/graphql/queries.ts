@@ -320,6 +320,7 @@ export const PRODUCT_QUERY = gql`
       brand { id name }
       shops { id url price currency available name }
       specs { id value specType { id key label } }
+      deals { id title price currency condition sellerName }
       createdAt
       updatedAt
     }
@@ -361,6 +362,7 @@ export const PRODUCTS_QUERY = gql`
         brand { id name }
         shops { price currency available }
         specs { id value specType { id key label } }
+        deals { id title price currency condition sellerName }
       }
       meta { total page limit totalPages hasNextPage hasPreviousPage }
     }

@@ -24,7 +24,7 @@ export function ActiveFilters({ filters, onClearAll }: ActiveFiltersProps) {
         <Badge
           key={index}
           variant="secondary"
-          className="cursor-pointer hover:bg-secondary/80"
+          className="cursor-pointer hover:bg-primary/20 hover:text-primary transition-colors"
           onClick={filter.onRemove}
         >
           {filter.label}: {filter.value}
