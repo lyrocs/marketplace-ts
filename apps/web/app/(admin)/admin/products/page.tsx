@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/client/react'
+import { useState, useMemo, useRef } from 'react'
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react'
 import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import { ImageUpload } from '@/components/shared/image-upload'
@@ -27,7 +27,7 @@ import {
   Textarea,
   Checkbox,
 } from '@marketplace/ui'
-import { Plus, Trash2, Eye, Edit } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit, X } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -40,6 +40,7 @@ export default function AdminProductsPage() {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const [editOpen, setEditOpen] = useState(false)
   const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', brandId: '', description: '', features: [] as string[], specIds: [] as number[], images: [] as string[] })
+  const editFeaturesRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
@@ -58,6 +59,7 @@ export default function AdminProductsPage() {
   const [addProductImage] = useMutation(ADD_PRODUCT_IMAGE_MUTATION)
   const [deleteProductImage] = useMutation(DELETE_PRODUCT_IMAGE_MUTATION)
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
+  const [fetchProduct] = useLazyQuery(PRODUCT_QUERY, { fetchPolicy: 'network-only' })
 
   const products = data?.products?.data || []
   const meta = data?.products?.meta
@@ -70,16 +72,38 @@ export default function AdminProductsPage() {
   const availableSpecTypeIds = selectedCategory?.specTypes?.map((st: any) => st.id) || []
   const availableSpecTypes = specTypes.filter((st: any) => availableSpecTypeIds.includes(st.id))
 
-  const openEditDialog = (product: any) => {
+  const brands = brandsData?.brands || []
+
+  const suggestBrands = (productName: string) => {
+    if (!productName) return []
+    const nameLower = productName.toLowerCase()
+    return brands.filter((b: any) => nameLower.includes(b.name.toLowerCase()))
+  }
+
+  const newProductBrandSuggestions = useMemo(
+    () => !newProduct.brandId ? suggestBrands(newProduct.name) : [],
+    [newProduct.name, newProduct.brandId, brands]
+  )
+
+  const editProductBrandSuggestions = useMemo(
+    () => !editProduct.brandId ? suggestBrands(editProduct.name) : [],
+    [editProduct.name, editProduct.brandId, brands]
+  )
+
+  const openEditDialog = async (productOrId: any) => {
+    const id = typeof productOrId === 'number' ? productOrId : productOrId.id
+    const { data: fullData } = await fetchProduct({ variables: { id } })
+    const p = fullData?.product
+    if (!p) return
     setEditProduct({
-      id: product.id,
-      name: product.name,
-      categoryId: (product.categoryId || product.category?.id || '').toString(),
-      brandId: (product.brandId || product.brand?.id || '').toString(),
-      description: product.description || '',
-      features: Array.isArray(product.features) ? product.features : [],
-      specIds: product.specs?.map((s: any) => s.id) || [],
-      images: Array.isArray(product.images) ? product.images : [],
+      id: p.id,
+      name: p.name,
+      categoryId: (p.categoryId || p.category?.id || '').toString(),
+      brandId: (p.brandId || p.brand?.id || '').toString(),
+      description: p.description || '',
+      features: Array.isArray(p.features) ? p.features : [],
+      specIds: p.specs?.map((s: any) => s.id) || [],
+      images: Array.isArray(p.images) ? p.images : [],
     })
     setEditOpen(true)
   }
@@ -313,11 +337,26 @@ export default function AdminProductsPage() {
               <Select value={newProduct.brandId} onValueChange={(v) => setNewProduct({ ...newProduct, brandId: v })}>
                 <SelectTrigger><SelectValue placeholder="Select brand" /></SelectTrigger>
                 <SelectContent>
-                  {(brandsData?.brands || []).map((brand: any) => (
+                  {brands.map((brand: any) => (
                     <SelectItem key={brand.id} value={brand.id.toString()}>{brand.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {newProductBrandSuggestions.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground">Detected:</span>
+                  {newProductBrandSuggestions.map((brand: any) => (
+                    <button
+                      key={brand.id}
+                      type="button"
+                      onClick={() => setNewProduct({ ...newProduct, brandId: brand.id.toString() })}
+                      className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      {brand.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label>Description (optional)</Label>
@@ -496,7 +535,7 @@ export default function AdminProductsPage() {
 
       {/* Edit Product Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[calc(100vw-2rem)] w-full max-h-[calc(100vh-2rem)] h-full overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
@@ -533,11 +572,26 @@ export default function AdminProductsPage() {
               <Select value={editProduct.brandId} onValueChange={(v) => setEditProduct({ ...editProduct, brandId: v })}>
                 <SelectTrigger><SelectValue placeholder="Select brand" /></SelectTrigger>
                 <SelectContent>
-                  {(brandsData?.brands || []).map((brand: any) => (
+                  {brands.map((brand: any) => (
                     <SelectItem key={brand.id} value={brand.id.toString()}>{brand.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {editProductBrandSuggestions.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground">Detected:</span>
+                  {editProductBrandSuggestions.map((brand: any) => (
+                    <button
+                      key={brand.id}
+                      type="button"
+                      onClick={() => setEditProduct({ ...editProduct, brandId: brand.id.toString() })}
+                      className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      {brand.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label>Description</Label>
@@ -547,36 +601,46 @@ export default function AdminProductsPage() {
                 rows={4}
               />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <Label>Features</Label>
-              <div className="space-y-2">
-                {editProduct.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <Input
-                      value={feature}
-                      onChange={(e) => {
-                        const updated = [...editProduct.features]
-                        updated[i] = e.target.value
-                        setEditProduct({ ...editProduct, features: updated })
-                      }}
-                      placeholder="Feature description"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setEditProduct({ ...editProduct, features: editProduct.features.filter((_, idx) => idx !== i) })}
+              {editProduct.features.length > 0 && (
+                <div className="grid grid-cols-2 gap-1.5">
+                  {editProduct.features.map((feature, i) => (
+                    <div
+                      key={i}
+                      className="group flex items-center justify-between rounded-md border border-border/50 bg-white/5 px-2.5 py-1.5 text-sm text-foreground hover:border-primary/30 transition-colors"
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditProduct({ ...editProduct, features: [...editProduct.features, ''] })}
-                >
-                  <Plus className="mr-1 h-3 w-3" /> Add Feature
-                </Button>
+                      <span className="truncate">{feature}</span>
+                      <button
+                        type="button"
+                        onClick={() => setEditProduct({ ...editProduct, features: editProduct.features.filter((_, idx) => idx !== i) })}
+                        className="ml-2 shrink-0 rounded-full p-0.5 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div
+                className="flex items-center rounded-lg border border-border bg-input px-3 py-2 cursor-text focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/30 transition-colors"
+                onClick={() => editFeaturesRef.current?.focus()}
+              >
+                <Plus className="h-3.5 w-3.5 text-muted-foreground/50 mr-2 shrink-0" />
+                <input
+                  ref={editFeaturesRef}
+                  type="text"
+                  placeholder="Type a feature and press Enter..."
+                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 outline-none"
+                  onKeyDown={(e) => {
+                    const value = (e.target as HTMLInputElement).value.trim()
+                    if (e.key === 'Enter' && value) {
+                      e.preventDefault()
+                      setEditProduct({ ...editProduct, features: [...editProduct.features, value] });
+                      (e.target as HTMLInputElement).value = ''
+                    }
+                  }}
+                />
               </div>
             </div>
             <div className="space-y-3">

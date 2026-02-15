@@ -27,6 +27,7 @@ export class ProductsService {
     // Transform specs from ProductSpec[] to Spec[]
     return {
       ...product,
+      features: this.normalizeFeatures(product.features),
       specs: product.specs.map((ps: any) => ps.spec),
       deals: (product as any).dealProducts.map((dp: any) => ({
         id: dp.deal.id,
@@ -37,6 +38,13 @@ export class ProductsService {
         sellerName: dp.deal.user?.name,
       })),
     };
+  }
+
+  private normalizeFeatures(features: any): string[] {
+    if (!features || !Array.isArray(features)) return [];
+    return features.map((f: any) =>
+      typeof f === 'string' ? f : (f.value || `${f.label}: ${f.value}`),
+    );
   }
 
   async search({
@@ -146,6 +154,7 @@ export class ProductsService {
     // Transform specs and deals from relations
     const transformedProducts = products.map((p: any) => ({
       ...p,
+      features: this.normalizeFeatures(p.features),
       specs: p.specs.map((ps: any) => ps.spec),
       deals: (p.dealProducts || []).map((dp: any) => ({
         id: dp.deal.id,
@@ -339,15 +348,16 @@ export class ProductsService {
           }
         }
 
-        // Build features as { label, value } from the JSON structure
-        const features: { label: string; value: string }[] = [];
+        // Build features as string[] from the JSON structure
+        const features: string[] = [];
         if (item.features && Array.isArray(item.features)) {
           for (const group of item.features) {
-            const title = group.title || 'Features';
             if (Array.isArray(group.items)) {
               for (const val of group.items) {
-                features.push({ label: title, value: val });
+                features.push(val);
               }
+            } else if (typeof group === 'string') {
+              features.push(group);
             }
           }
         }

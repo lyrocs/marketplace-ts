@@ -72,24 +72,17 @@ export default async function ProductDetailsPage({
             </ProductSection>
           )}
 
-          {/* Technical Specifications */}
+          {/* Features */}
           {product.features && product.features.length > 0 && (
-            <ProductSection title="Technical Specifications">
-              <div className="mt-6 space-y-6">
-                {product.features.map((feature: any) => (
-                  <div key={feature.label}>
-                    <h3 className="mb-3 border-b border-border/50 pb-2 text-lg font-bold text-foreground">
-                      {feature.label}
-                    </h3>
-                    <dl className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <dt className="text-muted-foreground">{feature.label}</dt>
-                        <dd className="font-semibold text-foreground">{feature.value}</dd>
-                      </div>
-                    </dl>
-                  </div>
+            <ProductSection title="Features">
+              <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {product.features.map((feature: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                    {feature}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </ProductSection>
           )}
         </div>
