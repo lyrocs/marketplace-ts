@@ -39,7 +39,7 @@ export default function AdminProductsPage() {
   const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '', specIds: [] as number[], images: [] as string[] })
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const [editOpen, setEditOpen] = useState(false)
-  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', description: '', specIds: [] as number[], images: [] as string[] })
+  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', brandId: '', description: '', features: [] as string[], specIds: [] as number[], images: [] as string[] })
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
@@ -75,7 +75,9 @@ export default function AdminProductsPage() {
       id: product.id,
       name: product.name,
       categoryId: (product.categoryId || product.category?.id || '').toString(),
+      brandId: (product.brandId || product.brand?.id || '').toString(),
       description: product.description || '',
+      features: Array.isArray(product.features) ? product.features : [],
       specIds: product.specs?.map((s: any) => s.id) || [],
       images: Array.isArray(product.images) ? product.images : [],
     })
@@ -138,7 +140,9 @@ export default function AdminProductsPage() {
           id: editProduct.id,
           name: editProduct.name,
           categoryId: parseInt(editProduct.categoryId),
+          brandId: editProduct.brandId ? parseInt(editProduct.brandId) : undefined,
           description: editProduct.description || undefined,
+          features: editProduct.features,
         },
       })
       // Update specs separately
@@ -407,6 +411,18 @@ export default function AdminProductsPage() {
                   </div>
                 )}
 
+                {/* Features */}
+                {product.features && product.features.length > 0 && (
+                  <div>
+                    <Label>Features</Label>
+                    <ul className="mt-2 space-y-1 text-sm text-muted-foreground list-disc list-inside">
+                      {product.features.map((feature: string, i: number) => (
+                        <li key={i}>{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {/* Specifications */}
                 {product.specs && product.specs.length > 0 && (
                   <div>
@@ -513,12 +529,55 @@ export default function AdminProductsPage() {
               </Select>
             </div>
             <div className="space-y-1.5">
+              <Label>Brand</Label>
+              <Select value={editProduct.brandId} onValueChange={(v) => setEditProduct({ ...editProduct, brandId: v })}>
+                <SelectTrigger><SelectValue placeholder="Select brand" /></SelectTrigger>
+                <SelectContent>
+                  {(brandsData?.brands || []).map((brand: any) => (
+                    <SelectItem key={brand.id} value={brand.id.toString()}>{brand.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Label>Description</Label>
               <Textarea
                 value={editProduct.description}
                 onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
                 rows={4}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Features</Label>
+              <div className="space-y-2">
+                {editProduct.features.map((feature, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      value={feature}
+                      onChange={(e) => {
+                        const updated = [...editProduct.features]
+                        updated[i] = e.target.value
+                        setEditProduct({ ...editProduct, features: updated })
+                      }}
+                      placeholder="Feature description"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setEditProduct({ ...editProduct, features: editProduct.features.filter((_, idx) => idx !== i) })}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditProduct({ ...editProduct, features: [...editProduct.features, ''] })}
+                >
+                  <Plus className="mr-1 h-3 w-3" /> Add Feature
+                </Button>
+              </div>
             </div>
             <div className="space-y-3">
               <Label>Specifications</Label>

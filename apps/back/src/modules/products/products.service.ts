@@ -199,6 +199,7 @@ export class ProductsService {
       brandId: number | null;
       images: string[];
       description: string;
+      features: any;
       status: string;
     }>,
   ): Promise<any> {
@@ -275,5 +276,145 @@ export class ProductsService {
     });
 
     return this.findById(productId);
+  }
+
+  async importFromJson(json: string): Promise<{ imported: number; failed: number; errors: string[] }> {
+    let items: any[];
+    try {
+      items = JSON.parse(json);
+    } catch {
+      return { imported: 0, failed: 0, errors: ['Invalid JSON'] };
+    }
+
+    if (!Array.isArray(items)) {
+      return { imported: 0, failed: 0, errors: ['JSON must be an array'] };
+    }
+
+    let imported = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const item of items) {
+      try {
+        // Find or create brand
+        let brandId: number | null = null;
+        if (item.manufacturer_name) {
+          const brand = await prisma.brand.upsert({
+            where: { name: item.manufacturer_name },
+            update: {},
+            create: { name: item.manufacturer_name },
+          });
+          brandId = brand.id;
+        }
+
+        // Find category by name (case-insensitive match on key or name)
+        let categoryId: number | null = null;
+        if (item.category_name) {
+          const category = await prisma.category.findFirst({
+            where: {
+              OR: [
+                { key: { equals: item.category_name, mode: 'insensitive' } },
+                { name: { equals: item.category_name, mode: 'insensitive' } },
+              ],
+            },
+          });
+          if (category) {
+            categoryId = category.id;
+          }
+        }
+
+        // If no category found, use a default or skip
+        if (!categoryId) {
+          // Try to find or create a generic category
+          const defaultCat = await prisma.category.findFirst({
+            where: { key: 'uncategorized' },
+          });
+          if (defaultCat) {
+            categoryId = defaultCat.id;
+          } else {
+            const created = await prisma.category.create({
+              data: { name: 'Uncategorized', key: 'uncategorized', description: 'Imported products without a category' },
+            });
+            categoryId = created.id;
+          }
+        }
+
+        // Build features as { label, value } from the JSON structure
+        const features: { label: string; value: string }[] = [];
+        if (item.features && Array.isArray(item.features)) {
+          for (const group of item.features) {
+            const title = group.title || 'Features';
+            if (Array.isArray(group.items)) {
+              for (const val of group.items) {
+                features.push({ label: title, value: val });
+              }
+            }
+          }
+        }
+
+        // Create product in draft status
+        const product = await prisma.product.create({
+          data: {
+            name: item.name,
+            categoryId,
+            brandId,
+            description: item.description || null,
+            images: item.images || [],
+            features: features.length > 0 ? features : undefined,
+            status: 'draft',
+          },
+        });
+
+        // Create shop entry
+        if (item.url && item.shop) {
+          await prisma.shop.create({
+            data: {
+              productId: product.id,
+              name: item.shop,
+              url: item.url,
+              price: item.price ?? null,
+              currency: item.currency || 'USD',
+              available: item.available ?? true,
+            },
+          });
+        }
+
+        // Create specs
+        if (item.specs && Array.isArray(item.specs)) {
+          for (const specItem of item.specs) {
+            if (!specItem.type || !specItem.value) continue;
+
+            // Find or create spec type
+            const specType = await prisma.specType.upsert({
+              where: { key: specItem.type },
+              update: {},
+              create: { key: specItem.type, label: specItem.type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) },
+            });
+
+            // Find or create spec value
+            let spec = await prisma.spec.findFirst({
+              where: { specTypeId: specType.id, value: specItem.value },
+            });
+            if (!spec) {
+              spec = await prisma.spec.create({
+                data: { specTypeId: specType.id, value: specItem.value },
+              });
+            }
+
+            // Link to product
+            await prisma.productSpec.create({
+              data: { productId: product.id, specId: spec.id },
+            }).catch(() => {}); // ignore duplicate
+          }
+        }
+
+        imported++;
+      } catch (e: any) {
+        failed++;
+        errors.push(`${item.name || 'Unknown'}: ${e.message}`);
+      }
+    }
+
+    return { imported, failed, errors };
   }
 }

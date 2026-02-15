@@ -331,6 +331,7 @@ export const PRODUCT_QUERY = gql`
       brandId
       images
       description
+      features
       status
       category { id name key }
       brand { id name }
@@ -399,12 +400,14 @@ export const CREATE_PRODUCT_MUTATION = gql`
 `
 
 export const UPDATE_PRODUCT_MUTATION = gql`
-  mutation UpdateProduct($id: Int!, $name: String, $categoryId: Int, $description: String) {
-    updateProduct(id: $id, name: $name, categoryId: $categoryId, description: $description) {
+  mutation UpdateProduct($id: Int!, $name: String, $categoryId: Int, $brandId: Int, $description: String, $features: [String!]) {
+    updateProduct(id: $id, name: $name, categoryId: $categoryId, brandId: $brandId, description: $description, features: $features) {
       id
       name
       categoryId
+      brandId
       description
+      features
       status
     }
   }
@@ -413,6 +416,16 @@ export const UPDATE_PRODUCT_MUTATION = gql`
 export const DELETE_PRODUCT_MUTATION = gql`
   mutation DeleteProduct($id: Int!) {
     deleteProduct(id: $id)
+  }
+`
+
+export const IMPORT_PRODUCTS_MUTATION = gql`
+  mutation ImportProducts($json: String!) {
+    importProducts(json: $json) {
+      imported
+      failed
+      errors
+    }
   }
 `
 

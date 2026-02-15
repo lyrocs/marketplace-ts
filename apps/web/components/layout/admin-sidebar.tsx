@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@marketplace/ui'
-import { LayoutDashboard, ShoppingBag, Package, Tag, Settings, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, Package, Tag, Settings, ChevronRight, FileJson } from 'lucide-react'
 
 const sidebarItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -12,6 +12,7 @@ const sidebarItems = [
   { href: '/admin/categories', label: 'Categories', icon: Tag },
   { href: '/admin/brands', label: 'Brands', icon: Tag },
   { href: '/admin/specs', label: 'Specifications', icon: Settings },
+  { href: '/admin/import', label: 'Import', icon: FileJson },
 ]
 
 export function AdminSidebar() {

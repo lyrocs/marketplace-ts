@@ -118,6 +118,12 @@ type DiscussionUserOutput {
   name: String
 }
 
+type ImportResultOutput {
+  errors: [String!]!
+  failed: Int!
+  imported: Int!
+}
+
 type Mutation {
   addDealImage(dealId: Int!, imageUrl: String!): DealOutput!
   addProductImage(imageUrl: String!, productId: Int!): ProductOutput!
@@ -136,6 +142,7 @@ type Mutation {
   deleteProductImage(imageUrl: String!, productId: Int!): ProductOutput!
   deleteSpec(id: Int!): Boolean!
   deleteSpecType(id: Int!): Boolean!
+  importProducts(json: String!): ImportResultOutput!
   login(email: String!, password: String!): AuthPayloadOutput!
   markDiscussionRead(discussionId: Int!): Boolean!
   publishDeal(id: Int!): DealOutput!
@@ -147,7 +154,7 @@ type Mutation {
   updateBrand(id: Int!, name: String!): BrandGqlOutput!
   updateCategory(description: String, id: Int!, image: String, key: String, name: String): CategoryTreeOutput!
   updateDeal(canBeDelivered: Boolean, condition: String, currency: String, description: String, features: [DealFeatureInput!], id: Int!, invoiceAvailable: Boolean, location: String, price: Float, products: [DealProductInput!], sellingReason: String, title: String): DealOutput!
-  updateProduct(categoryId: Int, description: String, id: Int!, name: String): ProductOutput!
+  updateProduct(brandId: Int, categoryId: Int, description: String, features: [String!], id: Int!, name: String): ProductOutput!
   updateProductSpecs(productId: Int!, specIds: [Int!]!): ProductOutput!
   updateProfile(image: String, name: String): UserProfileOutput!
   updateSpecType(description: String, id: Int!, key: String, label: String): SpecTypeGqlOutput!
@@ -179,6 +186,7 @@ type ProductOutput {
   createdAt: DateTime!
   deals: [ProductDealOutput!]!
   description: String
+  features: [String!]!
   id: Int!
   images: [String!]!
   name: String!

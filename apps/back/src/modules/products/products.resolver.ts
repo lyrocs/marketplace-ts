@@ -7,6 +7,7 @@ import {
   ObjectType,
   Field,
   Float,
+  InputType,
 } from '@nestjs/graphql'
 import { UseGuards } from '@nestjs/common'
 import { ProductsService } from './products.service.js'
@@ -126,6 +127,9 @@ export class ProductOutput {
   @Field({ nullable: true })
   description?: string
 
+  @Field(() => [String], { defaultValue: [] })
+  features: string[]
+
   @Field()
   status: string
 
@@ -224,12 +228,16 @@ export class ProductsResolver {
     @Args({ name: 'id', type: () => Int }) id: number,
     @Args({ name: 'name', nullable: true }) name?: string,
     @Args({ name: 'categoryId', type: () => Int, nullable: true }) categoryId?: number,
+    @Args({ name: 'brandId', type: () => Int, nullable: true }) brandId?: number,
     @Args({ name: 'description', nullable: true }) description?: string,
+    @Args({ name: 'features', type: () => [String], nullable: true }) features?: string[],
   ): Promise<ProductOutput> {
     const data: any = {}
     if (name !== undefined) data.name = name
     if (categoryId !== undefined) data.categoryId = categoryId
+    if (brandId !== undefined) data.brandId = brandId
     if (description !== undefined) data.description = description
+    if (features !== undefined) data.features = features
     return this.productsService.update(id, data) as any
   }
 
@@ -290,4 +298,25 @@ export class ProductsResolver {
   ): Promise<ProductOutput> {
     return this.productsService.deleteImage(productId, imageUrl) as any
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Mutation(() => ImportResultOutput)
+  async importProducts(
+    @Args({ name: 'json' }) json: string,
+  ): Promise<ImportResultOutput> {
+    return this.productsService.importFromJson(json)
+  }
+}
+
+@ObjectType()
+export class ImportResultOutput {
+  @Field(() => Int)
+  imported: number
+
+  @Field(() => Int)
+  failed: number
+
+  @Field(() => [String])
+  errors: string[]
 }
