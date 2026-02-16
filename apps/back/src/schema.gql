@@ -155,7 +155,7 @@ type Mutation {
   updateBrand(id: Int!, name: String!): BrandGqlOutput!
   updateCategory(description: String, id: Int!, image: String, key: String, name: String): CategoryTreeOutput!
   updateDeal(canBeDelivered: Boolean, condition: String, currency: String, description: String, features: [DealFeatureInput!], id: Int!, invoiceAvailable: Boolean, location: String, price: Float, products: [DealProductInput!], sellingReason: String, title: String): DealOutput!
-  updateProduct(brandId: Int, categoryId: Int, description: String, features: [String!], id: Int!, name: String): ProductOutput!
+  updateProduct(brandId: Int, categoryId: Int, description: String, features: [String!], id: Int!, name: String, status: String): ProductOutput!
   updateProductSpecs(productId: Int!, specIds: [Int!]!): ProductOutput!
   updateProfile(image: String, name: String): UserProfileOutput!
   updateSpecType(description: String, id: Int!, key: String, label: String): SpecTypeGqlOutput!

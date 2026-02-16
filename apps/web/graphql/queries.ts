@@ -375,6 +375,7 @@ export const PRODUCTS_QUERY = gql`
         categoryId
         images
         description
+        status
         category { id name key }
         brand { id name }
         shops { price currency available }
@@ -400,8 +401,8 @@ export const CREATE_PRODUCT_MUTATION = gql`
 `
 
 export const UPDATE_PRODUCT_MUTATION = gql`
-  mutation UpdateProduct($id: Int!, $name: String, $categoryId: Int, $brandId: Int, $description: String, $features: [String!]) {
-    updateProduct(id: $id, name: $name, categoryId: $categoryId, brandId: $brandId, description: $description, features: $features) {
+  mutation UpdateProduct($id: Int!, $name: String, $categoryId: Int, $brandId: Int, $description: String, $features: [String!], $status: String) {
+    updateProduct(id: $id, name: $name, categoryId: $categoryId, brandId: $brandId, description: $description, features: $features, status: $status) {
       id
       name
       categoryId

@@ -231,6 +231,7 @@ export class ProductsResolver {
     @Args({ name: 'brandId', type: () => Int, nullable: true }) brandId?: number,
     @Args({ name: 'description', nullable: true }) description?: string,
     @Args({ name: 'features', type: () => [String], nullable: true }) features?: string[],
+    @Args({ name: 'status', nullable: true }) status?: string,
   ): Promise<ProductOutput> {
     const data: any = {}
     if (name !== undefined) data.name = name
@@ -238,6 +239,7 @@ export class ProductsResolver {
     if (brandId !== undefined) data.brandId = brandId
     if (description !== undefined) data.description = description
     if (features !== undefined) data.features = features
+    if (status !== undefined) data.status = status
     return this.productsService.update(id, data) as any
   }
 

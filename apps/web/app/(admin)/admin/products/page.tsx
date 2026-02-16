@@ -39,7 +39,7 @@ export default function AdminProductsPage() {
   const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '', specIds: [] as number[], images: [] as string[] })
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const [editOpen, setEditOpen] = useState(false)
-  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', brandId: '', description: '', features: [] as string[], specIds: [] as number[], images: [] as string[] })
+  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', brandId: '', description: '', status: 'draft', features: [] as string[], specIds: [] as number[], images: [] as string[] })
   const editFeaturesRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
@@ -101,6 +101,7 @@ export default function AdminProductsPage() {
       categoryId: (p.categoryId || p.category?.id || '').toString(),
       brandId: (p.brandId || p.brand?.id || '').toString(),
       description: p.description || '',
+      status: p.status || 'draft',
       features: Array.isArray(p.features) ? p.features : [],
       specIds: p.specs?.map((s: any) => s.id) || [],
       images: Array.isArray(p.images) ? p.images : [],
@@ -167,6 +168,7 @@ export default function AdminProductsPage() {
           brandId: editProduct.brandId ? parseInt(editProduct.brandId) : undefined,
           description: editProduct.description || undefined,
           features: editProduct.features,
+          status: editProduct.status,
         },
       })
       // Update specs separately
@@ -220,6 +222,17 @@ export default function AdminProductsPage() {
     }
   }
 
+  const handleToggleStatus = async (id: number, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'draft' : 'active'
+    try {
+      await updateProduct({ variables: { id, status: newStatus } })
+      toast({ title: `Status changed to ${newStatus}`, variant: 'success' })
+      await refetch()
+    } catch {
+      toast({ title: 'Failed to update status', variant: 'destructive' })
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -256,6 +269,7 @@ export default function AdminProductsPage() {
                   <thead>
                     <tr className="border-b">
                       <th className="px-4 py-3 text-left font-semibold">Name</th>
+                      <th className="px-4 py-3 text-left font-semibold">Status</th>
                       <th className="px-4 py-3 text-left font-semibold">Category</th>
                       <th className="px-4 py-3 text-left font-semibold">Brand</th>
                       <th className="px-4 py-3 text-left font-semibold">Shops</th>
@@ -266,6 +280,19 @@ export default function AdminProductsPage() {
                     {products.map((product: any) => (
                       <tr key={product.id} className="border-b last:border-0">
                         <td className="px-4 py-3 font-medium">{product.name}</td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => handleToggleStatus(product.id, product.status)}
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors cursor-pointer ${
+                              product.status === 'active'
+                                ? 'bg-[hsl(var(--neon-green))]/15 text-[hsl(var(--neon-green))] hover:bg-[hsl(var(--neon-green))]/25'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                            }`}
+                          >
+                            <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${product.status === 'active' ? 'bg-[hsl(var(--neon-green))]' : 'bg-muted-foreground/50'}`} />
+                            {product.status}
+                          </button>
+                        </td>
                         <td className="px-4 py-3 text-muted-foreground">{product.category?.name}</td>
                         <td className="px-4 py-3 text-muted-foreground">{product.brand?.name || '—'}</td>
                         <td className="px-4 py-3 text-muted-foreground">{product.shops?.length || 0}</td>
@@ -537,8 +564,24 @@ export default function AdminProductsPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-[calc(100vw-2rem)] w-full max-h-[calc(100vh-2rem)] h-full overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
-            <DialogDescription>Update product information</DialogDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle>Edit Product</DialogTitle>
+                <DialogDescription>Update product information</DialogDescription>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditProduct({ ...editProduct, status: editProduct.status === 'active' ? 'draft' : 'active' })}
+                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold transition-colors cursor-pointer ${
+                  editProduct.status === 'active'
+                    ? 'bg-[hsl(var(--neon-green))]/15 text-[hsl(var(--neon-green))] hover:bg-[hsl(var(--neon-green))]/25'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${editProduct.status === 'active' ? 'bg-[hsl(var(--neon-green))]' : 'bg-muted-foreground/50'}`} />
+                {editProduct.status}
+              </button>
+            </div>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
