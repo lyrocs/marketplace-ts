@@ -9,7 +9,7 @@ export default function ImportProductsPage() {
   const [jsonInput, setJsonInput] = useState('')
   const [parsed, setParsed] = useState<any[] | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
-  const [result, setResult] = useState<{ imported: number; failed: number; errors: string[] } | null>(null)
+  const [result, setResult] = useState<{ imported: number; updated: number; failed: number; errors: string[] } | null>(null)
 
   const [importProducts, { loading }] = useMutation(IMPORT_PRODUCTS_MUTATION)
 
@@ -52,12 +52,12 @@ export default function ImportProductsPage() {
     try {
       const { data } = await importProducts({ variables: { json: jsonInput } })
       setResult(data.importProducts)
-      if (data.importProducts.imported > 0) {
+      if (data.importProducts.imported > 0 || data.importProducts.updated > 0) {
         setJsonInput('')
         setParsed(null)
       }
     } catch (err: any) {
-      setResult({ imported: 0, failed: 0, errors: [err.message] })
+      setResult({ imported: 0, updated: 0, failed: 0, errors: [err.message] })
     }
   }
 
@@ -66,23 +66,24 @@ export default function ImportProductsPage() {
       <div>
         <h1 className="text-2xl font-bold font-heading text-foreground">Import Products</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Import products from JSON. Products will be created in <span className="text-primary font-mono font-semibold">draft</span> status.
+          Import products from JSON. New products are created in <span className="text-primary font-mono font-semibold">draft</span> status. Existing products (matched by name) are updated.
         </p>
       </div>
 
       {/* Result banner */}
       {result && (
-        <div className={`glass-card rounded-xl p-4 flex items-start gap-3 ${result.imported > 0 ? 'border-[hsl(var(--neon-green))]/30' : 'border-destructive/30'}`}>
-          {result.imported > 0 ? (
+        <div className={`glass-card rounded-xl p-4 flex items-start gap-3 ${(result.imported > 0 || result.updated > 0) ? 'border-[hsl(var(--neon-green))]/30' : 'border-destructive/30'}`}>
+          {(result.imported > 0 || result.updated > 0) ? (
             <CheckCircle2 className="h-5 w-5 text-[hsl(var(--neon-green))] shrink-0 mt-0.5" />
           ) : (
             <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
           )}
           <div className="space-y-1 text-sm">
             <p className="font-medium text-foreground">
-              {result.imported > 0 && <span className="text-[hsl(var(--neon-green))]">{result.imported} products imported.</span>}
+              {result.imported > 0 && <span className="text-[hsl(var(--neon-green))]">{result.imported} created.</span>}
+              {result.updated > 0 && <span className="text-primary ml-2">{result.updated} updated.</span>}
               {result.failed > 0 && <span className="text-destructive ml-2">{result.failed} failed.</span>}
-              {result.imported === 0 && result.failed === 0 && result.errors.length > 0 && (
+              {result.imported === 0 && result.updated === 0 && result.failed === 0 && result.errors.length > 0 && (
                 <span className="text-destructive">Import failed.</span>
               )}
             </p>
@@ -141,10 +142,10 @@ export default function ImportProductsPage() {
                 <tr className="border-b border-border/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="pb-2 pr-4">#</th>
                   <th className="pb-2 pr-4">Name</th>
-                  <th className="pb-2 pr-4">Brand</th>
                   <th className="pb-2 pr-4">Category</th>
                   <th className="pb-2 pr-4">Price</th>
                   <th className="pb-2 pr-4">Shop</th>
+                  <th className="pb-2 pr-4">Available</th>
                   <th className="pb-2">Specs</th>
                 </tr>
               </thead>
@@ -153,12 +154,17 @@ export default function ImportProductsPage() {
                   <tr key={i} className="text-muted-foreground">
                     <td className="py-2 pr-4 font-mono text-xs text-muted-foreground/50">{i + 1}</td>
                     <td className="py-2 pr-4 font-medium text-foreground max-w-[200px] truncate">{item.name || '—'}</td>
-                    <td className="py-2 pr-4">{item.manufacturer_name || '—'}</td>
                     <td className="py-2 pr-4">{item.category_name || '—'}</td>
                     <td className="py-2 pr-4 font-mono text-primary">
                       {item.price != null ? `${item.currency === 'EUR' ? '€' : '$'}${item.price}` : '—'}
                     </td>
                     <td className="py-2 pr-4">{item.shop || '—'}</td>
+                    <td className="py-2 pr-4">
+                      {item.available === false
+                        ? <span className="text-xs text-destructive">No</span>
+                        : <span className="text-xs text-[hsl(var(--neon-green))]">Yes</span>
+                      }
+                    </td>
                     <td className="py-2 font-mono text-xs">
                       {item.specs?.length ?? 0}
                     </td>

@@ -287,19 +287,20 @@ export class ProductsService {
     return this.findById(productId);
   }
 
-  async importFromJson(json: string): Promise<{ imported: number; failed: number; errors: string[] }> {
+  async importFromJson(json: string): Promise<{ imported: number; updated: number; failed: number; errors: string[] }> {
     let items: any[];
     try {
       items = JSON.parse(json);
     } catch {
-      return { imported: 0, failed: 0, errors: ['Invalid JSON'] };
+      return { imported: 0, updated: 0, failed: 0, errors: ['Invalid JSON'] };
     }
 
     if (!Array.isArray(items)) {
-      return { imported: 0, failed: 0, errors: ['JSON must be an array'] };
+      return { imported: 0, updated: 0, failed: 0, errors: ['JSON must be an array'] };
     }
 
     let imported = 0;
+    let updated = 0;
     let failed = 0;
     const errors: string[] = [];
 
@@ -334,7 +335,6 @@ export class ProductsService {
 
         // If no category found, use a default or skip
         if (!categoryId) {
-          // Try to find or create a generic category
           const defaultCat = await prisma.category.findFirst({
             where: { key: 'uncategorized' },
           });
@@ -348,60 +348,120 @@ export class ProductsService {
           }
         }
 
-        // Build features as string[] from the JSON structure
+        // Build features as string[] — handles plain strings, grouped objects, or mixed
         const features: string[] = [];
         if (item.features && Array.isArray(item.features)) {
-          for (const group of item.features) {
-            if (Array.isArray(group.items)) {
-              for (const val of group.items) {
-                features.push(val);
+          for (const entry of item.features) {
+            if (typeof entry === 'string') {
+              features.push(entry);
+            } else if (Array.isArray(entry)) {
+              for (const val of entry) {
+                if (typeof val === 'string') features.push(val);
               }
-            } else if (typeof group === 'string') {
-              features.push(group);
+            } else if (entry && typeof entry === 'object') {
+              if (Array.isArray(entry.items)) {
+                for (const val of entry.items) {
+                  if (typeof val === 'string') features.push(val);
+                }
+              } else if (entry.value) {
+                features.push(String(entry.value));
+              }
             }
           }
         }
 
-        // Create product in draft status
-        const product = await prisma.product.create({
-          data: {
-            name: item.name,
-            categoryId,
-            brandId,
-            description: item.description || null,
-            images: item.images || [],
-            features: features.length > 0 ? features : undefined,
-            status: 'draft',
-          },
+        // Check if product already exists by name (case-insensitive)
+        const existing = await prisma.product.findFirst({
+          where: { name: { equals: item.name, mode: 'insensitive' } },
+          include: { shops: true },
         });
 
-        // Create shop entry
-        if (item.url && item.shop) {
-          await prisma.shop.create({
+        let product: any;
+        let isUpdate = false;
+
+        if (existing) {
+          // Update existing product
+          isUpdate = true;
+          product = await prisma.product.update({
+            where: { id: existing.id },
             data: {
-              productId: product.id,
-              name: item.shop,
-              url: item.url,
-              price: item.price ?? null,
-              currency: item.currency || 'USD',
-              available: item.available ?? true,
+              ...(brandId && { brandId }),
+              ...(categoryId && { categoryId }),
+              ...(item.description && { description: item.description }),
+              ...(item.images?.length > 0 && { images: item.images }),
+              ...(features.length > 0 && { features }),
             },
           });
+
+          // Update or create shop entry
+          if (item.url && item.shop) {
+            const existingShop = existing.shops.find(
+              (s: any) => s.url === item.url || s.name === item.shop,
+            );
+            if (existingShop) {
+              await prisma.shop.update({
+                where: { id: existingShop.id },
+                data: {
+                  url: item.url,
+                  name: item.shop,
+                  price: item.price ?? existingShop.price,
+                  currency: item.currency || existingShop.currency || 'USD',
+                  available: item.available ?? existingShop.available ?? true,
+                },
+              });
+            } else {
+              await prisma.shop.create({
+                data: {
+                  productId: product.id,
+                  name: item.shop,
+                  url: item.url,
+                  price: item.price ?? null,
+                  currency: item.currency || 'USD',
+                  available: item.available ?? true,
+                },
+              });
+            }
+          }
+        } else {
+          // Create new product in draft status
+          product = await prisma.product.create({
+            data: {
+              name: item.name,
+              categoryId,
+              brandId,
+              description: item.description || null,
+              images: item.images || [],
+              features: features.length > 0 ? features : undefined,
+              status: 'draft',
+            },
+          });
+
+          // Create shop entry
+          if (item.url && item.shop) {
+            await prisma.shop.create({
+              data: {
+                productId: product.id,
+                name: item.shop,
+                url: item.url,
+                price: item.price ?? null,
+                currency: item.currency || 'USD',
+                available: item.available ?? true,
+              },
+            });
+          }
         }
 
-        // Create specs
+        // Upsert specs
         if (item.specs && Array.isArray(item.specs)) {
           for (const specItem of item.specs) {
             if (!specItem.type || !specItem.value) continue;
 
-            // Find or create spec type
             const specType = await prisma.specType.upsert({
               where: { key: specItem.type },
               update: {},
               create: { key: specItem.type, label: specItem.type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) },
             });
 
-            // Find or create spec value
             let spec = await prisma.spec.findFirst({
               where: { specTypeId: specType.id, value: specItem.value },
             });
@@ -411,20 +471,23 @@ export class ProductsService {
               });
             }
 
-            // Link to product
             await prisma.productSpec.create({
               data: { productId: product.id, specId: spec.id },
             }).catch(() => {}); // ignore duplicate
           }
         }
 
-        imported++;
+        if (isUpdate) {
+          updated++;
+        } else {
+          imported++;
+        }
       } catch (e: any) {
         failed++;
         errors.push(`${item.name || 'Unknown'}: ${e.message}`);
       }
     }
 
-    return { imported, failed, errors };
+    return { imported, updated, failed, errors };
   }
 }

@@ -423,6 +423,7 @@ export const IMPORT_PRODUCTS_MUTATION = gql`
   mutation ImportProducts($json: String!) {
     importProducts(json: $json) {
       imported
+      updated
       failed
       errors
     }

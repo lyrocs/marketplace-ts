@@ -315,6 +315,9 @@ export class ImportResultOutput {
   imported: number
 
   @Field(() => Int)
+  updated: number
+
+  @Field(() => Int)
   failed: number
 
   @Field(() => [String])

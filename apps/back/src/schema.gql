@@ -122,6 +122,7 @@ type ImportResultOutput {
   errors: [String!]!
   failed: Int!
   imported: Int!
+  updated: Int!
 }
 
 type Mutation {
