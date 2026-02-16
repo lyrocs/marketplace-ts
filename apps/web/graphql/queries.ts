@@ -387,6 +387,18 @@ export const PRODUCTS_QUERY = gql`
   }
 `
 
+export const SUGGEST_PRODUCT_MUTATION = gql`
+  mutation SuggestProduct($name: String!, $categoryId: Int!, $brandId: Int) {
+    suggestProduct(name: $name, categoryId: $categoryId, brandId: $brandId) {
+      id
+      name
+      categoryId
+      brandId
+      status
+    }
+  }
+`
+
 export const CREATE_PRODUCT_MUTATION = gql`
   mutation CreateProduct($name: String!, $categoryId: Int!, $brandId: Int, $description: String) {
     createProduct(name: $name, categoryId: $categoryId, brandId: $brandId, description: $description) {

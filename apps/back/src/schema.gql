@@ -152,6 +152,7 @@ type Mutation {
   requestPasswordReset(email: String!): SuccessOutput!
   resetPassword(password: String!, token: String!): SuccessOutput!
   startDiscussion(dealId: Int!): DiscussionOutput!
+  suggestProduct(brandId: Int, categoryId: Int!, name: String!): ProductOutput!
   updateBrand(id: Int!, name: String!): BrandGqlOutput!
   updateCategory(description: String, id: Int!, image: String, key: String, name: String): CategoryTreeOutput!
   updateDeal(canBeDelivered: Boolean, condition: String, currency: String, description: String, features: [DealFeatureInput!], id: Int!, invoiceAvailable: Boolean, location: String, price: Float, products: [DealProductInput!], sellingReason: String, title: String): DealOutput!

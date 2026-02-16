@@ -204,6 +204,21 @@ export class ProductsResolver {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Mutation(() => ProductOutput)
+  async suggestProduct(
+    @Args({ name: 'name' }) name: string,
+    @Args({ name: 'categoryId', type: () => Int }) categoryId: number,
+    @Args({ name: 'brandId', type: () => Int, nullable: true }) brandId?: number,
+  ): Promise<ProductOutput> {
+    return this.productsService.create({
+      name,
+      categoryId,
+      brandId,
+      status: 'draft',
+    }) as any
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   @Mutation(() => ProductOutput)
   async createProduct(

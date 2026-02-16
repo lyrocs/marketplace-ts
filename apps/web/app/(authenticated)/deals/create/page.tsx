@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect, FormEvent } from 'react'
-import { useMutation, useQuery } from '@apollo/client/react'
+import { useMutation } from '@apollo/client/react'
 import { useRouter } from 'next/navigation'
-import { CREATE_DEAL_DRAFT_MUTATION, UPDATE_DEAL_MUTATION, PUBLISH_DEAL_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, PRODUCTS_QUERY } from '@/graphql/queries'
+import { CREATE_DEAL_DRAFT_MUTATION, UPDATE_DEAL_MUTATION, PUBLISH_DEAL_MUTATION } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { useToast } from '@/hooks/use-toast'
 import { ImageUpload } from '@/components/shared/image-upload'
 import { ADD_DEAL_IMAGE_MUTATION, DELETE_DEAL_IMAGE_MUTATION } from '@/graphql/queries'
+import { DealProductPicker } from '@/components/deal/deal-product-picker'
 import {
   Card,
   CardContent,
@@ -48,13 +49,6 @@ export default function CreateDealPage() {
   const [addImage] = useMutation(ADD_DEAL_IMAGE_MUTATION)
   const [deleteImage] = useMutation(DELETE_DEAL_IMAGE_MUTATION)
 
-  const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
-  const { data: brandsData } = useQuery(BRANDS_QUERY)
-
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>()
-  const { data: productsData } = useQuery(PRODUCTS_QUERY, {
-    variables: { categoryId: selectedCategoryId, limit: 50 },
-  })
 
   // Create draft on mount
   useEffect(() => {
@@ -119,15 +113,6 @@ export default function CreateDealPage() {
     }
   }
 
-  const handleProductToggle = (productId: number) => {
-    setSelectedProducts((prev) => {
-      const exists = prev.find((p) => p.productId === productId)
-      if (exists) {
-        return prev.filter((p) => p.productId !== productId)
-      }
-      return [...prev, { productId, quantity: 1 }]
-    })
-  }
 
   if (authLoading) return null
 
@@ -226,42 +211,10 @@ export default function CreateDealPage() {
         <Card>
           <CardContent className="pt-6">
             <h2 className="text-lg font-semibold mb-4">Products</h2>
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label>Filter by Category</Label>
-                <Select value={selectedCategoryId?.toString() || 'all'} onValueChange={(v) => setSelectedCategoryId(v === 'all' ? undefined : parseInt(v))}>
-                  <SelectTrigger><SelectValue placeholder="All categories" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {(categoriesData?.categories || []).map((cat: any) => (
-                      <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="max-h-48 overflow-y-auto space-y-2 rounded-lg border p-3">
-                {(productsData?.products?.data || []).map((product: any) => {
-                  const isSelected = selectedProducts.some((p) => p.productId === product.id)
-                  return (
-                    <label key={product.id} className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-muted">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleProductToggle(product.id)}
-                        className="rounded"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{product.name}</p>
-                        <p className="text-xs text-muted-foreground">{product.category?.name}{product.brand ? ` · ${product.brand.name}` : ''}</p>
-                      </div>
-                    </label>
-                  )
-                })}
-              </div>
-              {selectedProducts.length > 0 && (
-                <p className="text-sm text-muted-foreground">{selectedProducts.length} product(s) selected</p>
-              )}
-            </div>
+            <DealProductPicker
+              selectedProducts={selectedProducts}
+              onProductsChange={setSelectedProducts}
+            />
           </CardContent>
         </Card>
 
