@@ -257,7 +257,24 @@ export class DealsResolver {
     @CurrentUser() user: any,
     @Args({ name: 'id', type: () => Int }) id: number,
   ): Promise<DealOutput> {
-    const deal = await this.dealsService.updateStatus(id, 'PUBLISHED')
+    const deal = await this.dealsService.updateStatus(id, 'PENDING')
+    return mapDeal(deal)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => DealOutput)
+  async markDealSold(
+    @CurrentUser() user: any,
+    @Args({ name: 'id', type: () => Int }) id: number,
+  ): Promise<DealOutput> {
+    const existing = await this.dealsService.findById(id)
+    if (!existing || existing.userId !== user.id) {
+      throw new Error('Deal not found or unauthorized')
+    }
+    if (existing.status !== 'PUBLISHED') {
+      throw new Error('Only published deals can be marked as sold')
+    }
+    const deal = await this.dealsService.updateStatus(id, 'SOLD')
     return mapDeal(deal)
   }
 
@@ -297,7 +314,7 @@ export class DealsResolver {
   @Roles(UserRole.ADMIN)
   @Query(() => DealsListOutput)
   async adminDeals(
-    @Args({ name: 'status', defaultValue: 'PUBLISHED' }) status: string,
+    @Args({ name: 'status', defaultValue: 'PENDING' }) status: string,
     @Args({ name: 'page', type: () => Int, defaultValue: 1 }) page?: number,
     @Args({ name: 'limit', type: () => Int, defaultValue: 20 }) limit?: number,
   ): Promise<DealsListOutput> {

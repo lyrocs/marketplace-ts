@@ -694,16 +694,16 @@ async function main() {
     },
   })
 
-  // Draft deal
+  // Pending deal (submitted for review)
   const deal6 = await prisma.deal.create({
     data: {
       userId: bob.id,
-      status: DealStatus.DRAFT,
+      status: DealStatus.PENDING,
       price: 80,
       currency: 'USD',
       location: 'Austin, TX',
       title: 'Walksnail Avatar V2 VTX',
-      description: 'Work in progress listing...',
+      description: 'Walksnail Avatar V2 in fair condition, works well but has some cosmetic wear.',
       images: ['https://placehold.co/800x600/0f1117/a855f7?text=Walksnail+Used'],
       condition: DealCondition.FAIR,
     },
@@ -824,7 +824,7 @@ async function main() {
     - 20 brands (FPV-specific)
     - 9 spec types with 31 spec values
     - 18 products with specs, shops, and components
-    - 8 deals (5 published, 1 draft, 1 sold, 1 declined)
+    - 8 deals (5 published, 1 pending, 1 sold, 1 declined)
     - 4 discussions with statuses
 
     Demo accounts (password: "password"):

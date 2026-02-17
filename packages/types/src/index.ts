@@ -58,6 +58,7 @@ export interface JwtPayload {
 
 export enum DealStatus {
   DRAFT = 'DRAFT',
+  PENDING = 'PENDING',
   PUBLISHED = 'PUBLISHED',
   DECLINED = 'DECLINED',
   EXPIRED = 'EXPIRED',

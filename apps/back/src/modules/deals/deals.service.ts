@@ -84,7 +84,7 @@ export class DealsService {
 
   async findPublishedByUser(userId: string): Promise<any> {
     return prisma.deal.findMany({
-      where: { userId, status: 'PUBLISHED' },
+      where: { userId, status: { in: ['PUBLISHED', 'SOLD'] } },
       include: {
         user: { select: { id: true, name: true, image: true } },
         products: {
@@ -110,7 +110,7 @@ export class DealsService {
     page?: number;
     limit?: number;
   }): Promise<any> {
-    const where: any = { status: 'PUBLISHED' };
+    const where: any = { status: { in: ['PUBLISHED', 'SOLD'] } };
 
     if (title) {
       where.title = { contains: title, mode: 'insensitive' };

@@ -92,10 +92,10 @@ export default function CreateDealPage() {
     await handleSave()
     try {
       await publishDeal({ variables: { id: dealId } })
-      toast({ title: 'Deal published!', variant: 'success' })
-      router.push(`/deal/${dealId}`)
+      toast({ title: 'Deal submitted for review!', variant: 'success' })
+      router.push('/deals')
     } catch {
-      toast({ title: 'Failed to publish', variant: 'destructive' })
+      toast({ title: 'Failed to submit', variant: 'destructive' })
     }
   }
 
@@ -223,7 +223,7 @@ export default function CreateDealPage() {
           <Button variant="outline" type="button" onClick={() => router.push('/deals')}>Cancel</Button>
           <div className="flex gap-3">
             <Button variant="outline" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Draft'}</Button>
-            <Button type="button" onClick={handlePublish} disabled={saving}>Publish Deal</Button>
+            <Button type="button" onClick={handlePublish} disabled={saving}>Submit for Review</Button>
           </div>
         </div>
       </form>

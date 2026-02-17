@@ -545,6 +545,7 @@ export const MY_DEALS_QUERY = gql`
       currency
       title
       images
+      reasonDeclined
       createdAt
       products { productName quantity }
     }
@@ -600,6 +601,15 @@ export const UPDATE_DEAL_MUTATION = gql`
 export const PUBLISH_DEAL_MUTATION = gql`
   mutation PublishDeal($id: Int!) {
     publishDeal(id: $id) {
+      id
+      status
+    }
+  }
+`
+
+export const MARK_DEAL_SOLD_MUTATION = gql`
+  mutation MarkDealSold($id: Int!) {
+    markDealSold(id: $id) {
       id
       status
     }

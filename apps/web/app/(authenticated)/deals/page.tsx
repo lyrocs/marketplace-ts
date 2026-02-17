@@ -9,11 +9,22 @@ import { Plus } from 'lucide-react'
 
 const statusColors: Record<string, string> = {
   DRAFT: 'secondary',
+  PENDING: 'warning',
   PUBLISHED: 'success',
   DECLINED: 'destructive',
   EXPIRED: 'outline',
   SOLD: 'default',
   ARCHIVED: 'outline',
+}
+
+const statusLabels: Record<string, string> = {
+  DRAFT: 'Draft',
+  PENDING: 'Pending Review',
+  PUBLISHED: 'Published',
+  DECLINED: 'Declined',
+  EXPIRED: 'Expired',
+  SOLD: 'Sold',
+  ARCHIVED: 'Archived',
 }
 
 export default function MyDealsPage() {
@@ -74,9 +85,14 @@ export default function MyDealsPage() {
                         {deal.price ? `${deal.currency || 'USD'} ${Number(deal.price).toFixed(2)}` : 'No price set'} · {deal.products?.length || 0} product(s)
                       </p>
                     </div>
-                    <Badge variant={statusColors[deal.status] as any || 'outline'}>
-                      {deal.status}
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1">
+                      <Badge variant={statusColors[deal.status] as any || 'outline'}>
+                        {statusLabels[deal.status] || deal.status}
+                      </Badge>
+                      {deal.status === 'DECLINED' && deal.reasonDeclined && (
+                        <p className="text-xs text-destructive max-w-48 text-right truncate">{deal.reasonDeclined}</p>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </Link>

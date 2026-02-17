@@ -7,6 +7,7 @@ import {
   DEAL_QUERY,
   UPDATE_DEAL_MUTATION,
   PUBLISH_DEAL_MUTATION,
+  MARK_DEAL_SOLD_MUTATION,
   ADD_DEAL_IMAGE_MUTATION,
   DELETE_DEAL_IMAGE_MUTATION,
 } from '@/graphql/queries'
@@ -17,6 +18,7 @@ import { DealProductPicker } from '@/components/deal/deal-product-picker'
 import {
   Card,
   CardContent,
+  Badge,
   Button,
   Input,
   Label,
@@ -60,6 +62,7 @@ export default function EditDealPage() {
 
   const [updateDeal] = useMutation(UPDATE_DEAL_MUTATION)
   const [publishDeal] = useMutation(PUBLISH_DEAL_MUTATION)
+  const [markDealSold] = useMutation(MARK_DEAL_SOLD_MUTATION)
   const [addImage] = useMutation(ADD_DEAL_IMAGE_MUTATION)
   const [deleteImage] = useMutation(DELETE_DEAL_IMAGE_MUTATION)
 
@@ -125,16 +128,31 @@ export default function EditDealPage() {
     }
   }
 
-  const handlePublish = async () => {
+  const handleSubmitForReview = async () => {
     if (!dealId) return
     await handleSave()
     try {
       await publishDeal({ variables: { id: dealId } })
-      toast({ title: 'Deal published!', variant: 'success' })
-      router.push(`/deal/${dealId}`)
+      toast({ title: 'Deal submitted for review!', variant: 'success' })
+      router.push('/deals')
     } catch (error: any) {
       toast({
-        title: 'Failed to publish',
+        title: 'Failed to submit',
+        description: error.message,
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleMarkSold = async () => {
+    if (!dealId) return
+    try {
+      await markDealSold({ variables: { id: dealId } })
+      toast({ title: 'Deal marked as sold!', variant: 'success' })
+      router.push('/deals')
+    } catch (error: any) {
+      toast({
+        title: 'Failed to mark as sold',
         description: error.message,
         variant: 'destructive',
       })
@@ -214,15 +232,43 @@ export default function EditDealPage() {
         <div>
           <h1 className="text-3xl font-bold">Edit Deal</h1>
           <p className="text-muted-foreground mt-1">
-            Deal #{deal.id} · Status: <span className="font-semibold capitalize">{deal.status.toLowerCase()}</span>
+            Deal #{deal.id} · Status: <Badge variant={
+              deal.status === 'PUBLISHED' ? 'success' :
+              deal.status === 'PENDING' ? 'warning' :
+              deal.status === 'DECLINED' ? 'destructive' :
+              deal.status === 'SOLD' ? 'default' :
+              'secondary'
+            } as any}>
+              {deal.status === 'PENDING' ? 'Pending Review' :
+               deal.status === 'PUBLISHED' ? 'Published' :
+               deal.status === 'DECLINED' ? 'Declined' :
+               deal.status === 'SOLD' ? 'Sold' :
+               deal.status === 'DRAFT' ? 'Draft' :
+               deal.status.toLowerCase()}
+            </Badge>
           </p>
         </div>
-        {deal.status === 'PUBLISHED' && (
-          <Button variant="outline" onClick={() => router.push(`/deal/${dealId}`)}>
-            View Live Deal
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {(deal.status === 'PUBLISHED' || deal.status === 'SOLD') && (
+            <Button variant="outline" onClick={() => router.push(`/deal/${dealId}`)}>
+              {deal.status === 'SOLD' ? 'View Deal' : 'View Live Deal'}
+            </Button>
+          )}
+          {deal.status === 'PUBLISHED' && (
+            <Button variant="outline" onClick={handleMarkSold}>
+              Mark as Sold
+            </Button>
+          )}
+        </div>
       </div>
+
+      {deal.status === 'PENDING' && (
+        <Card className="mb-6 border-amber-300 bg-amber-50 dark:bg-amber-950/20">
+          <CardContent className="pt-6">
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Your deal is being reviewed by our team. You will be notified once it is approved or if changes are needed.</p>
+          </CardContent>
+        </Card>
+      )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Images */}
@@ -342,7 +388,7 @@ export default function EditDealPage() {
               <h2 className="text-lg font-semibold text-destructive mb-2">Deal Declined</h2>
               <p className="text-sm text-muted-foreground">{deal.reasonDeclined}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Please address the issues above and save your changes before republishing.
+                Please address the issues above and save your changes before resubmitting.
               </p>
             </CardContent>
           </Card>
@@ -354,17 +400,19 @@ export default function EditDealPage() {
             Cancel
           </Button>
           <div className="flex gap-3">
-            <Button variant="outline" type="submit" disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
+            {deal.status !== 'SOLD' && (
+              <Button variant="outline" type="submit" disabled={saving}>
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            )}
             {deal.status === 'DRAFT' && (
-              <Button type="button" onClick={handlePublish} disabled={saving}>
-                Publish Deal
+              <Button type="button" onClick={handleSubmitForReview} disabled={saving}>
+                Submit for Review
               </Button>
             )}
             {deal.status === 'DECLINED' && (
-              <Button type="button" onClick={handlePublish} disabled={saving}>
-                Republish Deal
+              <Button type="button" onClick={handleSubmitForReview} disabled={saving}>
+                Resubmit for Review
               </Button>
             )}
           </div>

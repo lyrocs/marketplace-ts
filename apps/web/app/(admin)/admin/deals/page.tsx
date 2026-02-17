@@ -28,10 +28,19 @@ import { Check, X, Eye } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const statuses = ['PUBLISHED', 'DRAFT', 'DECLINED', 'SOLD', 'ARCHIVED', 'EXPIRED']
+const statuses = ['PENDING', 'PUBLISHED', 'DECLINED', 'SOLD', 'ARCHIVED', 'EXPIRED']
+
+const statusLabels: Record<string, string> = {
+  PENDING: 'Pending Review',
+  PUBLISHED: 'Published',
+  DECLINED: 'Declined',
+  SOLD: 'Sold',
+  ARCHIVED: 'Archived',
+  EXPIRED: 'Expired',
+}
 
 export default function AdminDealsPage() {
-  const [activeStatus, setActiveStatus] = useState('PUBLISHED')
+  const [activeStatus, setActiveStatus] = useState('PENDING')
   const [page, setPage] = useState(1)
   const [selectedDealId, setSelectedDealId] = useState<number | null>(null)
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false)
@@ -87,7 +96,7 @@ export default function AdminDealsPage() {
       <Tabs value={activeStatus} onValueChange={(v) => { setActiveStatus(v); setPage(1) }} className="mt-6">
         <TabsList className="flex flex-wrap h-auto gap-1">
           {statuses.map((s) => (
-            <TabsTrigger key={s} value={s} className="capitalize">{s.toLowerCase()}</TabsTrigger>
+            <TabsTrigger key={s} value={s}>{statusLabels[s] || s}</TabsTrigger>
           ))}
         </TabsList>
 
@@ -139,17 +148,7 @@ export default function AdminDealsPage() {
                         <Button variant="outline" size="sm" onClick={() => setSelectedDealId(deal.id)}>
                           <Eye className="mr-1 h-3 w-3" /> View
                         </Button>
-                        {activeStatus === 'PUBLISHED' && (
-                          <>
-                            <Button variant="outline" size="sm" onClick={() => openDeclineDialog(deal.id)}>
-                              <X className="mr-1 h-3 w-3" /> Decline
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleStatusChange(deal.id, 'SOLD')}>
-                              Sold
-                            </Button>
-                          </>
-                        )}
-                        {activeStatus === 'DRAFT' && (
+                        {activeStatus === 'PENDING' && (
                           <>
                             <Button size="sm" onClick={() => handleStatusChange(deal.id, 'PUBLISHED')}>
                               <Check className="mr-1 h-3 w-3" /> Approve
@@ -158,6 +157,11 @@ export default function AdminDealsPage() {
                               <X className="mr-1 h-3 w-3" /> Decline
                             </Button>
                           </>
+                        )}
+                        {activeStatus === 'PUBLISHED' && (
+                          <Button variant="outline" size="sm" onClick={() => openDeclineDialog(deal.id)}>
+                            <X className="mr-1 h-3 w-3" /> Decline
+                          </Button>
                         )}
                         {(activeStatus === 'DECLINED' || activeStatus === 'ARCHIVED') && (
                           <Button variant="outline" size="sm" onClick={() => handleStatusChange(deal.id, 'PUBLISHED')}>
@@ -301,20 +305,20 @@ export default function AdminDealsPage() {
                   <Link href={`/deal/${deal.id}`} target="_blank">
                     <Button variant="outline">View Public Page</Button>
                   </Link>
-                  {deal.status === 'DRAFT' && (
-                    <>
-                      <Button onClick={() => {
-                        handleStatusChange(deal.id, 'PUBLISHED')
-                      }}>
-                        <Check className="mr-1 h-4 w-4" /> Approve
-                      </Button>
-                      <Button variant="destructive" onClick={() => {
-                        setSelectedDealId(null)
-                        openDeclineDialog(deal.id)
-                      }}>
-                        <X className="mr-1 h-4 w-4" /> Decline
-                      </Button>
-                    </>
+                  {deal.status === 'PENDING' && (
+                    <Button onClick={() => {
+                      handleStatusChange(deal.id, 'PUBLISHED')
+                    }}>
+                      <Check className="mr-1 h-4 w-4" /> Approve
+                    </Button>
+                  )}
+                  {(deal.status === 'PENDING' || deal.status === 'PUBLISHED') && (
+                    <Button variant="destructive" onClick={() => {
+                      setSelectedDealId(null)
+                      openDeclineDialog(deal.id)
+                    }}>
+                      <X className="mr-1 h-4 w-4" /> Decline
+                    </Button>
                   )}
                 </div>
               </DialogFooter>

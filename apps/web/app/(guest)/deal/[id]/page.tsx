@@ -28,7 +28,7 @@ export default async function DealDetailPage({
   const data = await fetchGraphQL(DEAL_QUERY, { id: dealId })
   const deal = data?.deal
 
-  if (!deal) notFound()
+  if (!deal || (deal.status !== 'PUBLISHED' && deal.status !== 'SOLD')) notFound()
 
   const images = deal.images || []
 
@@ -90,8 +90,11 @@ export default async function DealDetailPage({
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div>
+                {deal.status === 'SOLD' && (
+                  <Badge variant="destructive" className="mb-2 text-sm">SOLD</Badge>
+                )}
                 {deal.price != null && (
-                  <p className="text-3xl font-bold text-primary">
+                  <p className={`text-3xl font-bold ${deal.status === 'SOLD' ? 'text-muted-foreground line-through' : 'text-primary'}`}>
                     {deal.currency || 'USD'} {Number(deal.price).toFixed(2)}
                   </p>
                 )}
@@ -117,7 +120,9 @@ export default async function DealDetailPage({
                 </div>
               </div>
 
-              <DealContactButton dealId={dealId} sellerId={deal.userId} />
+              {deal.status !== 'SOLD' && (
+                <DealContactButton dealId={dealId} sellerId={deal.userId} />
+              )}
             </CardContent>
           </Card>
 
