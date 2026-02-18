@@ -70,7 +70,7 @@ export class ProductsService {
     page?: number;
     limit?: number;
   }): Promise<any> {
-    const where: any = {};
+    const where: any = { status: { not: 'draft' } };
 
     if (name) {
       where.name = { contains: name, mode: 'insensitive' };
