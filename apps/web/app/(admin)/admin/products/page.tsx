@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef } from 'react'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react'
-import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
+import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_MUTATION, REUPLOAD_PRODUCT_IMAGES_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import { ImageUpload } from '@/components/shared/image-upload'
 import {
@@ -27,7 +27,7 @@ import {
   Textarea,
   Checkbox,
 } from '@marketplace/ui'
-import { Plus, Trash2, Eye, Edit, X } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit, X, Upload, ExternalLink } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -59,6 +59,7 @@ export default function AdminProductsPage() {
   const [addProductImage] = useMutation(ADD_PRODUCT_IMAGE_MUTATION)
   const [deleteProductImage] = useMutation(DELETE_PRODUCT_IMAGE_MUTATION)
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
+  const [reuploadImages, { loading: reuploading }] = useMutation(REUPLOAD_PRODUCT_IMAGES_MUTATION)
   const [fetchProduct] = useLazyQuery(PRODUCT_QUERY, { fetchPolicy: 'network-only' })
 
   const products = data?.products?.data || []
@@ -73,6 +74,22 @@ export default function AdminProductsPage() {
   const availableSpecTypes = specTypes.filter((st: any) => availableSpecTypeIds.includes(st.id))
 
   const brands = brandsData?.brands || []
+
+  const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || ''
+  const isExternalImage = (url: string) => s3BaseUrl ? !url.startsWith(s3BaseUrl) : false
+  const hasExternalImages = (imgs: string[]) => imgs.some(isExternalImage)
+
+  const handleReuploadImages = async () => {
+    try {
+      const { data } = await reuploadImages({ variables: { productId: editProduct.id } })
+      if (data?.reuploadProductImages?.images) {
+        setEditProduct({ ...editProduct, images: data.reuploadProductImages.images })
+      }
+      toast({ title: 'Images uploaded to S3', variant: 'success' })
+    } catch {
+      toast({ title: 'Failed to upload images', variant: 'destructive' })
+    }
+  }
 
   const suggestBrands = (productName: string) => {
     if (!productName) return []
@@ -590,12 +607,48 @@ export default function AdminProductsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Product Images</Label>
+              <div className="flex items-center justify-between">
+                <Label>Product Images</Label>
+                {hasExternalImages(editProduct.images) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleReuploadImages}
+                    disabled={reuploading}
+                  >
+                    <Upload className="mr-1.5 h-3.5 w-3.5" />
+                    {reuploading ? 'Uploading...' : 'Upload all to S3'}
+                  </Button>
+                )}
+              </div>
+              {/* Image grid with external badges */}
+              {editProduct.images.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {editProduct.images.map((url, i) => (
+                    <div key={url} className="relative h-24 w-24 overflow-hidden rounded-lg border">
+                      <Image src={url} alt={`Image ${i + 1}`} fill className="object-cover" />
+                      {isExternalImage(url) && (
+                        <span className="absolute top-1 left-1 inline-flex items-center gap-0.5 rounded bg-amber-500/90 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                          <ExternalLink className="h-2.5 w-2.5" />
+                          External
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleEditImageRemoved(url)}
+                        className="absolute top-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
               <ImageUpload
-                images={editProduct.images}
+                images={[]}
                 onImageAdded={handleEditImageAdded}
                 onImageRemoved={handleEditImageRemoved}
-                maxImages={10}
+                maxImages={10 - editProduct.images.length}
               />
             </div>
 

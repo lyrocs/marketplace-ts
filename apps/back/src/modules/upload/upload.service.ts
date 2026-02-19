@@ -85,6 +85,48 @@ export class UploadService {
     }
   }
 
+  isS3Url(url: string): boolean {
+    if (this.s3BaseUrl && url.startsWith(this.s3BaseUrl)) return true;
+    if (this.s3Endpoint && url.startsWith(this.s3Endpoint)) return true;
+    if (url.includes(`${this.s3Bucket}.s3.amazonaws.com`)) return true;
+    return false;
+  }
+
+  async uploadFromUrl(
+    url: string,
+    folder = 'products',
+  ): Promise<string> {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+
+    // Derive extension from content-type or URL
+    const extMap: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    };
+    const ext = extMap[contentType] || url.split('.').pop()?.split('?')[0] || 'jpg';
+    const key = `${folder}/${uuidv4()}.${ext}`;
+
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: this.s3Bucket,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+        CacheControl: 'public, max-age=31536000',
+      }),
+    );
+
+    if (this.s3BaseUrl) return `${this.s3BaseUrl}/${key}`;
+    if (this.s3Endpoint) return `${this.s3Endpoint}/${this.s3Bucket}/${key}`;
+    return `https://${this.s3Bucket}.s3.amazonaws.com/${key}`;
+  }
+
   async deleteImage(url: string): Promise<void> {
     // Extract key from URL
     const urlObj = new URL(url);

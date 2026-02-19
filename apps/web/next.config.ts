@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_API_URL:
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+    NEXT_PUBLIC_S3_BASE_URL:
+      process.env.S3_BASE_URL || "https://s3.lyrocs.ovh/marketplace",
   },
   images: {
     remotePatterns: [

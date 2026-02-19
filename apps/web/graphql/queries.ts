@@ -434,6 +434,15 @@ export const DELETE_PRODUCT_MUTATION = gql`
   }
 `
 
+export const REUPLOAD_PRODUCT_IMAGES_MUTATION = gql`
+  mutation ReuploadProductImages($productId: Int!) {
+    reuploadProductImages(productId: $productId) {
+      id
+      images
+    }
+  }
+`
+
 export const IMPORT_PRODUCTS_MUTATION = gql`
   mutation ImportProducts($json: String!) {
     importProducts(json: $json) {

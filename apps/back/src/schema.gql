@@ -152,6 +152,7 @@ type Mutation {
   removeProductSpec(productId: Int!, specId: Int!): ProductOutput!
   requestPasswordReset(email: String!): SuccessOutput!
   resetPassword(password: String!, token: String!): SuccessOutput!
+  reuploadProductImages(productId: Int!): ProductOutput!
   startDiscussion(dealId: Int!): DiscussionOutput!
   suggestProduct(brandId: Int, categoryId: Int!, name: String!): ProductOutput!
   updateBrand(id: Int!, name: String!): BrandGqlOutput!

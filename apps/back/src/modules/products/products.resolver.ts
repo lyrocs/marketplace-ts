@@ -320,6 +320,15 @@ export class ProductsResolver {
 
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
+  @Mutation(() => ProductOutput)
+  async reuploadProductImages(
+    @Args({ name: 'productId', type: () => Int }) productId: number,
+  ): Promise<ProductOutput> {
+    return this.productsService.reuploadImages(productId) as any
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
   @Mutation(() => ImportResultOutput)
   async importProducts(
     @Args({ name: 'json' }) json: string,

@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { prisma } from '@marketplace/database';
+import { UploadService } from '../upload/upload.service.js';
 
 @Injectable()
 export class ProductsService {
+  constructor(private uploadService: UploadService) {}
   async findById(id: number): Promise<any> {
     const product = await prisma.product.findUnique({
       where: { id },
@@ -285,6 +287,35 @@ export class ProductsService {
       where: { id: productId },
       data: { images: updatedImages },
     });
+
+    return this.findById(productId);
+  }
+
+  async reuploadImages(productId: number): Promise<any> {
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) throw new Error('Product not found');
+
+    const images = (Array.isArray(product.images) ? product.images : []) as string[];
+    let changed = false;
+    const updatedImages = [...images];
+
+    for (let i = 0; i < updatedImages.length; i++) {
+      const url = updatedImages[i];
+      if (this.uploadService.isS3Url(url)) continue;
+      try {
+        updatedImages[i] = await this.uploadService.uploadFromUrl(url, 'products');
+        changed = true;
+      } catch (e: any) {
+        console.error(`Failed to reupload image for product ${productId}: ${e.message}`);
+      }
+    }
+
+    if (changed) {
+      await prisma.product.update({
+        where: { id: productId },
+        data: { images: updatedImages },
+      });
+    }
 
     return this.findById(productId);
   }
