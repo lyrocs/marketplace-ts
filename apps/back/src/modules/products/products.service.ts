@@ -58,6 +58,7 @@ export class ProductsService {
     sortOrder = 'desc',
     page = 1,
     limit = 12,
+    includeDrafts,
   }: {
     name?: string;
     categoryId?: number;
@@ -69,8 +70,9 @@ export class ProductsService {
     sortOrder?: string;
     page?: number;
     limit?: number;
+    includeDrafts?: boolean;
   }): Promise<any> {
-    const where: any = { status: { not: 'draft' } };
+    const where: any = includeDrafts ? {} : { status: { not: 'draft' } };
 
     if (name) {
       where.name = { contains: name, mode: 'insensitive' };

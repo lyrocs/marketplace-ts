@@ -188,6 +188,7 @@ export class ProductsResolver {
     @Args({ name: 'sortOrder', nullable: true, defaultValue: 'desc' }) sortOrder?: string,
     @Args({ name: 'page', type: () => Int, defaultValue: 1 }) page?: number,
     @Args({ name: 'limit', type: () => Int, defaultValue: 12 }) limit?: number,
+    @Args({ name: 'includeDrafts', nullable: true }) includeDrafts?: boolean,
   ): Promise<ProductsListOutput> {
     return this.productsService.search({
       name,
@@ -200,6 +201,7 @@ export class ProductsResolver {
       sortOrder,
       page,
       limit,
+      includeDrafts,
     }) as any
   }
 

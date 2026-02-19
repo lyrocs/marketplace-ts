@@ -44,7 +44,7 @@ export default function AdminProductsPage() {
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
-    variables: { name: searchName || undefined, page, limit: 20 },
+    variables: { name: searchName || undefined, page, limit: 20, includeDrafts: true },
   })
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)

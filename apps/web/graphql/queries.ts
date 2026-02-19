@@ -356,6 +356,7 @@ export const PRODUCTS_QUERY = gql`
     $sortOrder: String
     $page: Int
     $limit: Int
+    $includeDrafts: Boolean
   ) {
     products(
       name: $name
@@ -368,6 +369,7 @@ export const PRODUCTS_QUERY = gql`
       sortOrder: $sortOrder
       page: $page
       limit: $limit
+      includeDrafts: $includeDrafts
     ) {
       data {
         id

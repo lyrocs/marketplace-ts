@@ -230,7 +230,7 @@ type Query {
   myProfile: UserProfileOutput!
   myStats: UserStatsOutput!
   product(id: Int!): ProductOutput
-  products(brandId: Int, categoryId: Int, limit: Int! = 12, maxPrice: Float, minPrice: Float, name: String, page: Int! = 1, sortBy: String = "createdAt", sortOrder: String = "desc", specIds: [Int!]): ProductsListOutput!
+  products(brandId: Int, categoryId: Int, includeDrafts: Boolean, limit: Int! = 12, maxPrice: Float, minPrice: Float, name: String, page: Int! = 1, sortBy: String = "createdAt", sortOrder: String = "desc", specIds: [Int!]): ProductsListOutput!
   publicProfile(id: String!): PublicProfileOutput
   recentDeals: [DealOutput!]!
   rootCategories: [CategoryTreeOutput!]!
