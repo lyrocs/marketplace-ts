@@ -90,74 +90,69 @@ async function main() {
   // =========================================================================
   console.log('  Creating categories...')
 
-  const frames = await prisma.category.create({
-    data: { name: 'Frames', key: 'frames', description: 'FPV drone frames — 5", 3", toothpick, cinewhoop, and more' },
+  const electronic = await prisma.category.create({
+    data: { name: 'ELECTRONIC', key: 'electronic', description: 'Electronic components for FPV drones' },
   })
-  const frames5inch = await prisma.category.create({
-    data: { name: '5" Frames', key: 'frames-5inch', description: '5-inch freestyle and racing frames', parentId: frames.id },
+  const catMotor = await prisma.category.create({
+    data: { name: 'MOTOR', key: 'motor', parentId: electronic.id },
   })
-  const frames3inch = await prisma.category.create({
-    data: { name: '3" Frames', key: 'frames-3inch', description: '3-inch micro frames', parentId: frames.id },
+  const catEsc = await prisma.category.create({
+    data: { name: 'ESC', key: 'esc', parentId: electronic.id },
   })
-
-  const motors = await prisma.category.create({
-    data: { name: 'Motors', key: 'motors', description: 'Brushless motors for FPV drones' },
+  const catFc = await prisma.category.create({
+    data: { name: 'FC', key: 'fc', parentId: electronic.id },
   })
-  const motors2306 = await prisma.category.create({
-    data: { name: '2306 Motors', key: 'motors-2306', description: '2306 size motors for 5" builds', parentId: motors.id },
-  })
-  const motors1404 = await prisma.category.create({
-    data: { name: '1404 Motors', key: 'motors-1404', description: '1404 size motors for 3" builds', parentId: motors.id },
+  const catStack = await prisma.category.create({
+    data: { name: 'STACK', key: 'stack', parentId: electronic.id },
   })
 
-  const escs = await prisma.category.create({
-    data: { name: 'ESCs', key: 'escs', description: 'Electronic Speed Controllers — 4-in-1 and individual' },
+  const video = await prisma.category.create({
+    data: { name: 'VIDEO', key: 'video', description: 'Video systems for FPV drones' },
   })
-  const escs4in1 = await prisma.category.create({
-    data: { name: '4-in-1 ESCs', key: 'escs-4in1', description: 'All-in-one ESC stacks', parentId: escs.id },
+  const catCamera = await prisma.category.create({
+    data: { name: 'CAMERA', key: 'camera', parentId: video.id },
   })
-
-  const fcs = await prisma.category.create({
-    data: { name: 'Flight Controllers', key: 'flight-controllers', description: 'F4/F7/H7 flight controllers' },
+  const catVtx = await prisma.category.create({
+    data: { name: 'VTX', key: 'vtx', parentId: video.id },
   })
-  const fcsH7 = await prisma.category.create({
-    data: { name: 'H7 FCs', key: 'fcs-h7', description: 'H7 processor flight controllers', parentId: fcs.id },
+  const catVrx = await prisma.category.create({
+    data: { name: 'VRX', key: 'vrx', parentId: video.id },
   })
-
-  const vtx = await prisma.category.create({
-    data: { name: 'Video TX (VTX)', key: 'vtx', description: 'Video transmitters — analog, DJI, HDZero, Walksnail' },
-  })
-  const vtxDigital = await prisma.category.create({
-    data: { name: 'Digital VTX', key: 'vtx-digital', description: 'Digital video transmitters', parentId: vtx.id },
+  const catGoggles = await prisma.category.create({
+    data: { name: 'GOGGLES', key: 'goggles', parentId: video.id },
   })
 
-  const cameras = await prisma.category.create({
-    data: { name: 'Cameras', key: 'cameras', description: 'FPV cameras and action cameras' },
+  const radio = await prisma.category.create({
+    data: { name: 'RADIO', key: 'radio', description: 'Radio control systems' },
   })
-  const camerasFPV = await prisma.category.create({
-    data: { name: 'FPV Cameras', key: 'cameras-fpv', description: 'Onboard FPV cameras', parentId: cameras.id },
+  const catRx = await prisma.category.create({
+    data: { name: 'RX', key: 'rx', parentId: radio.id },
   })
-
-  const goggles = await prisma.category.create({
-    data: { name: 'Goggles', key: 'goggles', description: 'FPV goggles — analog and digital' },
+  const catTx = await prisma.category.create({
+    data: { name: 'TX', key: 'tx', parentId: radio.id },
   })
-
-  const radios = await prisma.category.create({
-    data: { name: 'Radios', key: 'radios', description: 'Radio transmitters and receivers' },
-  })
-  const radiosTX = await prisma.category.create({
-    data: { name: 'Transmitters', key: 'radios-tx', description: 'Radio transmitters', parentId: radios.id },
+  const catRadio = await prisma.category.create({
+    data: { name: 'RADIO', key: 'radio-controller', parentId: radio.id },
   })
 
-  const batteries = await prisma.category.create({
-    data: { name: 'Batteries', key: 'batteries', description: 'LiPo and Li-Ion batteries for FPV' },
+  const frame = await prisma.category.create({
+    data: { name: 'FRAME', key: 'frame', description: 'FPV drone frames and parts' },
   })
-  const batteries6S = await prisma.category.create({
-    data: { name: '6S LiPo', key: 'batteries-6s', description: '6S LiPo packs', parentId: batteries.id },
+  const catFrameKit = await prisma.category.create({
+    data: { name: 'FRAME_KIT', key: 'frame-kit', parentId: frame.id },
+  })
+  const catFramePart = await prisma.category.create({
+    data: { name: 'FRAME_PART', key: 'frame-part', parentId: frame.id },
   })
 
-  const props = await prisma.category.create({
-    data: { name: 'Props', key: 'props', description: 'Propellers for FPV drones' },
+  const power = await prisma.category.create({
+    data: { name: 'POWER', key: 'power', description: 'Batteries and chargers' },
+  })
+  const catChargeur = await prisma.category.create({
+    data: { name: 'CHARGEUR', key: 'chargeur', parentId: power.id },
+  })
+  const catBattery = await prisma.category.create({
+    data: { name: 'BATTERY', key: 'battery', parentId: power.id },
   })
 
   // =========================================================================
@@ -184,84 +179,117 @@ async function main() {
   // =========================================================================
   console.log('  Creating spec types and specs...')
 
-  const specKV = await prisma.specType.create({ data: { key: 'kv_rating', label: 'KV Rating' } })
-  const specMotorSize = await prisma.specType.create({ data: { key: 'motor_size', label: 'Motor Size' } })
-  const specFrameSize = await prisma.specType.create({ data: { key: 'frame_size', label: 'Frame Size' } })
-  const specWeight = await prisma.specType.create({ data: { key: 'weight', label: 'Weight' } })
+  const specKV = await prisma.specType.create({ data: { key: 'kv', label: 'KV Rating' } })
+  const specStackSize = await prisma.specType.create({ data: { key: 'stack_size', label: 'Stack Size' } })
+  const specStackAmp = await prisma.specType.create({ data: { key: 'stack_amp', label: 'Stack Amperage' } })
+  const specCameraSize = await prisma.specType.create({ data: { key: 'camera_size', label: 'Camera Size' } })
+  const specVideoSystem = await prisma.specType.create({ data: { key: 'video_system', label: 'Video System' } })
+  const specVtxSize = await prisma.specType.create({ data: { key: 'vtx_size', label: 'VTX Size' } })
   const specProtocol = await prisma.specType.create({ data: { key: 'protocol', label: 'Protocol' } })
-  const specCells = await prisma.specType.create({ data: { key: 'battery_cells', label: 'Battery Cells' } })
-  const specCapacity = await prisma.specType.create({ data: { key: 'capacity', label: 'Capacity' } })
-  const specResolution = await prisma.specType.create({ data: { key: 'resolution', label: 'Resolution' } })
-  const specFOV = await prisma.specType.create({ data: { key: 'fov', label: 'FOV' } })
+  const specFrameSize = await prisma.specType.create({ data: { key: 'frame_size', label: 'Frame Size' } })
+  const specBatteryCell = await prisma.specType.create({ data: { key: 'battery_cell', label: 'Battery Cells' } })
+  const specBatteryType = await prisma.specType.create({ data: { key: 'battery_type', label: 'Battery Type' } })
+  const specBatteryConnector = await prisma.specType.create({ data: { key: 'battery_connector', label: 'Battery Connector' } })
+  const specBatteryCapacity = await prisma.specType.create({ data: { key: 'battery_capacity', label: 'Battery Capacity' } })
 
   // Link spec types to categories
   await prisma.categorySpecType.createMany({
     data: [
-      { categoryId: motors.id, specTypeId: specKV.id },
-      { categoryId: motors.id, specTypeId: specMotorSize.id },
-      { categoryId: motors.id, specTypeId: specWeight.id },
-      { categoryId: motors2306.id, specTypeId: specKV.id },
-      { categoryId: motors2306.id, specTypeId: specMotorSize.id },
-      { categoryId: motors1404.id, specTypeId: specKV.id },
-      { categoryId: motors1404.id, specTypeId: specMotorSize.id },
-      { categoryId: frames.id, specTypeId: specFrameSize.id },
-      { categoryId: frames.id, specTypeId: specWeight.id },
-      { categoryId: frames5inch.id, specTypeId: specFrameSize.id },
-      { categoryId: frames5inch.id, specTypeId: specWeight.id },
-      { categoryId: frames3inch.id, specTypeId: specFrameSize.id },
-      { categoryId: escs.id, specTypeId: specProtocol.id },
-      { categoryId: escs4in1.id, specTypeId: specProtocol.id },
-      { categoryId: fcs.id, specTypeId: specProtocol.id },
-      { categoryId: vtx.id, specTypeId: specProtocol.id },
-      { categoryId: vtxDigital.id, specTypeId: specProtocol.id },
-      { categoryId: goggles.id, specTypeId: specResolution.id },
-      { categoryId: goggles.id, specTypeId: specFOV.id },
-      { categoryId: radios.id, specTypeId: specProtocol.id },
-      { categoryId: radiosTX.id, specTypeId: specProtocol.id },
-      { categoryId: batteries.id, specTypeId: specCells.id },
-      { categoryId: batteries.id, specTypeId: specCapacity.id },
-      { categoryId: batteries6S.id, specTypeId: specCells.id },
-      { categoryId: batteries6S.id, specTypeId: specCapacity.id },
-      { categoryId: cameras.id, specTypeId: specResolution.id },
-      { categoryId: cameras.id, specTypeId: specFOV.id },
-      { categoryId: camerasFPV.id, specTypeId: specResolution.id },
-      { categoryId: camerasFPV.id, specTypeId: specFOV.id },
+      // MOTOR → kv
+      { categoryId: catMotor.id, specTypeId: specKV.id },
+      // ESC → stack_size, stack_amp
+      { categoryId: catEsc.id, specTypeId: specStackSize.id },
+      { categoryId: catEsc.id, specTypeId: specStackAmp.id },
+      // FC → stack_size
+      { categoryId: catFc.id, specTypeId: specStackSize.id },
+      // STACK → stack_size, stack_amp
+      { categoryId: catStack.id, specTypeId: specStackSize.id },
+      { categoryId: catStack.id, specTypeId: specStackAmp.id },
+      // CAMERA → camera_size, video_system
+      { categoryId: catCamera.id, specTypeId: specCameraSize.id },
+      { categoryId: catCamera.id, specTypeId: specVideoSystem.id },
+      // VTX → vtx_size, video_system
+      { categoryId: catVtx.id, specTypeId: specVtxSize.id },
+      { categoryId: catVtx.id, specTypeId: specVideoSystem.id },
+      // VRX → video_system
+      { categoryId: catVrx.id, specTypeId: specVideoSystem.id },
+      // GOGGLES → video_system
+      { categoryId: catGoggles.id, specTypeId: specVideoSystem.id },
+      // RX → protocol
+      { categoryId: catRx.id, specTypeId: specProtocol.id },
+      // TX → protocol
+      { categoryId: catTx.id, specTypeId: specProtocol.id },
+      // RADIO → protocol
+      { categoryId: catRadio.id, specTypeId: specProtocol.id },
+      // FRAME_KIT → frame_size
+      { categoryId: catFrameKit.id, specTypeId: specFrameSize.id },
+      // FRAME_PART → frame_size
+      { categoryId: catFramePart.id, specTypeId: specFrameSize.id },
+      // CHARGEUR → battery_cell, battery_type, battery_connector
+      { categoryId: catChargeur.id, specTypeId: specBatteryCell.id },
+      { categoryId: catChargeur.id, specTypeId: specBatteryType.id },
+      { categoryId: catChargeur.id, specTypeId: specBatteryConnector.id },
+      // BATTERY → battery_cell, battery_capacity, battery_connector, battery_type
+      { categoryId: catBattery.id, specTypeId: specBatteryCell.id },
+      { categoryId: catBattery.id, specTypeId: specBatteryCapacity.id },
+      { categoryId: catBattery.id, specTypeId: specBatteryConnector.id },
+      { categoryId: catBattery.id, specTypeId: specBatteryType.id },
     ],
   })
 
   // Create spec values
   const specs = await Promise.all([
-    prisma.spec.create({ data: { specTypeId: specKV.id, value: '1750KV' } }),        // 0
-    prisma.spec.create({ data: { specTypeId: specKV.id, value: '1950KV' } }),        // 1
-    prisma.spec.create({ data: { specTypeId: specKV.id, value: '2450KV' } }),        // 2
-    prisma.spec.create({ data: { specTypeId: specKV.id, value: '3600KV' } }),        // 3
-    prisma.spec.create({ data: { specTypeId: specMotorSize.id, value: '2306' } }),   // 4
-    prisma.spec.create({ data: { specTypeId: specMotorSize.id, value: '2207' } }),   // 5
-    prisma.spec.create({ data: { specTypeId: specMotorSize.id, value: '1404' } }),   // 6
-    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '5"' } }),     // 7
-    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '3"' } }),     // 8
-    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '7"' } }),     // 9
-    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '30g' } }),       // 10
-    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '33g' } }),       // 11
-    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '105g' } }),      // 12
-    prisma.spec.create({ data: { specTypeId: specWeight.id, value: '120g' } }),      // 13
-    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'ELRS' } }),    // 14
-    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'Crossfire' } }),// 15
-    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'DJI O3' } }),  // 16
-    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'HDZero' } }),  // 17
-    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'Walksnail' } }),// 18
-    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'BLHeli_32' } }),// 19
-    prisma.spec.create({ data: { specTypeId: specCells.id, value: '4S' } }),         // 20
-    prisma.spec.create({ data: { specTypeId: specCells.id, value: '6S' } }),         // 21
-    prisma.spec.create({ data: { specTypeId: specCapacity.id, value: '1100mAh' } }), // 22
-    prisma.spec.create({ data: { specTypeId: specCapacity.id, value: '1300mAh' } }), // 23
-    prisma.spec.create({ data: { specTypeId: specCapacity.id, value: '1550mAh' } }), // 24
-    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '1080p' } }), // 25
-    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '720p 100fps' } }),// 26
-    prisma.spec.create({ data: { specTypeId: specResolution.id, value: '540p' } }),  // 27
-    prisma.spec.create({ data: { specTypeId: specFOV.id, value: '155°' } }),         // 28
-    prisma.spec.create({ data: { specTypeId: specFOV.id, value: '170°' } }),         // 29
-    prisma.spec.create({ data: { specTypeId: specFOV.id, value: '50°' } }),          // 30
+    // KV values
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '1750KV' } }),          // 0
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '1950KV' } }),          // 1
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '2450KV' } }),          // 2
+    prisma.spec.create({ data: { specTypeId: specKV.id, value: '3600KV' } }),          // 3
+    // Stack Size values
+    prisma.spec.create({ data: { specTypeId: specStackSize.id, value: '20x20' } }),    // 4
+    prisma.spec.create({ data: { specTypeId: specStackSize.id, value: '25.5x25.5' } }),// 5
+    prisma.spec.create({ data: { specTypeId: specStackSize.id, value: '30.5x30.5' } }),// 6
+    // Stack Amp values
+    prisma.spec.create({ data: { specTypeId: specStackAmp.id, value: '35A' } }),       // 7
+    prisma.spec.create({ data: { specTypeId: specStackAmp.id, value: '45A' } }),       // 8
+    prisma.spec.create({ data: { specTypeId: specStackAmp.id, value: '55A' } }),       // 9
+    prisma.spec.create({ data: { specTypeId: specStackAmp.id, value: '65A' } }),       // 10
+    // Camera Size values
+    prisma.spec.create({ data: { specTypeId: specCameraSize.id, value: 'Micro' } }),   // 11
+    prisma.spec.create({ data: { specTypeId: specCameraSize.id, value: 'Nano' } }),    // 12
+    prisma.spec.create({ data: { specTypeId: specCameraSize.id, value: 'Full' } }),    // 13
+    // Video System values
+    prisma.spec.create({ data: { specTypeId: specVideoSystem.id, value: 'Analog' } }), // 14
+    prisma.spec.create({ data: { specTypeId: specVideoSystem.id, value: 'DJI O3' } }), // 15
+    prisma.spec.create({ data: { specTypeId: specVideoSystem.id, value: 'HDZero' } }), // 16
+    prisma.spec.create({ data: { specTypeId: specVideoSystem.id, value: 'Walksnail' } }),// 17
+    // VTX Size values
+    prisma.spec.create({ data: { specTypeId: specVtxSize.id, value: '20x20' } }),      // 18
+    prisma.spec.create({ data: { specTypeId: specVtxSize.id, value: '25.5x25.5' } }), // 19
+    prisma.spec.create({ data: { specTypeId: specVtxSize.id, value: '30.5x30.5' } }), // 20
+    // Protocol values
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'ELRS' } }),      // 21
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'Crossfire' } }), // 22
+    prisma.spec.create({ data: { specTypeId: specProtocol.id, value: 'FrSky' } }),     // 23
+    // Frame Size values
+    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '3"' } }),       // 24
+    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '5"' } }),       // 25
+    prisma.spec.create({ data: { specTypeId: specFrameSize.id, value: '7"' } }),       // 26
+    // Battery Cell values
+    prisma.spec.create({ data: { specTypeId: specBatteryCell.id, value: '3S' } }),     // 27
+    prisma.spec.create({ data: { specTypeId: specBatteryCell.id, value: '4S' } }),     // 28
+    prisma.spec.create({ data: { specTypeId: specBatteryCell.id, value: '6S' } }),     // 29
+    // Battery Type values
+    prisma.spec.create({ data: { specTypeId: specBatteryType.id, value: 'LiPo' } }),  // 30
+    prisma.spec.create({ data: { specTypeId: specBatteryType.id, value: 'Li-Ion' } }), // 31
+    prisma.spec.create({ data: { specTypeId: specBatteryType.id, value: 'LiHV' } }),  // 32
+    // Battery Connector values
+    prisma.spec.create({ data: { specTypeId: specBatteryConnector.id, value: 'XT30' } }),// 33
+    prisma.spec.create({ data: { specTypeId: specBatteryConnector.id, value: 'XT60' } }),// 34
+    prisma.spec.create({ data: { specTypeId: specBatteryConnector.id, value: 'XT90' } }),// 35
+    // Battery Capacity values
+    prisma.spec.create({ data: { specTypeId: specBatteryCapacity.id, value: '1100mAh' } }),// 36
+    prisma.spec.create({ data: { specTypeId: specBatteryCapacity.id, value: '1300mAh' } }),// 37
+    prisma.spec.create({ data: { specTypeId: specBatteryCapacity.id, value: '1550mAh' } }),// 38
   ])
 
   // =========================================================================
@@ -273,7 +301,7 @@ async function main() {
   const chimera5 = await prisma.product.create({
     data: {
       name: 'iFlight Chimera5 Pro Frame',
-      categoryId: frames5inch.id,
+      categoryId: catFrameKit.id,
       brandId: iflight.id,
       status: 'active',
       description: 'Premium 5-inch freestyle frame with carbon fiber construction. Dead cat geometry for propeller-free camera view.',
@@ -285,7 +313,7 @@ async function main() {
   const mark5 = await prisma.product.create({
     data: {
       name: 'GEPRC Mark5 HD Frame Kit',
-      categoryId: frames5inch.id,
+      categoryId: catFrameKit.id,
       brandId: geprc.id,
       status: 'active',
       description: 'True-X 5" frame designed for DJI O3 Air Unit. 5mm arms with reinforced motor mounts.',
@@ -298,7 +326,7 @@ async function main() {
   const xing2306 = await prisma.product.create({
     data: {
       name: 'iFlight XING2 2306 1750KV',
-      categoryId: motors2306.id,
+      categoryId: catMotor.id,
       brandId: iflight.id,
       status: 'active',
       description: 'High-performance 2306 motor for 6S 5-inch builds. Titanium alloy shaft with Japanese bearings.',
@@ -310,7 +338,7 @@ async function main() {
   const ethixStout = await prisma.product.create({
     data: {
       name: 'Ethix Stout V4 2306 1750KV',
-      categoryId: motors2306.id,
+      categoryId: catMotor.id,
       brandId: ethix.id,
       status: 'active',
       description: 'Mr Steele signature motor. Optimized for smooth freestyle with incredible low-end torque.',
@@ -322,7 +350,7 @@ async function main() {
   const emax1404 = await prisma.product.create({
     data: {
       name: 'EMAX RS1404 3600KV',
-      categoryId: motors1404.id,
+      categoryId: catMotor.id,
       brandId: emax.id,
       status: 'active',
       description: 'Lightweight 1404 motor for 3-inch micro quads. Bell designed for minimal drag.',
@@ -331,11 +359,11 @@ async function main() {
     },
   })
 
-  // --- ESCs ---
+  // --- Stacks ---
   const speedyBee = await prisma.product.create({
     data: {
       name: 'SpeedyBee F405 V4 55A 4-in-1 Stack',
-      categoryId: escs4in1.id,
+      categoryId: catStack.id,
       status: 'active',
       description: 'F405 flight controller + 55A BLHeli_32 4-in-1 ESC stack. Bluetooth configuration via app.',
       features: ['F405 processor', '55A continuous', 'BLHeli_32', 'Bluetooth config', 'Barometer onboard'],
@@ -347,7 +375,7 @@ async function main() {
   const diatoneH7 = await prisma.product.create({
     data: {
       name: 'Diatone Mamba H743 MK4',
-      categoryId: fcsH7.id,
+      categoryId: catFc.id,
       brandId: diatone.id,
       status: 'active',
       description: 'H7 flight controller with dual gyro. 9 UARTs, 128MB flash for blackbox.',
@@ -360,7 +388,7 @@ async function main() {
   const djiO3 = await prisma.product.create({
     data: {
       name: 'DJI O3 Air Unit',
-      categoryId: vtxDigital.id,
+      categoryId: catVtx.id,
       brandId: dji.id,
       status: 'active',
       description: 'DJI digital FPV system with 1080p recording and ultra-low latency transmission.',
@@ -372,7 +400,7 @@ async function main() {
   const walksnailAvatar = await prisma.product.create({
     data: {
       name: 'Walksnail Avatar HD V2',
-      categoryId: vtxDigital.id,
+      categoryId: catVtx.id,
       brandId: walksnail.id,
       status: 'active',
       description: 'Walksnail digital VTX with gyroflow support and 1080p recording.',
@@ -384,7 +412,7 @@ async function main() {
   const hdzeroVTX = await prisma.product.create({
     data: {
       name: 'HDZero Freestyle V2 VTX',
-      categoryId: vtxDigital.id,
+      categoryId: catVtx.id,
       brandId: hdzero.id,
       status: 'active',
       description: 'Ultra-low-latency digital VTX. 720p/100fps with < 4ms glass-to-glass latency.',
@@ -397,7 +425,7 @@ async function main() {
   const foxeerRazer = await prisma.product.create({
     data: {
       name: 'Foxeer Razer Mini',
-      categoryId: camerasFPV.id,
+      categoryId: catCamera.id,
       brandId: foxeer.id,
       status: 'active',
       description: 'Compact analog FPV camera with excellent low-light performance. 1200TVL CMOS sensor.',
@@ -410,7 +438,7 @@ async function main() {
   const djiGoggles3 = await prisma.product.create({
     data: {
       name: 'DJI Goggles 3',
-      categoryId: goggles.id,
+      categoryId: catGoggles.id,
       brandId: dji.id,
       status: 'active',
       description: 'Lightweight FPV goggles with micro-OLED screens. Works with DJI O3 and O4 systems.',
@@ -422,7 +450,7 @@ async function main() {
   const fatsharkRecon = await prisma.product.create({
     data: {
       name: 'Fatshark Recon HD',
-      categoryId: goggles.id,
+      categoryId: catGoggles.id,
       brandId: fatshark.id,
       status: 'active',
       description: 'Entry-level HD goggles compatible with HDZero and Walksnail digital systems.',
@@ -435,7 +463,7 @@ async function main() {
   const zorro = await prisma.product.create({
     data: {
       name: 'RadioMaster Zorro ELRS',
-      categoryId: radiosTX.id,
+      categoryId: catRadio.id,
       brandId: radiomaster.id,
       status: 'active',
       description: 'Compact gamepad-style radio with built-in ELRS module. Perfect for travel.',
@@ -447,7 +475,7 @@ async function main() {
   const tx16s = await prisma.product.create({
     data: {
       name: 'RadioMaster TX16S MKII ELRS',
-      categoryId: radiosTX.id,
+      categoryId: catRadio.id,
       brandId: radiomaster.id,
       status: 'active',
       description: 'Full-size radio transmitter with hall gimbals and ELRS module. The gold standard for FPV.',
@@ -460,25 +488,12 @@ async function main() {
   const cnhl6S = await prisma.product.create({
     data: {
       name: 'CNHL Black Series 1300mAh 6S 100C',
-      categoryId: batteries6S.id,
+      categoryId: catBattery.id,
       brandId: cnhl.id,
       status: 'active',
       description: 'High-discharge 6S LiPo for 5-inch freestyle. Consistent punch throughout the pack.',
       features: ['100C discharge', 'XT60 connector', '210g weight', 'HV compatible'],
       images: ['https://placehold.co/800x600/0f1117/00e5ff?text=CNHL+6S+1300'],
-    },
-  })
-
-  // --- Props ---
-  const hqS5 = await prisma.product.create({
-    data: {
-      name: 'HQProp Ethix S5 Light Grey',
-      categoryId: props.id,
-      brandId: hqprop.id,
-      status: 'active',
-      description: 'Ethix S5 prop designed by Mr Steele. Smooth, responsive, and incredibly durable polycarbonate.',
-      features: ['5x4x3 triblade', 'Polycarbonate', 'Balanced out of box', '4 sets (16 props)'],
-      images: ['https://placehold.co/800x600/0f1117/a855f7?text=HQ+Ethix+S5'],
     },
   })
 
@@ -489,47 +504,43 @@ async function main() {
 
   await prisma.productSpec.createMany({
     data: [
-      // Chimera5: 5" frame, 120g
-      { productId: chimera5.id, specId: specs[7].id },
-      { productId: chimera5.id, specId: specs[13].id },
-      // Mark5: 5" frame, 105g
-      { productId: mark5.id, specId: specs[7].id },
-      { productId: mark5.id, specId: specs[12].id },
-      // XING2 2306: 1750KV, 2306, 33g
+      // Chimera5: 5" frame
+      { productId: chimera5.id, specId: specs[25].id },
+      // Mark5: 5" frame
+      { productId: mark5.id, specId: specs[25].id },
+      // XING2 2306: 1750KV
       { productId: xing2306.id, specId: specs[0].id },
-      { productId: xing2306.id, specId: specs[4].id },
-      { productId: xing2306.id, specId: specs[11].id },
-      // Ethix Stout: 1750KV, 2306, 33g
+      // Ethix Stout: 1750KV
       { productId: ethixStout.id, specId: specs[0].id },
-      { productId: ethixStout.id, specId: specs[4].id },
-      { productId: ethixStout.id, specId: specs[11].id },
-      // EMAX 1404: 3600KV, 1404
+      // EMAX 1404: 3600KV
       { productId: emax1404.id, specId: specs[3].id },
-      { productId: emax1404.id, specId: specs[6].id },
-      // SpeedyBee: BLHeli_32
-      { productId: speedyBee.id, specId: specs[19].id },
-      // DJI O3: DJI O3 protocol, 1080p, 155° FOV
-      { productId: djiO3.id, specId: specs[16].id },
-      { productId: djiO3.id, specId: specs[25].id },
-      { productId: djiO3.id, specId: specs[28].id },
-      // Walksnail: Walksnail protocol, 1080p
-      { productId: walksnailAvatar.id, specId: specs[18].id },
-      { productId: walksnailAvatar.id, specId: specs[25].id },
-      // HDZero: HDZero protocol, 720p 100fps
-      { productId: hdzeroVTX.id, specId: specs[17].id },
-      { productId: hdzeroVTX.id, specId: specs[26].id },
-      // Foxeer Razer: 170° FOV
-      { productId: foxeerRazer.id, specId: specs[29].id },
-      // DJI Goggles 3: 1080p, 50° FOV
-      { productId: djiGoggles3.id, specId: specs[25].id },
-      { productId: djiGoggles3.id, specId: specs[30].id },
-      // Zorro: ELRS
-      { productId: zorro.id, specId: specs[14].id },
-      // TX16S: ELRS
-      { productId: tx16s.id, specId: specs[14].id },
-      // CNHL 6S: 6S, 1300mAh
-      { productId: cnhl6S.id, specId: specs[21].id },
-      { productId: cnhl6S.id, specId: specs[23].id },
+      // SpeedyBee: 30.5x30.5 stack, 55A
+      { productId: speedyBee.id, specId: specs[6].id },
+      { productId: speedyBee.id, specId: specs[9].id },
+      // Diatone H743: 30.5x30.5 stack
+      { productId: diatoneH7.id, specId: specs[6].id },
+      // DJI O3: DJI O3 video system
+      { productId: djiO3.id, specId: specs[15].id },
+      // Walksnail: Walksnail video system
+      { productId: walksnailAvatar.id, specId: specs[17].id },
+      // HDZero: HDZero video system
+      { productId: hdzeroVTX.id, specId: specs[16].id },
+      // Foxeer Razer: Analog video system, Micro camera size
+      { productId: foxeerRazer.id, specId: specs[14].id },
+      { productId: foxeerRazer.id, specId: specs[11].id },
+      // DJI Goggles 3: DJI O3 video system
+      { productId: djiGoggles3.id, specId: specs[15].id },
+      // Fatshark Recon: HDZero video system
+      { productId: fatsharkRecon.id, specId: specs[16].id },
+      // Zorro: ELRS protocol
+      { productId: zorro.id, specId: specs[21].id },
+      // TX16S: ELRS protocol
+      { productId: tx16s.id, specId: specs[21].id },
+      // CNHL 6S: 6S cells, 1300mAh capacity, XT60 connector, LiPo type
+      { productId: cnhl6S.id, specId: specs[29].id },
+      { productId: cnhl6S.id, specId: specs[37].id },
+      { productId: cnhl6S.id, specId: specs[34].id },
+      { productId: cnhl6S.id, specId: specs[30].id },
     ],
   })
 
@@ -576,8 +587,6 @@ async function main() {
       { productId: tx16s.id, name: 'RadioMaster Store', url: 'https://radiomasterrc.com/tx16s-mkii', price: 199.99, currency: 'USD', available: true },
       { productId: tx16s.id, name: 'GetFPV', url: 'https://getfpv.com/tx16s-mkii-elrs', price: 209.99, currency: 'USD', available: true },
       { productId: cnhl6S.id, name: 'CNHL Store', url: 'https://chinahobbyline.com/6s-1300', price: 24.99, currency: 'USD', available: true },
-      { productId: hqS5.id, name: 'GetFPV', url: 'https://getfpv.com/hqprop-ethix-s5', price: 3.49, currency: 'USD', available: true },
-      { productId: hqS5.id, name: 'RaceDayQuads', url: 'https://racedayquads.com/ethix-s5', price: 3.49, currency: 'USD', available: true },
     ],
   })
 
@@ -820,10 +829,10 @@ async function main() {
   console.log(`
     Summary:
     - 5 users (1 admin + 4 pilots)
-    - 10 root categories + subcategories (FPV drone gear)
+    - 5 root categories + 16 subcategories (FPV drone gear)
     - 20 brands (FPV-specific)
-    - 9 spec types with 31 spec values
-    - 18 products with specs, shops, and components
+    - 12 spec types with 39 spec values
+    - 17 products with specs, shops, and components
     - 8 deals (5 published, 1 pending, 1 sold, 1 declined)
     - 4 discussions with statuses
 
