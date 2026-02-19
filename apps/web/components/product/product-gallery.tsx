@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { ImageLightbox } from '@/components/shared/image-lightbox'
 
 interface ProductGalleryProps {
   images: string[]
@@ -13,11 +14,15 @@ export function ProductGallery({
   defaultImage = 'https://placehold.co/400x300/161822/7c8599?text=Image',
 }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const productImages = images && images.length > 0 ? images : [defaultImage]
 
   return (
     <div className="glass-card rounded-xl p-4">
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
+      <div
+        className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted cursor-pointer"
+        onClick={() => setLightboxOpen(true)}
+      >
         <Image
           src={productImages[selectedImageIndex]}
           alt="Main product image"
@@ -55,6 +60,13 @@ export function ProductGallery({
           ))}
         </div>
       )}
+
+      <ImageLightbox
+        images={productImages}
+        initialIndex={selectedImageIndex}
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </div>
   )
 }

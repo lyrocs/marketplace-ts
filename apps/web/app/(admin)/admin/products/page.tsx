@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
-import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react'
-import { PRODUCTS_QUERY, PRODUCT_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_MUTATION, REUPLOAD_PRODUCT_IMAGES_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
+import { useState, useMemo } from 'react'
+import { useQuery, useMutation } from '@apollo/client/react'
+import { PRODUCTS_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import { ImageUpload } from '@/components/shared/image-upload'
 import {
@@ -23,13 +23,10 @@ import {
   DialogDescription,
   DialogFooter,
   Skeleton,
-  Badge,
-  Textarea,
   Checkbox,
 } from '@marketplace/ui'
-import { Plus, Trash2, Eye, Edit, X, Upload, ExternalLink } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
-import Image from 'next/image'
 import Link from 'next/link'
 
 export default function AdminProductsPage() {
@@ -37,10 +34,6 @@ export default function AdminProductsPage() {
   const [searchName, setSearchName] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '', specIds: [] as number[], images: [] as string[] })
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
-  const [editOpen, setEditOpen] = useState(false)
-  const [editProduct, setEditProduct] = useState({ id: 0, name: '', categoryId: '', brandId: '', description: '', status: 'draft', features: [] as string[], specIds: [] as number[], images: [] as string[] })
-  const editFeaturesRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
@@ -49,82 +42,27 @@ export default function AdminProductsPage() {
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)
   const { data: specTypesData } = useQuery(SPEC_TYPES_QUERY)
-  const { data: productData, loading: productLoading } = useQuery(PRODUCT_QUERY, {
-    variables: { id: selectedProductId },
-    skip: !selectedProductId,
-  })
   const [createProduct] = useMutation(CREATE_PRODUCT_MUTATION)
   const [updateProduct] = useMutation(UPDATE_PRODUCT_MUTATION)
   const [updateProductSpecs] = useMutation(UPDATE_PRODUCT_SPECS_MUTATION)
   const [addProductImage] = useMutation(ADD_PRODUCT_IMAGE_MUTATION)
-  const [deleteProductImage] = useMutation(DELETE_PRODUCT_IMAGE_MUTATION)
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
-  const [reuploadImages, { loading: reuploading }] = useMutation(REUPLOAD_PRODUCT_IMAGES_MUTATION)
-  const [fetchProduct] = useLazyQuery(PRODUCT_QUERY, { fetchPolicy: 'network-only' })
 
   const products = data?.products?.data || []
   const meta = data?.products?.meta
-  const product = productData?.product
   const specTypes = specTypesData?.specTypes || []
   const categories = categoriesData?.categories || []
+  const brands = brandsData?.brands || []
 
   // Get spec types for selected category (for create dialog)
   const selectedCategory = categories.find((c: any) => c.id === parseInt(newProduct.categoryId))
   const availableSpecTypeIds = selectedCategory?.specTypes?.map((st: any) => st.id) || []
   const availableSpecTypes = specTypes.filter((st: any) => availableSpecTypeIds.includes(st.id))
 
-  const brands = brandsData?.brands || []
-
-  const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || ''
-  const isExternalImage = (url: string) => s3BaseUrl ? !url.startsWith(s3BaseUrl) : false
-  const hasExternalImages = (imgs: string[]) => imgs.some(isExternalImage)
-
-  const handleReuploadImages = async () => {
-    try {
-      const { data } = await reuploadImages({ variables: { productId: editProduct.id } })
-      if (data?.reuploadProductImages?.images) {
-        setEditProduct({ ...editProduct, images: data.reuploadProductImages.images })
-      }
-      toast({ title: 'Images uploaded to S3', variant: 'success' })
-    } catch {
-      toast({ title: 'Failed to upload images', variant: 'destructive' })
-    }
-  }
-
-  const suggestBrands = (productName: string) => {
-    if (!productName) return []
-    const nameLower = productName.toLowerCase()
-    return brands.filter((b: any) => nameLower.includes(b.name.toLowerCase()))
-  }
-
   const newProductBrandSuggestions = useMemo(
-    () => !newProduct.brandId ? suggestBrands(newProduct.name) : [],
+    () => !newProduct.brandId ? brands.filter((b: any) => newProduct.name && newProduct.name.toLowerCase().includes(b.name.toLowerCase())) : [],
     [newProduct.name, newProduct.brandId, brands]
   )
-
-  const editProductBrandSuggestions = useMemo(
-    () => !editProduct.brandId ? suggestBrands(editProduct.name) : [],
-    [editProduct.name, editProduct.brandId, brands]
-  )
-
-  const openEditDialog = async (productOrId: any) => {
-    const id = typeof productOrId === 'number' ? productOrId : productOrId.id
-    const { data: fullData } = await fetchProduct({ variables: { id } })
-    const p = fullData?.product
-    if (!p) return
-    setEditProduct({
-      id: p.id,
-      name: p.name,
-      categoryId: (p.categoryId || p.category?.id || '').toString(),
-      brandId: (p.brandId || p.brand?.id || '').toString(),
-      description: p.description || '',
-      status: p.status || 'draft',
-      features: Array.isArray(p.features) ? p.features : [],
-      specIds: p.specs?.map((s: any) => s.id) || [],
-      images: Array.isArray(p.images) ? p.images : [],
-    })
-    setEditOpen(true)
-  }
 
   const handleCreate = async () => {
     if (!newProduct.name || !newProduct.categoryId) {
@@ -143,23 +81,14 @@ export default function AdminProductsPage() {
 
       const productId = data?.createProduct?.id
 
-      // Add images if any
       if (productId && newProduct.images.length > 0) {
         for (const imageUrl of newProduct.images) {
-          await addProductImage({
-            variables: { productId, imageUrl },
-          })
+          await addProductImage({ variables: { productId, imageUrl } })
         }
       }
 
-      // Set specs if any selected
       if (productId && newProduct.specIds.length > 0) {
-        await updateProductSpecs({
-          variables: {
-            productId,
-            specIds: newProduct.specIds,
-          },
-        })
+        await updateProductSpecs({ variables: { productId, specIds: newProduct.specIds } })
       }
 
       toast({ title: 'Product created', variant: 'success' })
@@ -168,63 +97,6 @@ export default function AdminProductsPage() {
       await refetch()
     } catch {
       toast({ title: 'Failed to create product', variant: 'destructive' })
-    }
-  }
-
-  const handleUpdate = async () => {
-    if (!editProduct.name || !editProduct.categoryId) {
-      toast({ title: 'Name and category are required', variant: 'destructive' })
-      return
-    }
-    try {
-      await updateProduct({
-        variables: {
-          id: editProduct.id,
-          name: editProduct.name,
-          categoryId: parseInt(editProduct.categoryId),
-          brandId: editProduct.brandId ? parseInt(editProduct.brandId) : undefined,
-          description: editProduct.description || undefined,
-          features: editProduct.features,
-          status: editProduct.status,
-        },
-      })
-      // Update specs separately
-      await updateProductSpecs({
-        variables: {
-          productId: editProduct.id,
-          specIds: editProduct.specIds,
-        },
-      })
-      toast({ title: 'Product updated', variant: 'success' })
-      setEditOpen(false)
-      setSelectedProductId(null)
-      await refetch()
-    } catch {
-      toast({ title: 'Failed to update product', variant: 'destructive' })
-    }
-  }
-
-  const handleEditImageAdded = async (url: string) => {
-    try {
-      await addProductImage({
-        variables: { productId: editProduct.id, imageUrl: url },
-      })
-      setEditProduct({ ...editProduct, images: [...editProduct.images, url] })
-      toast({ title: 'Image added', variant: 'success' })
-    } catch {
-      toast({ title: 'Failed to add image', variant: 'destructive' })
-    }
-  }
-
-  const handleEditImageRemoved = async (url: string) => {
-    try {
-      await deleteProductImage({
-        variables: { productId: editProduct.id, imageUrl: url },
-      })
-      setEditProduct({ ...editProduct, images: editProduct.images.filter(img => img !== url) })
-      toast({ title: 'Image removed', variant: 'success' })
-    } catch {
-      toast({ title: 'Failed to remove image', variant: 'destructive' })
     }
   }
 
@@ -296,7 +168,11 @@ export default function AdminProductsPage() {
                   <tbody>
                     {products.map((product: any) => (
                       <tr key={product.id} className="border-b last:border-0">
-                        <td className="px-4 py-3 font-medium">{product.name}</td>
+                        <td className="px-4 py-3 font-medium">
+                          <Link href={`/admin/products/${product.id}`} className="hover:text-primary hover:underline transition-colors">
+                            {product.name}
+                          </Link>
+                        </td>
                         <td className="px-4 py-3">
                           <button
                             onClick={() => handleToggleStatus(product.id, product.status)}
@@ -315,12 +191,16 @@ export default function AdminProductsPage() {
                         <td className="px-4 py-3 text-muted-foreground">{product.shops?.length || 0}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => setSelectedProductId(product.id)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
+                            <Link href={`/admin/products/${product.id}`}>
+                              <Button variant="ghost" size="icon">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Link href={`/admin/products/${product.id}/edit`}>
+                              <Button variant="ghost" size="icon">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </Link>
                             <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
@@ -370,7 +250,7 @@ export default function AdminProductsPage() {
               <Select value={newProduct.categoryId} onValueChange={(v) => setNewProduct({ ...newProduct, categoryId: v, specIds: [] })}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
-                  {(categoriesData?.categories || []).map((cat: any) => (
+                  {categories.map((cat: any) => (
                     <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -444,335 +324,6 @@ export default function AdminProductsPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
             <Button onClick={handleCreate}>Create Product</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* View Product Dialog */}
-      <Dialog open={!!selectedProductId && !editOpen} onOpenChange={(open) => !open && setSelectedProductId(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{productLoading ? 'Loading...' : (product?.name || 'Product Details')}</DialogTitle>
-            {!productLoading && product && (
-              <div className="flex items-center gap-2 mt-2">
-                <Badge>{product.status}</Badge>
-                <span className="text-sm text-muted-foreground">
-                  {product.category?.name} {product.brand && `· ${product.brand.name}`}
-                </span>
-              </div>
-            )}
-          </DialogHeader>
-
-          {productLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-64 w-full" />
-            </div>
-          ) : product ? (
-            <>
-
-              <div className="space-y-6 mt-4">
-                {/* Images */}
-                {product.images && product.images.length > 0 && (
-                  <div>
-                    <h3 className="font-semibold mb-2">Images</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                      {product.images.map((img: string, i: number) => (
-                        <div key={i} className="relative h-32 rounded-lg overflow-hidden border">
-                          <Image src={img} alt={`Product image ${i + 1}`} fill className="object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Description */}
-                {product.description && (
-                  <div>
-                    <Label>Description</Label>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{product.description}</p>
-                  </div>
-                )}
-
-                {/* Features */}
-                {product.features && product.features.length > 0 && (
-                  <div>
-                    <Label>Features</Label>
-                    <ul className="mt-2 space-y-1 text-sm text-muted-foreground list-disc list-inside">
-                      {product.features.map((feature: string, i: number) => (
-                        <li key={i}>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Specifications */}
-                {product.specs && product.specs.length > 0 && (
-                  <div>
-                    <Label>Specifications</Label>
-                    <div className="grid grid-cols-2 gap-3 mt-2">
-                      {product.specs.map((spec: any) => (
-                        <div key={spec.id} className="flex items-center justify-between p-2 border rounded">
-                          <span className="text-sm font-medium">{spec.specType?.label}:</span>
-                          <Badge variant="secondary">{spec.value}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Shop Links */}
-                {product.shops && product.shops.length > 0 && (
-                  <div>
-                    <Label>Available at {product.shops.length} shop(s)</Label>
-                    <div className="space-y-2 mt-2">
-                      {product.shops.map((shop: any) => (
-                        <div key={shop.id} className="flex items-center justify-between p-3 border rounded">
-                          <div>
-                            <p className="font-medium">{shop.name}</p>
-                            <a href={shop.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
-                              {shop.url}
-                            </a>
-                          </div>
-                          <div className="text-right">
-                            {shop.price && (
-                              <p className="font-semibold">{shop.currency || 'USD'} {Number(shop.price).toFixed(2)}</p>
-                            )}
-                            <Badge variant={shop.available ? 'default' : 'secondary'}>
-                              {shop.available ? 'In Stock' : 'Out of Stock'}
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Metadata */}
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <Label>Created</Label>
-                    <p className="text-muted-foreground">{new Date(product.createdAt).toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <Label>Updated</Label>
-                    <p className="text-muted-foreground">{new Date(product.updatedAt).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              </div>
-
-              <DialogFooter className="mt-6">
-                <Button variant="outline" onClick={() => setSelectedProductId(null)}>Close</Button>
-                <Link href={`/product/${product.id}`} target="_blank">
-                  <Button variant="outline">View Public Page</Button>
-                </Link>
-                <Button onClick={() => {
-                  openEditDialog(product)
-                }}>
-                  <Edit className="mr-1 h-4 w-4" /> Edit
-                </Button>
-              </DialogFooter>
-            </>
-          ) : null}
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Product Dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-[calc(100vw-2rem)] w-full max-h-[calc(100vh-2rem)] h-full overflow-y-auto">
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <DialogTitle>Edit Product</DialogTitle>
-                <DialogDescription>Update product information</DialogDescription>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditProduct({ ...editProduct, status: editProduct.status === 'active' ? 'draft' : 'active' })}
-                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold transition-colors cursor-pointer ${
-                  editProduct.status === 'active'
-                    ? 'bg-[hsl(var(--neon-green))]/15 text-[hsl(var(--neon-green))] hover:bg-[hsl(var(--neon-green))]/25'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
-              >
-                <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${editProduct.status === 'active' ? 'bg-[hsl(var(--neon-green))]' : 'bg-muted-foreground/50'}`} />
-                {editProduct.status}
-              </button>
-            </div>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>Product Name</Label>
-              <Input value={editProduct.name} onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })} />
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label>Product Images</Label>
-                {hasExternalImages(editProduct.images) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleReuploadImages}
-                    disabled={reuploading}
-                  >
-                    <Upload className="mr-1.5 h-3.5 w-3.5" />
-                    {reuploading ? 'Uploading...' : 'Upload all to S3'}
-                  </Button>
-                )}
-              </div>
-              {/* Image grid with external badges */}
-              {editProduct.images.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {editProduct.images.map((url, i) => (
-                    <div key={url} className="relative h-24 w-24 overflow-hidden rounded-lg border">
-                      <Image src={url} alt={`Image ${i + 1}`} fill className="object-cover" />
-                      {isExternalImage(url) && (
-                        <span className="absolute top-1 left-1 inline-flex items-center gap-0.5 rounded bg-amber-500/90 px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                          <ExternalLink className="h-2.5 w-2.5" />
-                          External
-                        </span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => handleEditImageRemoved(url)}
-                        className="absolute top-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <ImageUpload
-                images={[]}
-                onImageAdded={handleEditImageAdded}
-                onImageRemoved={handleEditImageRemoved}
-                maxImages={10 - editProduct.images.length}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Category</Label>
-              <Select value={editProduct.categoryId} onValueChange={(v) => setEditProduct({ ...editProduct, categoryId: v })}>
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                <SelectContent>
-                  {(categoriesData?.categories || []).map((cat: any) => (
-                    <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Brand</Label>
-              <Select value={editProduct.brandId} onValueChange={(v) => setEditProduct({ ...editProduct, brandId: v })}>
-                <SelectTrigger><SelectValue placeholder="Select brand" /></SelectTrigger>
-                <SelectContent>
-                  {brands.map((brand: any) => (
-                    <SelectItem key={brand.id} value={brand.id.toString()}>{brand.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {editProductBrandSuggestions.length > 0 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs text-muted-foreground">Detected:</span>
-                  {editProductBrandSuggestions.map((brand: any) => (
-                    <button
-                      key={brand.id}
-                      type="button"
-                      onClick={() => setEditProduct({ ...editProduct, brandId: brand.id.toString() })}
-                      className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
-                    >
-                      {brand.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="space-y-1.5">
-              <Label>Description</Label>
-              <Textarea
-                value={editProduct.description}
-                onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
-                rows={4}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Features</Label>
-              {editProduct.features.length > 0 && (
-                <div className="grid grid-cols-2 gap-1.5">
-                  {editProduct.features.map((feature, i) => (
-                    <div
-                      key={i}
-                      className="group flex items-center justify-between rounded-md border border-border/50 bg-white/5 px-2.5 py-1.5 text-sm text-foreground hover:border-primary/30 transition-colors"
-                    >
-                      <span className="truncate">{feature}</span>
-                      <button
-                        type="button"
-                        onClick={() => setEditProduct({ ...editProduct, features: editProduct.features.filter((_, idx) => idx !== i) })}
-                        className="ml-2 shrink-0 rounded-full p-0.5 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div
-                className="flex items-center rounded-lg border border-border bg-input px-3 py-2 cursor-text focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/30 transition-colors"
-                onClick={() => editFeaturesRef.current?.focus()}
-              >
-                <Plus className="h-3.5 w-3.5 text-muted-foreground/50 mr-2 shrink-0" />
-                <input
-                  ref={editFeaturesRef}
-                  type="text"
-                  placeholder="Type a feature and press Enter..."
-                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  onKeyDown={(e) => {
-                    const value = (e.target as HTMLInputElement).value.trim()
-                    if (e.key === 'Enter' && value) {
-                      e.preventDefault()
-                      setEditProduct({ ...editProduct, features: [...editProduct.features, value] });
-                      (e.target as HTMLInputElement).value = ''
-                    }
-                  }}
-                />
-              </div>
-            </div>
-            <div className="space-y-3">
-              <Label>Specifications</Label>
-              <div className="border rounded-lg p-4 max-h-60 overflow-y-auto space-y-3">
-                {specTypes.map((specType: any) => (
-                  <div key={specType.id} className="space-y-2">
-                    <p className="text-sm font-semibold text-muted-foreground">{specType.label}</p>
-                    <div className="grid grid-cols-2 gap-2 pl-4">
-                      {specType.specs?.map((spec: any) => (
-                        <div key={spec.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`spec-${spec.id}`}
-                            checked={editProduct.specIds.includes(spec.id)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setEditProduct({ ...editProduct, specIds: [...editProduct.specIds, spec.id] })
-                              } else {
-                                setEditProduct({ ...editProduct, specIds: editProduct.specIds.filter(id => id !== spec.id) })
-                              }
-                            }}
-                          />
-                          <label htmlFor={`spec-${spec.id}`} className="text-sm cursor-pointer">
-                            {spec.value}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
-            <Button onClick={handleUpdate}>Update Product</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
