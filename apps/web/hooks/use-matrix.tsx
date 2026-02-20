@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import * as sdk from 'matrix-js-sdk'
 import { useAuth } from './use-auth'
 
 export interface MatrixMessage {
@@ -14,7 +13,7 @@ export interface MatrixMessage {
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
 
 interface UseMatrixResult {
-  client: sdk.MatrixClient | null
+  client: any | null
   messages: MatrixMessage[]
   loading: boolean
   error: string | null
@@ -24,9 +23,18 @@ interface UseMatrixResult {
   disconnect: () => void
 }
 
+// Cache the SDK module so it's only imported once
+let sdkPromise: Promise<typeof import('matrix-js-sdk')> | null = null
+function getSDK() {
+  if (!sdkPromise) {
+    sdkPromise = import('matrix-js-sdk')
+  }
+  return sdkPromise
+}
+
 export function useMatrix(): UseMatrixResult {
   const { user } = useAuth()
-  const [client, setClient] = useState<sdk.MatrixClient | null>(null)
+  const [client, setClient] = useState<any | null>(null)
   const [messages, setMessages] = useState<MatrixMessage[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -34,16 +42,21 @@ export function useMatrix(): UseMatrixResult {
   const currentRoomId = useRef<string | null>(null)
   const reconnectAttempts = useRef(0)
   const maxReconnectAttempts = 3
+  const sdkRef = useRef<typeof import('matrix-js-sdk') | null>(null)
 
   // Initialize Matrix client
   useEffect(() => {
+    console.log('[Matrix] Hook triggered, user:', user?.email, 'matrixLogin:', user?.matrixLogin, 'hasPassword:', !!user?.matrixPassword)
+
     if (!user?.matrixLogin || !user?.matrixPassword) {
+      console.log('[Matrix] Missing credentials, staying disconnected')
       setLoading(false)
       setConnectionStatus('disconnected')
       return
     }
 
     const matrixHost = process.env.NEXT_PUBLIC_MATRIX_HOST
+    console.log('[Matrix] Host:', matrixHost)
     if (!matrixHost) {
       setError('Matrix host not configured')
       setLoading(false)
@@ -51,11 +64,18 @@ export function useMatrix(): UseMatrixResult {
       return
     }
 
-    let matrixClient: sdk.MatrixClient | null = null
+    let matrixClient: any = null
+    let cancelled = false
 
     const initMatrix = async () => {
       try {
         setConnectionStatus('connecting')
+        console.log('[Matrix] Loading SDK...')
+
+        const sdk = await getSDK()
+        if (cancelled) return
+        sdkRef.current = sdk
+        console.log('[Matrix] SDK loaded, logging in as', user.matrixLogin)
 
         // Login to Matrix
         const baseUrl = `https://${matrixHost}`
@@ -69,19 +89,28 @@ export function useMatrix(): UseMatrixResult {
           }),
         })
 
+        console.log('[Matrix] Login response status:', response.status)
         if (!response.ok) {
-          throw new Error('Matrix login failed')
+          const body = await response.text()
+          console.error('[Matrix] Login failed:', response.status, body)
+          throw new Error(`Matrix login failed: ${response.status}`)
         }
 
         const data = await response.json()
+        console.log('[Matrix] Logged in as', data.user_id)
+        if (cancelled) return
+
         matrixClient = sdk.createClient({
           baseUrl,
           accessToken: data.access_token,
           userId: data.user_id,
         })
 
+        console.log('[Matrix] Client created, starting sync...')
+
         // Listen for sync state changes
         matrixClient.on(sdk.ClientEvent.Sync, (state: any) => {
+          console.log('[Matrix] Sync state:', state)
           if (state === 'PREPARED' || state === 'SYNCING') {
             setConnectionStatus('connected')
             reconnectAttempts.current = 0
@@ -119,9 +148,16 @@ export function useMatrix(): UseMatrixResult {
 
         await matrixClient.startClient({ initialSyncLimit: 10 })
 
+        if (cancelled) {
+          matrixClient.removeAllListeners()
+          matrixClient.stopClient()
+          return
+        }
+
         setClient(matrixClient)
         setLoading(false)
       } catch (err: any) {
+        if (cancelled) return
         console.error('Matrix initialization error:', err)
         setError(err.message || 'Failed to initialize Matrix')
         setLoading(false)
@@ -132,6 +168,7 @@ export function useMatrix(): UseMatrixResult {
     initMatrix()
 
     return () => {
+      cancelled = true
       if (matrixClient) {
         matrixClient.removeAllListeners()
         matrixClient.stopClient()
@@ -142,6 +179,8 @@ export function useMatrix(): UseMatrixResult {
   const loadMessages = useCallback(
     async (roomId: string) => {
       if (!client) return
+      const sdk = sdkRef.current
+      if (!sdk) return
 
       try {
         currentRoomId.current = roomId
@@ -171,14 +210,14 @@ export function useMatrix(): UseMatrixResult {
         const events = timeline.getEvents()
 
         const msgs: MatrixMessage[] = events
-          .filter((e) => e.getType() === 'm.room.message')
-          .map((e) => ({
+          .filter((e: any) => e.getType() === 'm.room.message')
+          .map((e: any) => ({
             eventId: e.getId() || '',
             sender: e.getSender() || '',
             body: e.getContent().body || '',
             timestamp: e.getTs() || 0,
           }))
-          .sort((a, b) => a.timestamp - b.timestamp)
+          .sort((a: MatrixMessage, b: MatrixMessage) => a.timestamp - b.timestamp)
 
         setMessages(msgs)
         setLoading(false)

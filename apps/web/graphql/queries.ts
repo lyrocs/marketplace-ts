@@ -14,6 +14,8 @@ export const LOGIN_MUTATION = gql`
         email
         image
         role
+        matrixLogin
+        matrixPassword
       }
     }
   }
@@ -29,6 +31,8 @@ export const REGISTER_MUTATION = gql`
         email
         image
         role
+        matrixLogin
+        matrixPassword
       }
     }
   }

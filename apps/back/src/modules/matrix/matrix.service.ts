@@ -22,8 +22,9 @@ export class MatrixService {
     }
 
     try {
+      const baseUrl = `https://${matrixHost}`;
       const response = await fetch(
-        `https://${matrixHost}/_matrix/client/v3/login`,
+        `${baseUrl}/_matrix/client/v3/login`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -36,13 +37,21 @@ export class MatrixService {
       );
 
       const data: any = await response.json();
-      this.accessToken = data?.access_token || '';
+
+      if (!data?.access_token) {
+        console.error('Matrix admin login failed:', data?.errcode, data?.error);
+        return;
+      }
+
+      this.accessToken = data.access_token;
 
       this.client = sdk.createClient({
-        baseUrl: `https://${matrixHost}`,
-        accessToken: this.accessToken ?? undefined,
-        userId: data?.user_id ?? (undefined as any),
+        baseUrl,
+        accessToken: this.accessToken!,
+        userId: data.user_id,
       });
+
+      console.log('✓ Matrix admin client initialized as', data.user_id);
     } catch (err) {
       console.warn('Matrix initialization failed:', err);
     }

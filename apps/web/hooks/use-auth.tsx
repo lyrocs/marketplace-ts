@@ -10,6 +10,8 @@ interface AuthUser {
   email: string
   image: string | null
   role: string
+  matrixLogin: string | null
+  matrixPassword: string | null
 }
 
 interface AuthContextType {

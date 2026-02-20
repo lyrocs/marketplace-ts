@@ -62,6 +62,8 @@ export class AuthService {
         email: user.email,
         image: user.image,
         role: user.role,
+        matrixLogin: user.matrixLogin,
+        matrixPassword: user.matrixPassword,
       },
     };
   }
