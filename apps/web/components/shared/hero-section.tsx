@@ -1,21 +1,24 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@marketplace/ui'
 import { HeroSearch } from './hero-search'
+import { useAuth } from '../../hooks/use-auth'
 
 interface HeroSectionProps {
   title?: string
   description?: string
   backgroundImage?: string
   searchPlaceholder?: string
-  isAuthenticated?: boolean
 }
 
 export function HeroSection({
   title = 'Find Your Next FPV Setup',
   description = 'The marketplace built for FPV pilots. Browse gear, compare prices, and trade with the community.',
   searchPlaceholder,
-  isAuthenticated = false,
 }: HeroSectionProps) {
+  const { isAuthenticated } = useAuth()
+
   return (
     <div className="relative flex min-h-[60vh] flex-col items-center justify-center px-4 text-center overflow-hidden">
       {/* Dark base + grid pattern */}
@@ -38,7 +41,7 @@ export function HeroSection({
 
         {/* Action Buttons */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-          <Link href="/deals">
+          <Link href="/products?type=deal">
             <Button size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50">
               Browse Deals
             </Button>
@@ -46,7 +49,7 @@ export function HeroSection({
           {isAuthenticated ? (
             <Link href="/deals/create">
               <Button size="lg" className="bg-gradient-to-r from-[hsl(185,100%,50%)] to-[hsl(270,95%,65%)] text-white hover:opacity-90 border-0">
-                Sell an Item
+                Create a Deal
               </Button>
             </Link>
           ) : (

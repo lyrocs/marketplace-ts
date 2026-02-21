@@ -1,4 +1,4 @@
-import { RECENT_DEALS_QUERY, ROOT_CATEGORIES_QUERY } from '@/graphql/queries'
+import { RECENT_DEALS_QUERY } from '@/graphql/queries'
 import { fetchGraphQLCached } from '@/lib/graphql-server'
 import { HeroSection } from '@/components/shared/hero-section'
 import { FeatureCard } from '@/components/cards/feature-card'
@@ -7,7 +7,6 @@ import { CTASection } from '@/components/shared/cta-section'
 import { DealCard } from '@/components/cards/deal-card'
 import { Users, Store, ShieldCheck, BookOpen, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
 import type { Metadata } from 'next'
 
 // SEO Metadata
@@ -24,32 +23,20 @@ export const metadata: Metadata = {
 
 // Server Component - no 'use client'
 export default async function HomePage() {
-  // Fetch data server-side in parallel
-  const [dealsData, categoriesData] = await Promise.all([
-    fetchGraphQLCached(RECENT_DEALS_QUERY, undefined, 60), // Cache for 60 seconds
-    fetchGraphQLCached(ROOT_CATEGORIES_QUERY, undefined, 300), // Cache for 5 minutes
-  ])
-
+  // Fetch data server-side
+  const dealsData = await fetchGraphQLCached(RECENT_DEALS_QUERY, undefined, 60)
   const recentDeals = dealsData?.recentDeals || []
-  const categories = categoriesData?.rootCategories || []
-
-  // Check authentication server-side (via cookie)
-  const cookieStore = await cookies()
-  const token = cookieStore.get('marketplace_token')
-  const isAuthenticated = !!token
 
   return (
     <div>
       {/* Hero Section with Search */}
-      <HeroSection
-        isAuthenticated={isAuthenticated}
-      />
+      <HeroSection />
 
       <div className="container mx-auto px-4 py-12 md:py-20">
         {/* Explore Cards Section */}
         <section className="grid grid-cols-1 gap-6 text-center md:grid-cols-2 lg:gap-8">
           <FeatureCard
-            href="/deals"
+            href="/products?type=deal"
             icon={<Users className="h-12 w-12" />}
             title="Explore Deals"
             description="Browse FPV gear deals from verified pilots in our community marketplace."
@@ -64,34 +51,6 @@ export default async function HomePage() {
           />
         </section>
 
-        {/* Categories Section */}
-        <section className="mt-20">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold font-heading">Browse Categories</h2>
-              <p className="text-muted-foreground mt-1">Find the parts you need for your next build</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {categories.map((cat: any) => (
-              <Link
-                key={cat.id}
-                href={`/products/${cat.key}`}
-                className="group flex flex-col items-center justify-center gap-3 rounded-xl glass-card glow-border p-6 text-center transition-all"
-              >
-                {cat.image ? (
-                  <div className="h-12 w-12 flex items-center justify-center text-4xl">
-                    <img src={cat.image} alt={cat.name} className="h-full w-full object-contain" />
-                  </div>
-                ) : (
-                  <span className="text-4xl">📂</span>
-                )}
-                <span className="text-sm font-semibold group-hover:text-primary transition-colors">{cat.name}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
         {/* Recent Deals Section */}
         <section className="mt-20">
           <div className="flex items-center justify-between mb-8">
@@ -99,7 +58,7 @@ export default async function HomePage() {
               <h2 className="text-3xl font-bold font-heading">Latest Deals</h2>
               <p className="text-muted-foreground mt-1">Fresh listings from the FPV community</p>
             </div>
-            <Link href="/deals" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+            <Link href="/products?type=deal" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
               View all <span>→</span>
             </Link>
           </div>
