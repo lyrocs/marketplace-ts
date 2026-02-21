@@ -43,27 +43,32 @@ export function Header() {
 
               {categoriesOpen && (
                 <div className="absolute left-0 top-full pt-2 w-[750px]">
-                  <div className="glass-card rounded-xl border-white/10 p-4">
+                  <div className="rounded-xl border border-white/10 bg-card/95 backdrop-blur-xl shadow-lg p-4">
                   <div className="grid grid-cols-3 gap-3">
                     {rootCategories.map((category: any) => (
                       <div key={category.id} className="space-y-1.5">
                         <Link
                           href={`/products/${category.key.toLowerCase()}`}
-                          className="flex items-center gap-2 font-semibold text-sm hover:text-primary transition-colors"
+                          className="flex items-center gap-3 font-semibold text-sm hover:text-primary transition-colors group"
                           onClick={() => setCategoriesOpen(false)}
                         >
                           {category.image && (
-                            <div className="relative h-6 w-6 rounded overflow-hidden flex-shrink-0">
+                            <div className="relative h-8 w-8 rounded-lg overflow-hidden flex-shrink-0">
                               <Image
                                 src={category.image}
                                 alt={category.name}
                                 fill
                                 className="object-cover"
-                                sizes="24px"
+                                sizes="32px"
                               />
                             </div>
                           )}
-                          <span>{category.name}</span>
+                          <div className="flex-1 min-w-0">
+                            <span className="group-hover:text-primary transition-colors">{category.name}</span>
+                            {category.description && (
+                              <p className="text-xs font-normal text-muted-foreground line-clamp-1 mt-0.5">{category.description}</p>
+                            )}
+                          </div>
                         </Link>
 
                         {category.children && category.children.length > 0 && (
@@ -87,16 +92,9 @@ export function Header() {
                                       />
                                     </div>
                                   )}
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium group-hover:text-primary transition-colors">
-                                      {child.name}
-                                    </p>
-                                    {child.description && (
-                                      <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                                        {child.description}
-                                      </p>
-                                    )}
-                                  </div>
+                                  <p className="text-sm font-medium group-hover:text-primary transition-colors">
+                                    {child.name}
+                                  </p>
                                 </div>
                               </Link>
                             ))}
