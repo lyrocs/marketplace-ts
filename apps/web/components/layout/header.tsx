@@ -7,7 +7,7 @@ import { Badge, Avatar, AvatarFallback, AvatarImage } from '@marketplace/ui'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@marketplace/ui'
 import { MessageSquare, ChevronDown, Menu, X, User, ShoppingBag, PlusCircle, Shield, LogOut, LogIn, UserPlus } from 'lucide-react'
 import { useQuery } from '@apollo/client/react'
-import { ROOT_CATEGORIES_QUERY } from '../../graphql/queries'
+import { ROOT_CATEGORIES_QUERY, UNREAD_COUNT_QUERY } from '../../graphql/queries'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
@@ -15,6 +15,11 @@ export function Header() {
   const { user, logout, isAdmin, isAuthenticated } = useAuth()
   const { data: categoriesData } = useQuery(ROOT_CATEGORIES_QUERY)
   const rootCategories = categoriesData?.rootCategories || []
+  const { data: unreadData } = useQuery(UNREAD_COUNT_QUERY, {
+    skip: !isAuthenticated,
+    pollInterval: 15000,
+  })
+  const unreadCount = unreadData?.unreadCount?.count || 0
   const [mobileOpen, setMobileOpen] = useState(false)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false)
@@ -126,6 +131,11 @@ export function Header() {
             <>
               <Link href="/chat" className="relative p-2 text-muted-foreground hover:text-primary transition-colors">
                 <MessageSquare className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -268,6 +278,11 @@ export function Header() {
                 <div className="border-t border-border/50 my-2" />
                 <Link href="/chat" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-white/5 transition-colors">
                   <MessageSquare className="h-4 w-4 text-muted-foreground" /> Messages
+                  {unreadCount > 0 && (
+                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-primary-foreground">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
                 <Link href="/profile" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-white/5 transition-colors">
                   <User className="h-4 w-4 text-muted-foreground" /> Profile

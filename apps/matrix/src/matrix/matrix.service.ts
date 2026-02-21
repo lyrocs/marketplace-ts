@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sdk from 'matrix-js-sdk';
 import { prisma } from '@marketplace/database';
@@ -7,7 +7,6 @@ import { prisma } from '@marketplace/database';
 export class MatrixService {
   private client: sdk.MatrixClient | null = null;
   private accessToken: string | null = null;
-  private discussionsService: any = null;
 
   constructor(private configService: ConfigService) {}
 
@@ -57,11 +56,6 @@ export class MatrixService {
     }
   }
 
-  // Method to set discussions service (called from module to avoid circular dependency)
-  setDiscussionsService(service: any): void {
-    this.discussionsService = service;
-  }
-
   async start(): Promise<any> {
     if (!this.client) {
       await this.init();
@@ -93,12 +87,7 @@ export class MatrixService {
           if (!roomId || !sender || !body) return;
 
           try {
-            // Use DiscussionsService to handle message tracking
-            if (this.discussionsService) {
-              await this.discussionsService.setNewMessage(roomId, sender);
-            } else {
-              console.warn('DiscussionsService not set in MatrixService');
-            }
+            await this.setNewMessage(roomId, sender);
           } catch (err) {
             console.error('Error setting new message for room:', roomId, err);
           }
@@ -110,6 +99,49 @@ export class MatrixService {
       console.error('Failed to start Matrix client:', err);
       throw err;
     }
+  }
+
+  private async setNewMessage(
+    roomId: string,
+    senderMatrixLogin: string,
+  ): Promise<any> {
+    // Find discussion by room ID with buyer and seller info
+    const discussion = await prisma.discussion.findFirst({
+      where: { matrixRoomId: roomId },
+      include: {
+        buyer: { select: { id: true, matrixLogin: true } },
+        seller: { select: { id: true, matrixLogin: true } },
+      },
+    });
+
+    if (!discussion) {
+      console.warn(
+        `Discussion not found for Matrix room: ${roomId}`,
+      );
+      return;
+    }
+
+    // Determine target user (opposite of sender)
+    const targetUserId =
+      senderMatrixLogin === discussion.buyer.matrixLogin
+        ? discussion.sellerId
+        : discussion.buyerId;
+
+    // Update or create discussion status for target user
+    await prisma.discussionStatus.upsert({
+      where: {
+        discussionId_userId: {
+          discussionId: discussion.id,
+          userId: targetUserId,
+        },
+      },
+      update: { newMessage: true },
+      create: {
+        discussionId: discussion.id,
+        userId: targetUserId,
+        newMessage: true,
+      },
+    });
   }
 
   async createUser(): Promise<{ username: string; password: string } | null> {

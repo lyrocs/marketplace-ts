@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { prisma } from '@marketplace/database';
-import { MatrixService } from '../matrix/matrix.service.js';
+import { MatrixClientService } from '../matrix/matrix-client.service.js';
 
 @Injectable()
 export class DiscussionsService {
-  constructor(private readonly matrixService: MatrixService) {}
+  constructor(private readonly matrixService: MatrixClientService) {}
 
   async findByUser(userId: string): Promise<any> {
     return prisma.discussion.findMany({
@@ -100,49 +100,6 @@ export class DiscussionsService {
     ]);
 
     return discussion;
-  }
-
-  async setNewMessage(
-    roomId: string,
-    senderMatrixLogin: string,
-  ): Promise<any> {
-    // Find discussion by room ID with buyer and seller info
-    const discussion = await prisma.discussion.findFirst({
-      where: { matrixRoomId: roomId },
-      include: {
-        buyer: { select: { id: true, matrixLogin: true } },
-        seller: { select: { id: true, matrixLogin: true } },
-      },
-    });
-
-    if (!discussion) {
-      console.warn(
-        `Discussion not found for Matrix room: ${roomId}`,
-      );
-      return;
-    }
-
-    // Determine target user (opposite of sender)
-    const targetUserId =
-      senderMatrixLogin === discussion.buyer.matrixLogin
-        ? discussion.sellerId
-        : discussion.buyerId;
-
-    // Update or create discussion status for target user
-    await prisma.discussionStatus.upsert({
-      where: {
-        discussionId_userId: {
-          discussionId: discussion.id,
-          userId: targetUserId,
-        },
-      },
-      update: { newMessage: true },
-      create: {
-        discussionId: discussion.id,
-        userId: targetUserId,
-        newMessage: true,
-      },
-    });
   }
 
   async markRead(discussionId: number, userId: string): Promise<any> {

@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '@marketplace/database';
 import { UserRole, JwtPayload } from '@marketplace/types';
 import { UsersService } from '../users/users.service.js';
-import { MatrixService } from '../matrix/matrix.service.js';
+import { MatrixClientService } from '../matrix/matrix-client.service.js';
 import { MailerService } from '../mailer/mailer.service.js';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
-    private readonly matrixService: MatrixService,
+    private readonly matrixService: MatrixClientService,
     private readonly mailerService: MailerService,
   ) {}
 
