@@ -29,7 +29,7 @@ const statusLabels: Record<string, string> = {
 
 export default function MyDealsPage() {
   const { user, loading: authLoading } = useAuthGuard()
-  const { data, loading } = useQuery(MY_DEALS_QUERY, { skip: !user })
+  const { data, loading } = useQuery(MY_DEALS_QUERY, { skip: !user, fetchPolicy: 'cache-and-network' })
 
   if (authLoading) return null
 
