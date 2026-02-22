@@ -20,7 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@marketplace/ui'
-import { Search, X, Plus, Package, Check, Tag, Store } from 'lucide-react'
+import { Search, X, Plus, Minus, Package, Check, Tag, Store } from 'lucide-react'
 import Image from 'next/image'
 
 interface SelectedProduct {
@@ -121,6 +121,15 @@ export function DealProductPicker({ selectedProducts, onProductsChange }: DealPr
     onProductsChange(selectedProducts.filter((p) => p.productId !== productId))
   }
 
+  const handleQuantityChange = (productId: number, quantity: number) => {
+    if (quantity < 1) return
+    onProductsChange(
+      selectedProducts.map((p) =>
+        p.productId === productId ? { ...p, quantity } : p,
+      ),
+    )
+  }
+
   // Brand suggestions for new product
   const newProductBrandSuggestions = useMemo(() => {
     if (!newProductName || newProductBrandId) return []
@@ -206,6 +215,24 @@ export function DealProductPicker({ selectedProducts, onProductsChange }: DealPr
                       {info.category && <span>{info.category}</span>}
                       {info.brand && <><span className="text-border">·</span><span>{info.brand}</span></>}
                     </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(sp.productId, sp.quantity - 1)}
+                      disabled={sp.quantity <= 1}
+                      className="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </button>
+                    <span className="w-6 text-center text-sm font-medium tabular-nums">{sp.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(sp.productId, sp.quantity + 1)}
+                      className="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                   <button
                     type="button"
