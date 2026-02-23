@@ -361,6 +361,7 @@ export const PRODUCTS_QUERY = gql`
     $page: Int
     $limit: Int
     $includeDrafts: Boolean
+    $status: String
   ) {
     products(
       name: $name
@@ -374,6 +375,7 @@ export const PRODUCTS_QUERY = gql`
       page: $page
       limit: $limit
       includeDrafts: $includeDrafts
+      status: $status
     ) {
       data {
         id

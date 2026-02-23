@@ -24,20 +24,30 @@ import {
   DialogFooter,
   Skeleton,
   Checkbox,
+  Tabs,
+  TabsList,
+  TabsTrigger,
 } from '@marketplace/ui'
-import { Plus, Trash2, Eye, Edit } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit, EyeOff } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
 import Link from 'next/link'
 
 export default function AdminProductsPage() {
   const [page, setPage] = useState(1)
   const [searchName, setSearchName] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
   const [createOpen, setCreateOpen] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '', specIds: [] as number[], images: [] as string[] })
   const { toast } = useToast()
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
-    variables: { name: searchName || undefined, page, limit: 20, includeDrafts: true },
+    variables: {
+      name: searchName || undefined,
+      page,
+      limit: 20,
+      includeDrafts: true,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+    },
   })
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)
@@ -112,13 +122,24 @@ export default function AdminProductsPage() {
   }
 
   const handleToggleStatus = async (id: number, currentStatus: string) => {
-    const newStatus = currentStatus === 'active' ? 'draft' : 'active'
+    const nextStatus: Record<string, string> = { active: 'draft', draft: 'active', ignored: 'draft' }
+    const newStatus = nextStatus[currentStatus] || 'active'
     try {
       await updateProduct({ variables: { id, status: newStatus } })
       toast({ title: `Status changed to ${newStatus}`, variant: 'success' })
       await refetch()
     } catch {
       toast({ title: 'Failed to update status', variant: 'destructive' })
+    }
+  }
+
+  const handleIgnoreProduct = async (id: number) => {
+    try {
+      await updateProduct({ variables: { id, status: 'ignored' } })
+      toast({ title: 'Product ignored', variant: 'success' })
+      await refetch()
+    } catch {
+      toast({ title: 'Failed to ignore product', variant: 'destructive' })
     }
   }
 
@@ -131,20 +152,28 @@ export default function AdminProductsPage() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="mt-4 flex items-center gap-3">
-        <Input
-          placeholder="Search products..."
-          value={searchName}
-          onChange={(e) => { setSearchName(e.target.value); setPage(1) }}
-          className="max-w-sm"
-        />
-        <span className="text-sm text-muted-foreground">
-          {meta?.total || 0} products
-        </span>
-      </div>
+      <Tabs value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1) }} className="mt-6">
+        <div className="flex items-center justify-between gap-3">
+          <TabsList className="flex flex-wrap h-auto gap-1">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="draft">Draft</TabsTrigger>
+            <TabsTrigger value="ignored">Ignored</TabsTrigger>
+          </TabsList>
+          <span className="text-sm text-muted-foreground">
+            {meta?.total || 0} products
+          </span>
+        </div>
 
-      {/* Product Table */}
+        <div className="mt-4 flex items-center gap-3">
+          <Input
+            placeholder="Search products..."
+            value={searchName}
+            onChange={(e) => { setSearchName(e.target.value); setPage(1) }}
+            className="max-w-sm"
+          />
+        </div>
+
       <div className="mt-4">
         {loading ? (
           <div className="space-y-2">
@@ -179,10 +208,16 @@ export default function AdminProductsPage() {
                             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors cursor-pointer ${
                               product.status === 'active'
                                 ? 'bg-[hsl(var(--neon-green))]/15 text-[hsl(var(--neon-green))] hover:bg-[hsl(var(--neon-green))]/25'
-                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                : product.status === 'ignored'
+                                  ? 'bg-amber-500/15 text-amber-500 hover:bg-amber-500/25'
+                                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
                             }`}
                           >
-                            <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${product.status === 'active' ? 'bg-[hsl(var(--neon-green))]' : 'bg-muted-foreground/50'}`} />
+                            <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
+                              product.status === 'active' ? 'bg-[hsl(var(--neon-green))]'
+                                : product.status === 'ignored' ? 'bg-amber-500'
+                                  : 'bg-muted-foreground/50'
+                            }`} />
                             {product.status}
                           </button>
                         </td>
@@ -201,6 +236,11 @@ export default function AdminProductsPage() {
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </Link>
+                            {product.status !== 'ignored' && (
+                              <Button variant="ghost" size="icon" onClick={() => handleIgnoreProduct(product.id)} title="Ignore product">
+                                <EyeOff className="h-4 w-4 text-amber-500" />
+                              </Button>
+                            )}
                             <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
@@ -221,6 +261,7 @@ export default function AdminProductsPage() {
           </div>
         )}
       </div>
+      </Tabs>
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>

@@ -61,6 +61,7 @@ export class ProductsService {
     page = 1,
     limit = 12,
     includeDrafts,
+    status,
   }: {
     name?: string;
     categoryId?: number;
@@ -73,8 +74,13 @@ export class ProductsService {
     page?: number;
     limit?: number;
     includeDrafts?: boolean;
+    status?: string;
   }): Promise<any> {
-    const where: any = includeDrafts ? {} : { status: { not: 'draft' } };
+    const where: any = status
+      ? { status }
+      : includeDrafts
+        ? { status: { not: 'ignored' } }
+        : { status: { notIn: ['draft', 'ignored'] } };
 
     if (name) {
       where.name = { contains: name, mode: 'insensitive' };
@@ -411,6 +417,12 @@ export class ProductsService {
 
         let product: any;
         let isUpdate = false;
+
+        if (existing && existing.status === 'ignored') {
+          // Skip ignored products — they were deliberately excluded
+          updated++;
+          continue;
+        }
 
         if (existing) {
           // Update existing product

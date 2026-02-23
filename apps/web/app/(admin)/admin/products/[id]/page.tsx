@@ -52,7 +52,8 @@ export default function AdminProductDetailPage() {
 
   const handleToggleStatus = async () => {
     if (!product) return
-    const newStatus = product.status === 'active' ? 'draft' : 'active'
+    const nextStatus: Record<string, string> = { active: 'draft', draft: 'active', ignored: 'draft' }
+    const newStatus = nextStatus[product.status] || 'active'
     try {
       await updateProduct({ variables: { id: productId, status: newStatus } })
       toast({ title: `Status changed to ${newStatus}`, variant: 'success' })
@@ -102,10 +103,16 @@ export default function AdminProductDetailPage() {
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors cursor-pointer ${
                   product.status === 'active'
                     ? 'bg-[hsl(var(--neon-green))]/15 text-[hsl(var(--neon-green))] hover:bg-[hsl(var(--neon-green))]/25'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    : product.status === 'ignored'
+                      ? 'bg-amber-500/15 text-amber-500 hover:bg-amber-500/25'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
-                <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${product.status === 'active' ? 'bg-[hsl(var(--neon-green))]' : 'bg-muted-foreground/50'}`} />
+                <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
+                  product.status === 'active' ? 'bg-[hsl(var(--neon-green))]'
+                    : product.status === 'ignored' ? 'bg-amber-500'
+                      : 'bg-muted-foreground/50'
+                }`} />
                 {product.status}
               </button>
               <span className="text-sm text-muted-foreground">
