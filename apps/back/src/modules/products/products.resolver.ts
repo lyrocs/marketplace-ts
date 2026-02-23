@@ -176,6 +176,13 @@ export class ProductsResolver {
     return product as any
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Query(() => ProductOutput, { nullable: true })
+  async adminProduct(@Args({ name: 'id', type: () => Int }) id: number): Promise<ProductOutput | null> {
+    return this.productsService.findById(id) as any
+  }
+
   @Public()
   @Query(() => ProductsListOutput)
   async products(

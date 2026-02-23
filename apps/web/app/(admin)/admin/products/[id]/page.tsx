@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client/react'
-import { PRODUCT_QUERY, DELETE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION } from '@/graphql/queries'
+import { ADMIN_PRODUCT_QUERY, DELETE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import {
   Card,
@@ -27,14 +27,14 @@ export default function AdminProductDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  const { data, loading } = useQuery(PRODUCT_QUERY, {
+  const { data, loading } = useQuery(ADMIN_PRODUCT_QUERY, {
     variables: { id: productId },
     skip: !productId,
   })
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
   const [updateProduct] = useMutation(UPDATE_PRODUCT_MUTATION)
 
-  const product = data?.product
+  const product = data?.adminProduct
 
   const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || ''
   const isExternalImage = (url: string) => s3BaseUrl ? !url.startsWith(s3BaseUrl) : false

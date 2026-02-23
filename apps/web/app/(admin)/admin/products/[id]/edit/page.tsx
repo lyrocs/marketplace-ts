@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react'
-import { PRODUCT_QUERY, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, REUPLOAD_PRODUCT_IMAGES_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
+import { ADMIN_PRODUCT_QUERY, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, REUPLOAD_PRODUCT_IMAGES_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import { ImageUpload } from '@/components/shared/image-upload'
 import {
@@ -42,7 +42,7 @@ export default function AdminProductEditPage() {
   })
   const [loaded, setLoaded] = useState(false)
 
-  const [fetchProduct, { loading: productLoading }] = useLazyQuery(PRODUCT_QUERY, { fetchPolicy: 'network-only' })
+  const [fetchProduct, { loading: productLoading }] = useLazyQuery(ADMIN_PRODUCT_QUERY, { fetchPolicy: 'network-only' })
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)
   const { data: specTypesData } = useQuery(SPEC_TYPES_QUERY)
@@ -62,7 +62,7 @@ export default function AdminProductEditPage() {
   useEffect(() => {
     if (!productId) return
     fetchProduct({ variables: { id: productId } }).then(({ data }) => {
-      const p = data?.product
+      const p = data?.adminProduct
       if (!p) return
       setEditProduct({
         id: p.id,

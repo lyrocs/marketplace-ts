@@ -348,6 +348,28 @@ export const PRODUCT_QUERY = gql`
   }
 `
 
+export const ADMIN_PRODUCT_QUERY = gql`
+  query AdminProduct($id: Int!) {
+    adminProduct(id: $id) {
+      id
+      name
+      categoryId
+      brandId
+      images
+      description
+      features
+      status
+      category { id name key }
+      brand { id name }
+      shops { id url price currency available name }
+      specs { id value specType { id key label } }
+      deals { id title price currency condition sellerName }
+      createdAt
+      updatedAt
+    }
+  }
+`
+
 export const PRODUCTS_QUERY = gql`
   query Products(
     $name: String
