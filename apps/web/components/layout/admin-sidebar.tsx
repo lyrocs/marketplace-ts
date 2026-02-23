@@ -1,9 +1,10 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@marketplace/ui'
-import { LayoutDashboard, ShoppingBag, Package, Tag, Settings, ChevronRight, FileJson } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, Package, Tag, Settings, ChevronRight, FileJson, Menu, X } from 'lucide-react'
 
 const sidebarItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -17,12 +18,31 @@ const sidebarItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const [open, setOpen] = useState(false)
 
-  return (
-    <aside className="flex h-full w-64 flex-col bg-card/80 backdrop-blur-xl border-r border-border/50">
-      <div className="flex h-16 items-center px-6">
-        <Link href="/" className="text-xl font-bold text-gradient font-heading">Marketplace</Link>
-        <span className="ml-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Admin</span>
+  // Close on navigation
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
+  // Prevent body scroll when open on mobile
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = '' }
+    }
+  }, [open])
+
+  const nav = (
+    <>
+      <div className="flex h-16 items-center justify-between px-6">
+        <div className="flex items-center">
+          <Link href="/" className="text-xl font-bold text-gradient font-heading">Marketplace</Link>
+          <span className="ml-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Admin</span>
+        </div>
+        <button className="md:hidden p-1 text-muted-foreground hover:text-foreground" onClick={() => setOpen(false)}>
+          <X className="h-5 w-5" />
+        </button>
       </div>
       <nav className="flex-1 overflow-y-auto p-4">
         <ul className="space-y-1">
@@ -51,6 +71,33 @@ export function AdminSidebar() {
       <div className="border-t border-border/50 p-4">
         <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">← Back to Site</Link>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile hamburger */}
+      <div className="md:hidden sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border/50 bg-background/80 backdrop-blur-xl px-4">
+        <button onClick={() => setOpen(true)} className="p-1.5 text-muted-foreground hover:text-foreground">
+          <Menu className="h-5 w-5" />
+        </button>
+        <span className="text-sm font-semibold">Admin</span>
+      </div>
+
+      {/* Mobile overlay */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
+          <aside className="relative flex h-full w-64 flex-col bg-card backdrop-blur-xl">
+            {nav}
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex h-full w-64 flex-col bg-card/80 backdrop-blur-xl border-r border-border/50">
+        {nav}
+      </aside>
+    </>
   )
 }
