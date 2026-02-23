@@ -28,7 +28,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@marketplace/ui'
-import { Plus, Trash2, Eye, Edit, EyeOff } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit, EyeOff, CheckCheck } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
 import Link from 'next/link'
 
@@ -134,6 +134,21 @@ export default function AdminProductsPage() {
     }
   }
 
+  const handleActivateAll = async () => {
+    const drafts = products.filter((p: any) => p.status === 'draft')
+    if (drafts.length === 0) return
+    try {
+      await Promise.all(
+        drafts.map((p: any) => updateProduct({ variables: { id: p.id, status: 'active' } }))
+      )
+      toast({ title: `${drafts.length} product(s) activated`, variant: 'success' })
+      await refetch()
+    } catch {
+      toast({ title: 'Failed to activate some products', variant: 'destructive' })
+      await refetch()
+    }
+  }
+
   const handleIgnoreProduct = async (id: number) => {
     try {
       await updateProduct({ variables: { id, status: 'ignored' } })
@@ -161,9 +176,16 @@ export default function AdminProductsPage() {
             <TabsTrigger value="draft">Draft</TabsTrigger>
             <TabsTrigger value="ignored">Ignored</TabsTrigger>
           </TabsList>
-          <span className="text-sm text-muted-foreground">
-            {meta?.total || 0} products
-          </span>
+          <div className="flex items-center gap-3">
+            {statusFilter === 'draft' && products.length > 0 && (
+              <Button variant="outline" size="sm" onClick={handleActivateAll}>
+                <CheckCheck className="mr-1.5 h-3.5 w-3.5" /> Activate all
+              </Button>
+            )}
+            <span className="text-sm text-muted-foreground">
+              {meta?.total || 0} products
+            </span>
+          </div>
         </div>
 
         <div className="mt-4 flex items-center gap-3">
