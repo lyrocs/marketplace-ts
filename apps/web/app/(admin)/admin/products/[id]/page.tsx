@@ -88,7 +88,7 @@ export default function AdminProductDetailPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <div className="flex items-center gap-4">
           <Link href="/admin/products">
             <Button variant="ghost" size="icon">
@@ -121,7 +121,7 @@ export default function AdminProductDetailPage() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Link href={`/product/${product.id}`} target="_blank">
             <Button variant="outline" size="sm">
               <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> View Public Page
