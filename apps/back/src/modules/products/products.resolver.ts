@@ -172,6 +172,7 @@ export class ProductsResolver {
   @Query(() => ProductOutput, { nullable: true })
   async product(@Args({ name: 'id', type: () => Int }) id: number): Promise<ProductOutput | null> {
     const product = await this.productsService.findById(id)
+    if (!product || product.status !== 'active') return null
     return product as any
   }
 

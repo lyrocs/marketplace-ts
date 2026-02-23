@@ -48,6 +48,7 @@ export default function AdminProductsPage() {
       includeDrafts: true,
       status: statusFilter !== 'all' ? statusFilter : undefined,
     },
+    fetchPolicy: 'network-only',
   })
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)
