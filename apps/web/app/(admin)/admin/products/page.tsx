@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useQuery, useMutation } from '@apollo/client/react'
 import { PRODUCTS_QUERY, CREATE_PRODUCT_MUTATION, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
@@ -28,7 +28,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@marketplace/ui'
-import { Plus, Trash2, Eye, Edit, EyeOff, CheckCheck } from 'lucide-react'
+import { Plus, Trash2, Eye, Edit, EyeOff, CheckCheck, Package } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
 import Link from 'next/link'
 
@@ -38,7 +38,13 @@ export default function AdminProductsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [createOpen, setCreateOpen] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', categoryId: '', brandId: '', description: '', specIds: [] as number[], images: [] as string[] })
+  const [hoverImage, setHoverImage] = useState<{ src: string; x: number; y: number } | null>(null)
   const { toast } = useToast()
+
+  const handleImageHover = useCallback((e: React.MouseEvent, src: string) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    setHoverImage({ src, x: rect.right + 8, y: rect.top + rect.height / 2 })
+  }, [])
 
   const { data, loading, refetch } = useQuery(PRODUCTS_QUERY, {
     variables: {
@@ -221,7 +227,20 @@ export default function AdminProductsPage() {
                     {products.map((product: any) => (
                       <tr key={product.id} className="border-b last:border-0">
                         <td className="px-4 py-3 font-medium">
-                          <Link href={`/admin/products/${product.id}`} className="hover:text-primary hover:underline transition-colors">
+                          <Link href={`/admin/products/${product.id}`} className="flex items-center gap-3 hover:text-primary transition-colors">
+                            <div
+                              className="h-20 w-20 flex-shrink-0 rounded-md border border-border/50 bg-muted overflow-hidden"
+                              onMouseEnter={(e) => product.images?.[0] && handleImageHover(e, product.images[0])}
+                              onMouseLeave={() => setHoverImage(null)}
+                            >
+                              {product.images?.[0] ? (
+                                <img src={product.images[0]} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center">
+                                  <Package className="h-4 w-4 text-muted-foreground/30" />
+                                </div>
+                              )}
+                            </div>
                             {product.name}
                           </Link>
                         </td>
@@ -391,6 +410,16 @@ export default function AdminProductsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Image hover preview */}
+      {hoverImage && (
+        <div
+          className="pointer-events-none fixed z-50 h-48 w-48 rounded-lg border border-border bg-card shadow-xl overflow-hidden"
+          style={{ left: hoverImage.x, top: hoverImage.y, transform: 'translateY(-50%)' }}
+        >
+          <img src={hoverImage.src} alt="" className="h-full w-full object-cover" />
+        </div>
+      )}
     </div>
   )
 }
