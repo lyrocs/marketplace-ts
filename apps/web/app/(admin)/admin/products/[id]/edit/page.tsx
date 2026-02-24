@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react'
+import { useQuery, useMutation } from '@apollo/client/react'
 import { ADMIN_PRODUCT_QUERY, UPDATE_PRODUCT_MUTATION, UPDATE_PRODUCT_SPECS_MUTATION, ADD_PRODUCT_IMAGE_MUTATION, DELETE_PRODUCT_IMAGE_MUTATION, REUPLOAD_PRODUCT_IMAGES_MUTATION, CATEGORIES_QUERY, BRANDS_QUERY, SPEC_TYPES_QUERY } from '@/graphql/queries'
 import { useToast } from '@/hooks/use-toast'
 import { ImageUpload } from '@/components/shared/image-upload'
@@ -42,7 +42,28 @@ export default function AdminProductEditPage() {
   })
   const [loaded, setLoaded] = useState(false)
 
-  const [fetchProduct, { loading: productLoading }] = useLazyQuery(ADMIN_PRODUCT_QUERY, { fetchPolicy: 'network-only' })
+  const { data: productData, loading: productLoading } = useQuery(ADMIN_PRODUCT_QUERY, {
+    variables: { id: productId },
+    skip: !productId,
+    fetchPolicy: 'network-only',
+  })
+
+  useEffect(() => {
+    const p = productData?.adminProduct
+    if (!p || loaded) return
+    setEditProduct({
+      id: p.id,
+      name: p.name,
+      categoryId: (p.categoryId || p.category?.id || '').toString(),
+      brandId: (p.brandId || p.brand?.id || '').toString(),
+      description: p.description || '',
+      status: p.status || 'draft',
+      features: Array.isArray(p.features) ? p.features : [],
+      specIds: p.specs?.map((s: any) => s.id) || [],
+      images: Array.isArray(p.images) ? p.images : [],
+    })
+    setLoaded(true)
+  }, [productData, loaded])
   const { data: categoriesData } = useQuery(CATEGORIES_QUERY)
   const { data: brandsData } = useQuery(BRANDS_QUERY)
   const { data: specTypesData } = useQuery(SPEC_TYPES_QUERY)
@@ -58,26 +79,6 @@ export default function AdminProductEditPage() {
   const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || ''
   const isExternalImage = (url: string) => s3BaseUrl ? !url.startsWith(s3BaseUrl) : false
   const hasExternalImages = (imgs: string[]) => imgs.some(isExternalImage)
-
-  useEffect(() => {
-    if (!productId) return
-    fetchProduct({ variables: { id: productId } }).then(({ data }) => {
-      const p = data?.adminProduct
-      if (!p) return
-      setEditProduct({
-        id: p.id,
-        name: p.name,
-        categoryId: (p.categoryId || p.category?.id || '').toString(),
-        brandId: (p.brandId || p.brand?.id || '').toString(),
-        description: p.description || '',
-        status: p.status || 'draft',
-        features: Array.isArray(p.features) ? p.features : [],
-        specIds: p.specs?.map((s: any) => s.id) || [],
-        images: Array.isArray(p.images) ? p.images : [],
-      })
-      setLoaded(true)
-    })
-  }, [productId])
 
   const brandSuggestions = useMemo(
     () => {
