@@ -28,7 +28,7 @@ export default function ChatListPage() {
 
   if (authLoading) return null
 
-  const discussions = (data as any)?.myDiscussions || []
+  const discussions = data?.myDiscussions || []
 
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto">

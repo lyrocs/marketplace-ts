@@ -34,7 +34,7 @@ export default function AdminProductDetailPage() {
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
   const [updateProduct] = useMutation(UPDATE_PRODUCT_MUTATION)
 
-  const product = (data as any)?.adminProduct
+  const product = data?.adminProduct
 
   const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || ''
   const isExternalImage = (url: string) => s3BaseUrl ? !url.startsWith(s3BaseUrl) : false

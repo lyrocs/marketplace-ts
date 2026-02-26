@@ -36,7 +36,7 @@ export default function AdminCategoriesPage() {
   const [createCategory] = useMutation(CREATE_CATEGORY_MUTATION)
   const [deleteCategory] = useMutation(DELETE_CATEGORY_MUTATION)
 
-  const categories = (data as any)?.categories || []
+  const categories = data?.categories || []
   const rootCategories = categories.filter((c: any) => !c.parentId)
 
   const toggleExpand = (id: number) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))

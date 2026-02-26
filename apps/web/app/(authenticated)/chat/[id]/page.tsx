@@ -24,7 +24,7 @@ export default function ChatRoomPage() {
     fetchPolicy: 'network-only',
   })
 
-  const discussion = (data as any)?.discussion
+  const discussion = data?.discussion
 
   const {
     messages: realtimeMessages,
@@ -46,7 +46,7 @@ export default function ChatRoomPage() {
   }, [discussion, discussionId, loadMessages, joinDiscussion, fetchMessages, markRead, socketMarkRead])
 
   // Merge history messages with realtime messages
-  const historyMessages = (messagesData as any)?.messages?.messages || []
+  const historyMessages = messagesData?.messages?.messages || []
   const allMessages = [...historyMessages]
   for (const msg of realtimeMessages) {
     if (!allMessages.some((m: any) => m.id === msg.id)) {

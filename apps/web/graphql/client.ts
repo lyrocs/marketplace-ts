@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache, HttpLink, from } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
+import { CombinedGraphQLErrors } from '@apollo/client/errors'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
@@ -23,14 +24,13 @@ const httpLink = new HttpLink({
   },
 })
 
-const errorLink = onError(({ graphQLErrors, networkError }: any) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message }: any) => {
+const errorLink = onError(({ error }) => {
+  if (CombinedGraphQLErrors.is(error)) {
+    error.errors.forEach(({ message }) => {
       console.error('GraphQL Error:', message)
     })
-  }
-  if (networkError) {
-    console.error('Network Error:', networkError)
+  } else {
+    console.error('Network Error:', error)
   }
 })
 

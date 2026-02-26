@@ -49,7 +49,7 @@ interface DealFormStepperProps {
     images: string[]
     selectedProducts: { productId: number; quantity: number }[]
     status: string
-    reasonDeclined?: string
+    reasonDeclined?: string | null
   }
 }
 

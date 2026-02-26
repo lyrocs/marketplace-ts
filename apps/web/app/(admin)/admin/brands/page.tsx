@@ -19,7 +19,7 @@ export default function AdminBrandsPage() {
   const [updateBrand] = useMutation(UPDATE_BRAND_MUTATION)
   const [deleteBrand] = useMutation(DELETE_BRAND_MUTATION)
 
-  const brands = (data as any)?.brands || []
+  const brands = data?.brands || []
 
   const openEditDialog = (brand: any) => {
     setEditBrand({ id: brand.id, name: brand.name })

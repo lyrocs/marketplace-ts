@@ -16,7 +16,7 @@ export default function AuthCallbackPage() {
 function AuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { refetch } = useAuth() as any
+  const { refetch } = useAuth()
 
   useEffect(() => {
     const token = searchParams.get('token')

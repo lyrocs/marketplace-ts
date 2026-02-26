@@ -13,10 +13,10 @@ export default function AdminDashboard() {
   const { data: soldDeals, loading: l4 } = useQuery(ADMIN_DEALS_QUERY, { variables: { status: 'SOLD', limit: 5 } })
 
   const stats = [
-    { label: 'Published Deals', value: (publishedDeals as any)?.adminDeals?.meta?.total || 0, icon: ShoppingBag, color: 'text-blue-600', href: '/admin/deals?status=PUBLISHED' },
-    { label: 'Draft Deals', value: (draftDeals as any)?.adminDeals?.meta?.total || 0, icon: Clock, color: 'text-yellow-600', href: '/admin/deals?status=DRAFT' },
-    { label: 'Sold Deals', value: (soldDeals as any)?.adminDeals?.meta?.total || 0, icon: TrendingUp, color: 'text-green-600', href: '/admin/deals?status=SOLD' },
-    { label: 'Declined', value: (declinedDeals as any)?.adminDeals?.meta?.total || 0, icon: Users, color: 'text-red-600', href: '/admin/deals?status=DECLINED' },
+    { label: 'Published Deals', value: publishedDeals?.adminDeals?.meta?.total || 0, icon: ShoppingBag, color: 'text-blue-600', href: '/admin/deals?status=PUBLISHED' },
+    { label: 'Draft Deals', value: draftDeals?.adminDeals?.meta?.total || 0, icon: Clock, color: 'text-yellow-600', href: '/admin/deals?status=DRAFT' },
+    { label: 'Sold Deals', value: soldDeals?.adminDeals?.meta?.total || 0, icon: TrendingUp, color: 'text-green-600', href: '/admin/deals?status=SOLD' },
+    { label: 'Declined', value: declinedDeals?.adminDeals?.meta?.total || 0, icon: Users, color: 'text-red-600', href: '/admin/deals?status=DECLINED' },
   ]
 
   return (
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
               {l1 ? (
                 Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12" />)
               ) : (
-                ((publishedDeals as any)?.adminDeals?.data || []).map((deal: any) => (
+                (publishedDeals?.adminDeals?.data || []).map((deal) => (
                   <div key={deal.id} className="flex items-center gap-3 py-2 border-b last:border-0">
                     <div className="flex-1">
                       <p className="text-sm font-medium">{deal.title || 'Untitled'}</p>
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
               {l2 ? (
                 Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12" />)
               ) : (
-                ((draftDeals as any)?.adminDeals?.data || []).map((deal: any) => (
+                (draftDeals?.adminDeals?.data || []).map((deal) => (
                   <div key={deal.id} className="flex items-center gap-3 py-2 border-b last:border-0">
                     <div className="flex-1">
                       <p className="text-sm font-medium">{deal.title || 'Untitled'}</p>

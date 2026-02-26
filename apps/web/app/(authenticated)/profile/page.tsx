@@ -17,14 +17,14 @@ export default function ProfilePage() {
   const [updateProfile] = useMutation(UPDATE_PROFILE_MUTATION)
   const { toast } = useToast()
 
-  const [name, setName] = useState((profileData as any)?.myProfile?.name || '')
+  const [name, setName] = useState(profileData?.myProfile?.name || '')
   const [saving, setSaving] = useState(false)
 
   if (authLoading) return null
 
-  const profile = (profileData as any)?.myProfile
-  const stats = (statsData as any)?.myStats
-  const recentDeals = (dealsData as any)?.myDeals?.slice(0, 3) || []
+  const profile = profileData?.myProfile
+  const stats = statsData?.myStats
+  const recentDeals = dealsData?.myDeals?.slice(0, 3) || []
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault()

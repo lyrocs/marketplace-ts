@@ -14,17 +14,17 @@ interface Discussion {
   hasUnread: boolean;
   deal: {
     id: number;
-    title?: string;
+    title?: string | null;
   };
   buyer: {
     id: string;
-    name?: string;
-    image?: string;
+    name?: string | null;
+    image?: string | null;
   };
   seller: {
     id: string;
-    name?: string;
-    image?: string;
+    name?: string | null;
+    image?: string | null;
   };
   createdAt: Date | string;
 }
@@ -102,8 +102,8 @@ export function DiscussionList({
                       {/* Avatar */}
                       <Avatar className="h-12 w-12 shrink-0">
                         <AvatarImage
-                          src={contact.image || undefined}
-                          alt={contact.name}
+                          src={contact.image ?? undefined}
+                          alt={contact.name ?? undefined}
                         />
                         <AvatarFallback>
                           {contact.name?.charAt(0)?.toUpperCase() || '?'}

@@ -17,8 +17,8 @@ export interface ChatMessage {
 interface ChatRoomProps {
   messages: ChatMessage[];
   currentUserId: string;
-  otherUserName?: string;
-  otherUserImage?: string;
+  otherUserName?: string | null;
+  otherUserImage?: string | null;
   isLoading: boolean;
   onLoadMore?: () => void;
   hasMore?: boolean;

@@ -36,8 +36,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   })
 
   useEffect(() => {
-    if ((meData as any)?.me) {
-      setUser((meData as any).me)
+    if (meData?.me) {
+      setUser(meData.me as AuthUser)
     }
   }, [meData])
 
@@ -61,18 +61,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const { data } = await loginMutation({ variables: { email, password } })
-    if ((data as any)?.login) {
-      localStorage.setItem('marketplace_token', (data as any).login.accessToken)
-      setUser((data as any).login.user)
+    if (data?.login) {
+      localStorage.setItem('marketplace_token', data.login.accessToken)
+      setUser(data.login.user as AuthUser)
       setLoading(false)
     }
   }, [loginMutation])
 
   const register = useCallback(async (name: string, email: string, password: string) => {
     const { data } = await registerMutation({ variables: { name, email, password } })
-    if ((data as any)?.register) {
-      localStorage.setItem('marketplace_token', (data as any).register.accessToken)
-      setUser((data as any).register.user)
+    if (data?.register) {
+      localStorage.setItem('marketplace_token', data.register.accessToken)
+      setUser(data.register.user as AuthUser)
       setLoading(false)
     }
   }, [registerMutation])

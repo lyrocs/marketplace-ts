@@ -1,10 +1,10 @@
-import { gql } from '@apollo/client'
+import { graphql } from './__generated__/gql'
 
 // ============================================================================
 // AUTH QUERIES & MUTATIONS
 // ============================================================================
 
-export const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = graphql(`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       accessToken
@@ -17,9 +17,9 @@ export const LOGIN_MUTATION = gql`
       }
     }
   }
-`
+`)
 
-export const REGISTER_MUTATION = gql`
+export const REGISTER_MUTATION = graphql(`
   mutation Register($name: String!, $email: String!, $password: String!) {
     register(name: $name, email: $email, password: $password) {
       accessToken
@@ -32,9 +32,9 @@ export const REGISTER_MUTATION = gql`
       }
     }
   }
-`
+`)
 
-export const ME_QUERY = gql`
+export const ME_QUERY = graphql(`
   query Me {
     me {
       id
@@ -44,29 +44,29 @@ export const ME_QUERY = gql`
       role
     }
   }
-`
+`)
 
-export const REQUEST_PASSWORD_RESET_MUTATION = gql`
+export const REQUEST_PASSWORD_RESET_MUTATION = graphql(`
   mutation RequestPasswordReset($email: String!) {
     requestPasswordReset(email: $email) {
       success
     }
   }
-`
+`)
 
-export const RESET_PASSWORD_MUTATION = gql`
+export const RESET_PASSWORD_MUTATION = graphql(`
   mutation ResetPassword($token: String!, $password: String!) {
     resetPassword(token: $token, password: $password) {
       success
     }
   }
-`
+`)
 
 // ============================================================================
 // USER QUERIES
 // ============================================================================
 
-export const MY_PROFILE_QUERY = gql`
+export const MY_PROFILE_QUERY = graphql(`
   query MyProfile {
     myProfile {
       id
@@ -78,9 +78,9 @@ export const MY_PROFILE_QUERY = gql`
       updatedAt
     }
   }
-`
+`)
 
-export const MY_STATS_QUERY = gql`
+export const MY_STATS_QUERY = graphql(`
   query MyStats {
     myStats {
       totalDeals
@@ -88,9 +88,9 @@ export const MY_STATS_QUERY = gql`
       soldDeals
     }
   }
-`
+`)
 
-export const PUBLIC_PROFILE_QUERY = gql`
+export const PUBLIC_PROFILE_QUERY = graphql(`
   query PublicProfile($id: String!) {
     publicProfile(id: $id) {
       id
@@ -102,9 +102,9 @@ export const PUBLIC_PROFILE_QUERY = gql`
       soldDeals
     }
   }
-`
+`)
 
-export const USER_DEALS_QUERY = gql`
+export const USER_DEALS_QUERY = graphql(`
   query UserDeals($userId: String!) {
     userDeals(userId: $userId) {
       id
@@ -118,9 +118,9 @@ export const USER_DEALS_QUERY = gql`
       products { productName categoryName }
     }
   }
-`
+`)
 
-export const UPDATE_PROFILE_MUTATION = gql`
+export const UPDATE_PROFILE_MUTATION = graphql(`
   mutation UpdateProfile($name: String, $image: String) {
     updateProfile(name: $name, image: $image) {
       id
@@ -129,13 +129,13 @@ export const UPDATE_PROFILE_MUTATION = gql`
       image
     }
   }
-`
+`)
 
 // ============================================================================
 // CATEGORY QUERIES
 // ============================================================================
 
-export const CATEGORIES_QUERY = gql`
+export const CATEGORIES_QUERY = graphql(`
   query Categories {
     categories {
       id
@@ -156,9 +156,9 @@ export const CATEGORIES_QUERY = gql`
       }
     }
   }
-`
+`)
 
-export const ROOT_CATEGORIES_QUERY = gql`
+export const ROOT_CATEGORIES_QUERY = graphql(`
   query RootCategories {
     rootCategories {
       id
@@ -175,9 +175,9 @@ export const ROOT_CATEGORIES_QUERY = gql`
       }
     }
   }
-`
+`)
 
-export const CATEGORY_BY_KEY_QUERY = gql`
+export const CATEGORY_BY_KEY_QUERY = graphql(`
   query CategoryByKey($key: String!) {
     categoryByKey(key: $key) {
       id
@@ -191,10 +191,10 @@ export const CATEGORY_BY_KEY_QUERY = gql`
       }
     }
   }
-`
+`)
 
 // Admin mutations
-export const CREATE_CATEGORY_MUTATION = gql`
+export const CREATE_CATEGORY_MUTATION = graphql(`
   mutation CreateCategory($name: String!, $key: String!, $image: String, $description: String, $parentId: Int) {
     createCategory(name: $name, key: $key, image: $image, description: $description, parentId: $parentId) {
       id
@@ -202,9 +202,9 @@ export const CREATE_CATEGORY_MUTATION = gql`
       key
     }
   }
-`
+`)
 
-export const UPDATE_CATEGORY_MUTATION = gql`
+export const UPDATE_CATEGORY_MUTATION = graphql(`
   mutation UpdateCategory($id: Int!, $name: String, $key: String, $image: String, $description: String) {
     updateCategory(id: $id, name: $name, key: $key, image: $image, description: $description) {
       id
@@ -212,56 +212,56 @@ export const UPDATE_CATEGORY_MUTATION = gql`
       key
     }
   }
-`
+`)
 
-export const DELETE_CATEGORY_MUTATION = gql`
+export const DELETE_CATEGORY_MUTATION = graphql(`
   mutation DeleteCategory($id: Int!) {
     deleteCategory(id: $id)
   }
-`
+`)
 
 // ============================================================================
 // BRAND QUERIES
 // ============================================================================
 
-export const BRANDS_QUERY = gql`
+export const BRANDS_QUERY = graphql(`
   query Brands {
     brands {
       id
       name
     }
   }
-`
+`)
 
-export const CREATE_BRAND_MUTATION = gql`
+export const CREATE_BRAND_MUTATION = graphql(`
   mutation CreateBrand($name: String!) {
     createBrand(name: $name) {
       id
       name
     }
   }
-`
+`)
 
-export const UPDATE_BRAND_MUTATION = gql`
+export const UPDATE_BRAND_MUTATION = graphql(`
   mutation UpdateBrand($id: Int!, $name: String!) {
     updateBrand(id: $id, name: $name) {
       id
       name
     }
   }
-`
+`)
 
-export const DELETE_BRAND_MUTATION = gql`
+export const DELETE_BRAND_MUTATION = graphql(`
   mutation DeleteBrand($id: Int!) {
     deleteBrand(id: $id)
   }
-`
+`)
 
 // ============================================================================
 // SPEC QUERIES
 // ============================================================================
 
-export const SPEC_TYPES_QUERY = gql`
+export const SPEC_TYPES_QUERY = graphql(`
   query SpecTypes {
     specTypes {
       id
@@ -274,18 +274,18 @@ export const SPEC_TYPES_QUERY = gql`
       }
     }
   }
-`
+`)
 
-export const SPECS_BY_TYPE_QUERY = gql`
+export const SPECS_BY_TYPE_QUERY = graphql(`
   query SpecsByType($specTypeId: Int!) {
     specsByType(specTypeId: $specTypeId) {
       id
       value
     }
   }
-`
+`)
 
-export const CREATE_SPEC_TYPE_MUTATION = gql`
+export const CREATE_SPEC_TYPE_MUTATION = graphql(`
   mutation CreateSpecType($key: String!, $label: String!, $description: String) {
     createSpecType(key: $key, label: $label, description: $description) {
       id
@@ -293,34 +293,34 @@ export const CREATE_SPEC_TYPE_MUTATION = gql`
       label
     }
   }
-`
+`)
 
-export const CREATE_SPEC_MUTATION = gql`
+export const CREATE_SPEC_MUTATION = graphql(`
   mutation CreateSpec($specTypeId: Int!, $value: String!) {
     createSpec(specTypeId: $specTypeId, value: $value) {
       id
       value
     }
   }
-`
+`)
 
-export const DELETE_SPEC_MUTATION = gql`
+export const DELETE_SPEC_MUTATION = graphql(`
   mutation DeleteSpec($id: Int!) {
     deleteSpec(id: $id)
   }
-`
+`)
 
-export const DELETE_SPEC_TYPE_MUTATION = gql`
+export const DELETE_SPEC_TYPE_MUTATION = graphql(`
   mutation DeleteSpecType($id: Int!) {
     deleteSpecType(id: $id)
   }
-`
+`)
 
 // ============================================================================
 // PRODUCT QUERIES
 // ============================================================================
 
-export const PRODUCT_QUERY = gql`
+export const PRODUCT_QUERY = graphql(`
   query Product($id: Int!) {
     product(id: $id) {
       id
@@ -340,9 +340,9 @@ export const PRODUCT_QUERY = gql`
       updatedAt
     }
   }
-`
+`)
 
-export const ADMIN_PRODUCT_QUERY = gql`
+export const ADMIN_PRODUCT_QUERY = graphql(`
   query AdminProduct($id: Int!) {
     adminProduct(id: $id) {
       id
@@ -362,9 +362,9 @@ export const ADMIN_PRODUCT_QUERY = gql`
       updatedAt
     }
   }
-`
+`)
 
-export const PRODUCTS_QUERY = gql`
+export const PRODUCTS_QUERY = graphql(`
   query Products(
     $name: String
     $categoryId: Int
@@ -409,9 +409,9 @@ export const PRODUCTS_QUERY = gql`
       meta { total page limit totalPages hasNextPage hasPreviousPage }
     }
   }
-`
+`)
 
-export const SUGGEST_PRODUCT_MUTATION = gql`
+export const SUGGEST_PRODUCT_MUTATION = graphql(`
   mutation SuggestProduct($name: String!, $categoryId: Int!, $brandId: Int) {
     suggestProduct(name: $name, categoryId: $categoryId, brandId: $brandId) {
       id
@@ -421,9 +421,9 @@ export const SUGGEST_PRODUCT_MUTATION = gql`
       status
     }
   }
-`
+`)
 
-export const CREATE_PRODUCT_MUTATION = gql`
+export const CREATE_PRODUCT_MUTATION = graphql(`
   mutation CreateProduct($name: String!, $categoryId: Int!, $brandId: Int, $description: String) {
     createProduct(name: $name, categoryId: $categoryId, brandId: $brandId, description: $description) {
       id
@@ -434,9 +434,9 @@ export const CREATE_PRODUCT_MUTATION = gql`
       status
     }
   }
-`
+`)
 
-export const UPDATE_PRODUCT_MUTATION = gql`
+export const UPDATE_PRODUCT_MUTATION = graphql(`
   mutation UpdateProduct($id: Int!, $name: String, $categoryId: Int, $brandId: Int, $description: String, $features: [String!], $status: String) {
     updateProduct(id: $id, name: $name, categoryId: $categoryId, brandId: $brandId, description: $description, features: $features, status: $status) {
       id
@@ -448,24 +448,24 @@ export const UPDATE_PRODUCT_MUTATION = gql`
       status
     }
   }
-`
+`)
 
-export const DELETE_PRODUCT_MUTATION = gql`
+export const DELETE_PRODUCT_MUTATION = graphql(`
   mutation DeleteProduct($id: Int!) {
     deleteProduct(id: $id)
   }
-`
+`)
 
-export const REUPLOAD_PRODUCT_IMAGES_MUTATION = gql`
+export const REUPLOAD_PRODUCT_IMAGES_MUTATION = graphql(`
   mutation ReuploadProductImages($productId: Int!) {
     reuploadProductImages(productId: $productId) {
       id
       images
     }
   }
-`
+`)
 
-export const IMPORT_PRODUCTS_MUTATION = gql`
+export const IMPORT_PRODUCTS_MUTATION = graphql(`
   mutation ImportProducts($json: String!) {
     importProducts(json: $json) {
       imported
@@ -474,40 +474,40 @@ export const IMPORT_PRODUCTS_MUTATION = gql`
       errors
     }
   }
-`
+`)
 
-export const UPDATE_PRODUCT_SPECS_MUTATION = gql`
+export const UPDATE_PRODUCT_SPECS_MUTATION = graphql(`
   mutation UpdateProductSpecs($productId: Int!, $specIds: [Int!]!) {
     updateProductSpecs(productId: $productId, specIds: $specIds) {
       id
       specs { id value specType { id key label } }
     }
   }
-`
+`)
 
-export const ADD_PRODUCT_IMAGE_MUTATION = gql`
+export const ADD_PRODUCT_IMAGE_MUTATION = graphql(`
   mutation AddProductImage($productId: Int!, $imageUrl: String!) {
     addProductImage(productId: $productId, imageUrl: $imageUrl) {
       id
       images
     }
   }
-`
+`)
 
-export const DELETE_PRODUCT_IMAGE_MUTATION = gql`
+export const DELETE_PRODUCT_IMAGE_MUTATION = graphql(`
   mutation DeleteProductImage($productId: Int!, $imageUrl: String!) {
     deleteProductImage(productId: $productId, imageUrl: $imageUrl) {
       id
       images
     }
   }
-`
+`)
 
 // ============================================================================
 // DEAL QUERIES
 // ============================================================================
 
-export const DEAL_QUERY = gql`
+export const DEAL_QUERY = graphql(`
   query Deal($id: Int!) {
     deal(id: $id) {
       id
@@ -531,9 +531,9 @@ export const DEAL_QUERY = gql`
       updatedAt
     }
   }
-`
+`)
 
-export const DEALS_QUERY = gql`
+export const DEALS_QUERY = graphql(`
   query Deals($title: String, $categoryId: Int, $specIds: [Int!], $page: Int, $limit: Int) {
     deals(title: $title, categoryId: $categoryId, specIds: $specIds, page: $page, limit: $limit) {
       data {
@@ -551,9 +551,9 @@ export const DEALS_QUERY = gql`
       meta { total page limit totalPages hasNextPage hasPreviousPage }
     }
   }
-`
+`)
 
-export const RECENT_DEALS_QUERY = gql`
+export const RECENT_DEALS_QUERY = graphql(`
   query RecentDeals {
     recentDeals {
       id
@@ -567,9 +567,9 @@ export const RECENT_DEALS_QUERY = gql`
       createdAt
     }
   }
-`
+`)
 
-export const MY_DEALS_QUERY = gql`
+export const MY_DEALS_QUERY = graphql(`
   query MyDeals {
     myDeals {
       id
@@ -583,18 +583,18 @@ export const MY_DEALS_QUERY = gql`
       products { productName quantity }
     }
   }
-`
+`)
 
-export const CREATE_DEAL_DRAFT_MUTATION = gql`
+export const CREATE_DEAL_DRAFT_MUTATION = graphql(`
   mutation CreateDealDraft {
     createDealDraft {
       id
       status
     }
   }
-`
+`)
 
-export const UPDATE_DEAL_MUTATION = gql`
+export const UPDATE_DEAL_MUTATION = graphql(`
   mutation UpdateDeal(
     $id: Int!
     $title: String
@@ -629,27 +629,27 @@ export const UPDATE_DEAL_MUTATION = gql`
       price
     }
   }
-`
+`)
 
-export const PUBLISH_DEAL_MUTATION = gql`
+export const PUBLISH_DEAL_MUTATION = graphql(`
   mutation PublishDeal($id: Int!) {
     publishDeal(id: $id) {
       id
       status
     }
   }
-`
+`)
 
-export const MARK_DEAL_SOLD_MUTATION = gql`
+export const MARK_DEAL_SOLD_MUTATION = graphql(`
   mutation MarkDealSold($id: Int!) {
     markDealSold(id: $id) {
       id
       status
     }
   }
-`
+`)
 
-export const ADMIN_UPDATE_DEAL_STATUS_MUTATION = gql`
+export const ADMIN_UPDATE_DEAL_STATUS_MUTATION = graphql(`
   mutation AdminUpdateDealStatus($id: Int!, $status: String!, $reason: String) {
     adminUpdateDealStatus(id: $id, status: $status, reason: $reason) {
       id
@@ -657,27 +657,27 @@ export const ADMIN_UPDATE_DEAL_STATUS_MUTATION = gql`
       reasonDeclined
     }
   }
-`
+`)
 
-export const ADD_DEAL_IMAGE_MUTATION = gql`
+export const ADD_DEAL_IMAGE_MUTATION = graphql(`
   mutation AddDealImage($dealId: Int!, $imageUrl: String!) {
     addDealImage(dealId: $dealId, imageUrl: $imageUrl) {
       id
       images
     }
   }
-`
+`)
 
-export const DELETE_DEAL_IMAGE_MUTATION = gql`
+export const DELETE_DEAL_IMAGE_MUTATION = graphql(`
   mutation DeleteDealImage($dealId: Int!, $imageUrl: String!) {
     deleteDealImage(dealId: $dealId, imageUrl: $imageUrl) {
       id
       images
     }
   }
-`
+`)
 
-export const ADMIN_DEALS_QUERY = gql`
+export const ADMIN_DEALS_QUERY = graphql(`
   query AdminDeals($status: String!, $page: Int, $limit: Int) {
     adminDeals(status: $status, page: $page, limit: $limit) {
       data {
@@ -696,13 +696,13 @@ export const ADMIN_DEALS_QUERY = gql`
       meta { total page limit totalPages hasNextPage hasPreviousPage }
     }
   }
-`
+`)
 
 // ============================================================================
 // DISCUSSION QUERIES
 // ============================================================================
 
-export const MY_DISCUSSIONS_QUERY = gql`
+export const MY_DISCUSSIONS_QUERY = graphql(`
   query MyDiscussions {
     myDiscussions {
       id
@@ -713,9 +713,9 @@ export const MY_DISCUSSIONS_QUERY = gql`
       createdAt
     }
   }
-`
+`)
 
-export const DISCUSSION_QUERY = gql`
+export const DISCUSSION_QUERY = graphql(`
   query Discussion($id: Int!) {
     discussion(id: $id) {
       id
@@ -724,18 +724,18 @@ export const DISCUSSION_QUERY = gql`
       seller { id name image }
     }
   }
-`
+`)
 
-export const START_DISCUSSION_MUTATION = gql`
+export const START_DISCUSSION_MUTATION = graphql(`
   mutation StartDiscussion($dealId: Int!) {
     startDiscussion(dealId: $dealId) {
       id
       deal { id title }
     }
   }
-`
+`)
 
-export const MESSAGES_QUERY = gql`
+export const MESSAGES_QUERY = graphql(`
   query Messages($discussionId: Int!, $cursor: String, $limit: Int) {
     messages(discussionId: $discussionId, cursor: $cursor, limit: $limit) {
       messages {
@@ -748,18 +748,18 @@ export const MESSAGES_QUERY = gql`
       nextCursor
     }
   }
-`
+`)
 
-export const MARK_DISCUSSION_READ_MUTATION = gql`
+export const MARK_DISCUSSION_READ_MUTATION = graphql(`
   mutation MarkDiscussionRead($discussionId: Int!) {
     markDiscussionRead(discussionId: $discussionId)
   }
-`
+`)
 
-export const UNREAD_COUNT_QUERY = gql`
+export const UNREAD_COUNT_QUERY = graphql(`
   query UnreadCount {
     unreadCount {
       count
     }
   }
-`
+`)

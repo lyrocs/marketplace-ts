@@ -71,30 +71,38 @@ export function ProductListing({ categoryKey, categories, brands, specTypes }: P
     : false
 
   // Fetch products or deals
-  const { data: productsData, loading: productsLoading } = useQuery(
-    isDeal ? DEALS_QUERY : PRODUCTS_QUERY,
-    {
-      variables: {
-        categoryId: categoryIdForQuery,
-        title: search,
-        name: search,
-        brandId,
-        specIds,
-        minPrice,
-        maxPrice,
-        sortBy,
-        sortOrder,
-        page,
-        limit: 12,
-      },
-      skip: categoryKey ? !categoryIdForQuery : false,
-    }
-  )
+  const skipQuery = categoryKey ? !categoryIdForQuery : false
+  const { data: dealsData, loading: dealsLoading } = useQuery(DEALS_QUERY, {
+    variables: {
+      categoryId: categoryIdForQuery,
+      title: search,
+      specIds,
+      page,
+      limit: 12,
+    },
+    skip: !isDeal || skipQuery,
+  })
+  const { data: productsData, loading: productsQueryLoading } = useQuery(PRODUCTS_QUERY, {
+    variables: {
+      categoryId: categoryIdForQuery,
+      name: search,
+      brandId,
+      specIds,
+      minPrice,
+      maxPrice,
+      sortBy,
+      sortOrder,
+      page,
+      limit: 12,
+    },
+    skip: isDeal || skipQuery,
+  })
+  const productsLoading = dealsLoading || productsQueryLoading
 
   const items = isDeal
-    ? (productsData as any)?.deals?.data || []
-    : (productsData as any)?.products?.data || []
-  const meta = isDeal ? (productsData as any)?.deals?.meta : (productsData as any)?.products?.meta
+    ? dealsData?.deals?.data || []
+    : productsData?.products?.data || []
+  const meta = isDeal ? dealsData?.deals?.meta : productsData?.products?.meta
 
   // --- Filter handlers ---
 

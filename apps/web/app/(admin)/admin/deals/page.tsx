@@ -53,15 +53,15 @@ export default function AdminDealsPage() {
   })
 
   const { data: dealData, loading: dealLoading } = useQuery(DEAL_QUERY, {
-    variables: { id: selectedDealId },
+    variables: { id: selectedDealId! },
     skip: !selectedDealId,
   })
 
   const [updateStatus] = useMutation(ADMIN_UPDATE_DEAL_STATUS_MUTATION)
 
-  const deals = (data as any)?.adminDeals?.data || []
-  const meta = (data as any)?.adminDeals?.meta
-  const deal = (dealData as any)?.deal
+  const deals = data?.adminDeals?.data || []
+  const meta = data?.adminDeals?.meta
+  const deal = dealData?.deal
 
   const handleStatusChange = async (dealId: number, status: string, reason?: string) => {
     try {
@@ -307,7 +307,7 @@ export default function AdminDealsPage() {
                   </Link>
                   {deal.status === 'PENDING' && (
                     <Button onClick={() => {
-                      handleStatusChange(deal.id, 'PUBLISHED')
+                      handleStatusChange(deal!.id, 'PUBLISHED')
                     }}>
                       <Check className="mr-1 h-4 w-4" /> Approve
                     </Button>
@@ -315,7 +315,7 @@ export default function AdminDealsPage() {
                   {(deal.status === 'PENDING' || deal.status === 'PUBLISHED') && (
                     <Button variant="destructive" onClick={() => {
                       setSelectedDealId(null)
-                      openDeclineDialog(deal.id)
+                      openDeclineDialog(deal!.id)
                     }}>
                       <X className="mr-1 h-4 w-4" /> Decline
                     </Button>

@@ -12,17 +12,17 @@ interface ChatHeaderProps {
   discussion: {
     deal: {
       id: number;
-      title?: string;
+      title?: string | null;
     };
     buyer: {
       id: string;
-      name?: string;
-      image?: string;
+      name?: string | null;
+      image?: string | null;
     };
     seller: {
       id: string;
-      name?: string;
-      image?: string;
+      name?: string | null;
+      image?: string | null;
     };
   };
   connectionStatus: ConnectionStatus;
@@ -67,7 +67,7 @@ export function ChatHeader({
 
         {/* Contact info */}
         <Avatar className="h-10 w-10">
-          <AvatarImage src={contact.image || undefined} alt={contact.name} />
+          <AvatarImage src={contact.image ?? undefined} alt={contact.name ?? undefined} />
           <AvatarFallback>
             {contact.name?.charAt(0)?.toUpperCase() || '?'}
           </AvatarFallback>

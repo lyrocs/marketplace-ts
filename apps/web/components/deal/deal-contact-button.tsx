@@ -25,8 +25,8 @@ export function DealContactButton({ dealId, sellerId }: DealContactButtonProps) 
     setLoading(true)
     try {
       const { data: result } = await startDiscussion({ variables: { dealId } })
-      if ((result as any)?.startDiscussion) {
-        window.location.href = `/chat/${(result as any).startDiscussion.id}`
+      if (result?.startDiscussion) {
+        window.location.href = `/chat/${result.startDiscussion.id}`
       }
     } finally {
       setLoading(false)

@@ -26,7 +26,7 @@ export default async function DealDetailPage({
   if (isNaN(dealId)) notFound()
 
   const data = await fetchGraphQL(DEAL_QUERY, { id: dealId })
-  const deal = (data as any)?.deal
+  const deal = data?.deal
 
   if (!deal || (deal.status !== 'PUBLISHED' && deal.status !== 'SOLD')) notFound()
 
