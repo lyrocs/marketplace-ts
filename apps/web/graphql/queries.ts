@@ -14,8 +14,6 @@ export const LOGIN_MUTATION = gql`
         email
         image
         role
-        matrixLogin
-        matrixPassword
       }
     }
   }
@@ -31,8 +29,6 @@ export const REGISTER_MUTATION = gql`
         email
         image
         role
-        matrixLogin
-        matrixPassword
       }
     }
   }
@@ -46,8 +42,6 @@ export const ME_QUERY = gql`
       email
       image
       role
-      matrixLogin
-      matrixPassword
     }
   }
 `
@@ -712,7 +706,6 @@ export const MY_DISCUSSIONS_QUERY = gql`
   query MyDiscussions {
     myDiscussions {
       id
-      matrixRoomId
       hasUnread
       deal { id title }
       buyer { id name image }
@@ -726,10 +719,9 @@ export const DISCUSSION_QUERY = gql`
   query Discussion($id: Int!) {
     discussion(id: $id) {
       id
-      matrixRoomId
       deal { id title }
-      buyer { id name image matrixLogin }
-      seller { id name image matrixLogin }
+      buyer { id name image }
+      seller { id name image }
     }
   }
 `
@@ -738,8 +730,22 @@ export const START_DISCUSSION_MUTATION = gql`
   mutation StartDiscussion($dealId: Int!) {
     startDiscussion(dealId: $dealId) {
       id
-      matrixRoomId
       deal { id title }
+    }
+  }
+`
+
+export const MESSAGES_QUERY = gql`
+  query Messages($discussionId: Int!, $cursor: String, $limit: Int) {
+    messages(discussionId: $discussionId, cursor: $cursor, limit: $limit) {
+      messages {
+        id
+        discussionId
+        senderId
+        content
+        createdAt
+      }
+      nextCursor
     }
   }
 `

@@ -14,9 +14,6 @@ export class UsersService {
         role: true,
         createdAt: true,
         updatedAt: true,
-        matrixLogin: true,
-        matrixPassword: true,
-        matrixToken: true,
       },
     });
   }

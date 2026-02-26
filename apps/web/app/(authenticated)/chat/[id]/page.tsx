@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery, useMutation } from '@apollo/client/react'
-import { DISCUSSION_QUERY, MARK_DISCUSSION_READ_MUTATION } from '@/graphql/queries'
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react'
+import { DISCUSSION_QUERY, MARK_DISCUSSION_READ_MUTATION, MESSAGES_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
-import { useMatrix } from '@/hooks/use-matrix'
+import { useChat } from '@/hooks/use-chat'
 import { ChatHeader, ChatRoom, MessageInput } from '@/components/chat'
 import { Skeleton } from '@marketplace/ui'
 
@@ -20,35 +20,45 @@ export default function ChatRoomPage() {
   })
 
   const [markRead] = useMutation(MARK_DISCUSSION_READ_MUTATION)
+  const [fetchMessages, { data: messagesData }] = useLazyQuery(MESSAGES_QUERY, {
+    fetchPolicy: 'network-only',
+  })
 
-  const discussion = data?.discussion
-  const matrixRoomId = discussion?.matrixRoomId
+  const discussion = (data as any)?.discussion
 
-  // Initialize Matrix client and load messages
   const {
-    messages,
-    loading: matrixLoading,
-    error: matrixError,
+    messages: realtimeMessages,
     connectionStatus,
     sendMessage,
     loadMessages,
-  } = useMatrix()
+    markRead: socketMarkRead,
+    joinDiscussion,
+  } = useChat()
 
+  // Load history and join discussion room
   useEffect(() => {
-    if (matrixRoomId) {
-      loadMessages(matrixRoomId)
-      markRead({ variables: { discussionId } }).catch(() => {})
-    }
-  }, [matrixRoomId, discussionId, loadMessages, markRead])
+    if (!discussion) return
+    loadMessages(discussionId)
+    joinDiscussion(discussionId)
+    fetchMessages({ variables: { discussionId } })
+    markRead({ variables: { discussionId } }).catch(() => {})
+    socketMarkRead(discussionId)
+  }, [discussion, discussionId, loadMessages, joinDiscussion, fetchMessages, markRead, socketMarkRead])
 
-  const handleSend = async (text: string) => {
-    if (!matrixRoomId) return
-
-    try {
-      await sendMessage(matrixRoomId, text)
-    } catch (err) {
-      console.error('Failed to send message:', err)
+  // Merge history messages with realtime messages
+  const historyMessages = (messagesData as any)?.messages?.messages || []
+  const allMessages = [...historyMessages]
+  for (const msg of realtimeMessages) {
+    if (!allMessages.some((m: any) => m.id === msg.id)) {
+      allMessages.push(msg)
     }
+  }
+  allMessages.sort(
+    (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  )
+
+  const handleSend = (text: string) => {
+    sendMessage(discussionId, text)
   }
 
   if (authLoading) return null
@@ -73,29 +83,6 @@ export default function ChatRoomPage() {
     )
   }
 
-  if (matrixError) {
-    return (
-      <div className="flex flex-col h-screen">
-        <ChatHeader
-          discussion={discussion}
-          connectionStatus="error"
-          currentUserId={user?.id || ''}
-        />
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="rounded-lg border border-destructive bg-destructive/10 p-6 max-w-md">
-            <p className="text-sm text-destructive">Matrix error: {matrixError}</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Make sure Matrix credentials are configured properly.
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const otherUser =
-    discussion.buyer.id === user?.id ? discussion.seller : discussion.buyer
-
   const isConnected = connectionStatus === 'connected'
 
   return (
@@ -107,31 +94,29 @@ export default function ChatRoomPage() {
       />
 
       <ChatRoom
-        messages={messages}
-        currentUserMatrixLogin={user?.matrixLogin || ''}
-        otherUserName={otherUser.name}
-        otherUserImage={otherUser.image}
-        isLoading={matrixLoading}
+        messages={allMessages.map((m: any) => ({
+          id: m.id,
+          senderId: m.senderId,
+          content: m.content,
+          createdAt: m.createdAt,
+        }))}
+        currentUserId={user?.id || ''}
+        otherUserName={
+          (discussion.buyer.id === user?.id ? discussion.seller : discussion.buyer).name
+        }
+        otherUserImage={
+          (discussion.buyer.id === user?.id ? discussion.seller : discussion.buyer).image
+        }
+        isLoading={!messagesData && realtimeMessages.length === 0}
       />
 
       <MessageInput
         onSend={handleSend}
         disabled={!isConnected}
         placeholder={
-          isConnected
-            ? 'Type a message...'
-            : 'Connecting to chat...'
+          isConnected ? 'Type a message...' : 'Connecting to chat...'
         }
       />
-
-      {/* Matrix Room ID for debugging */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="border-t p-2 text-center">
-          <p className="text-xs text-muted-foreground">
-            Room: {discussion.matrixRoomId}
-          </p>
-        </div>
-      )}
     </div>
   )
 }

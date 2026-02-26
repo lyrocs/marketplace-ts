@@ -10,7 +10,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '@marketplace/database';
 import { UserRole, JwtPayload } from '@marketplace/types';
 import { UsersService } from '../users/users.service.js';
-import { MatrixClientService } from '../matrix/matrix-client.service.js';
 import { MailerService } from '../mailer/mailer.service.js';
 
 @Injectable()
@@ -18,7 +17,6 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
-    private readonly matrixService: MatrixClientService,
     private readonly mailerService: MailerService,
   ) {}
 
@@ -62,8 +60,6 @@ export class AuthService {
         email: user.email,
         image: user.image,
         role: user.role,
-        matrixLogin: user.matrixLogin,
-        matrixPassword: user.matrixPassword,
       },
     };
   }
@@ -93,11 +89,6 @@ export class AuthService {
         password: hashedPassword,
         role,
       },
-    });
-
-    // Create Matrix user in background
-    this.createMatrixUserForRegistration(user.id).catch(() => {
-      console.warn('Matrix user creation failed for:', user.id);
     });
 
     return this.login(user);
@@ -143,8 +134,6 @@ export class AuthService {
         },
       });
 
-      // Create Matrix user in background
-      this.createMatrixUserForRegistration(user.id).catch(() => {});
     }
 
     await prisma.account.create({
@@ -300,16 +289,4 @@ export class AuthService {
     }
   }
 
-  private async createMatrixUserForRegistration(userId: string): Promise<any> {
-    const credentials = await this.matrixService.createUser();
-    if (credentials) {
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          matrixLogin: credentials.username,
-          matrixPassword: credentials.password,
-        },
-      });
-    }
-  }
 }

@@ -22,9 +22,6 @@ export class DiscussionUserOutput {
 
   @Field({ nullable: true })
   image?: string;
-
-  @Field({ nullable: true })
-  matrixLogin?: string;
 }
 
 @ObjectType()
@@ -40,9 +37,6 @@ export class DiscussionDealOutput {
 export class DiscussionOutput {
   @Field(() => Int)
   id: number;
-
-  @Field()
-  matrixRoomId: string;
 
   @Field()
   deal: DiscussionDealOutput;
@@ -76,7 +70,6 @@ export class DiscussionsResolver {
     const discussions = await this.discussionsService.findByUser(user.id);
     return discussions.map((d: any): any => ({
       id: d.id,
-      matrixRoomId: d.matrixRoomId,
       createdAt: d.createdAt,
       deal: d.deal,
       buyer: d.buyer,
@@ -94,7 +87,6 @@ export class DiscussionsResolver {
     if (!d) return null;
     return {
       id: d.id,
-      matrixRoomId: d.matrixRoomId,
       createdAt: d.createdAt,
       deal: d.deal,
       buyer: d.buyer,
@@ -125,7 +117,6 @@ export class DiscussionsResolver {
       const d = await this.discussionsService.findById(existing.id);
       return {
         id: d!.id,
-        matrixRoomId: d!.matrixRoomId,
         createdAt: d!.createdAt,
         deal: d!.deal,
         buyer: d!.buyer,
@@ -151,7 +142,6 @@ export class DiscussionsResolver {
     const d = await this.discussionsService.findById(discussion.id);
     return {
       id: d!.id,
-      matrixRoomId: d!.matrixRoomId,
       createdAt: d!.createdAt,
       deal: d!.deal,
       buyer: d!.buyer,

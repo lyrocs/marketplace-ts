@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   try {
     const data = await fetchGraphQL(PUBLIC_PROFILE_QUERY, { id })
-    const profile = data?.publicProfile
+    const profile = (data as any)?.publicProfile
     if (!profile) return { title: 'User Not Found' }
     return {
       title: `${profile.name || 'Pilot'} — Marketplace`,
@@ -39,10 +39,10 @@ export default async function PublicProfilePage({ params }: Props) {
     notFound()
   }
 
-  const profile = profileData?.publicProfile
+  const profile = (profileData as any)?.publicProfile
   if (!profile) notFound()
 
-  const deals = dealsData?.userDeals || []
+  const deals = (dealsData as any)?.userDeals || []
   const memberSince = new Date(profile.createdAt).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',

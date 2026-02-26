@@ -34,7 +34,7 @@ export default function EditDealPage() {
     )
   }
 
-  const deal = dealData?.deal
+  const deal = (dealData as any)?.deal
   if (!deal || deal.userId !== user?.id) {
     return (
       <div className="container max-w-4xl py-8">

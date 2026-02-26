@@ -7,6 +7,7 @@ async function main() {
   console.log('🌱 Seeding database...')
 
   // Clean existing data (order matters for FK constraints)
+  await prisma.message.deleteMany()
   await prisma.discussionStatus.deleteMany()
   await prisma.discussion.deleteMany()
   await prisma.dealProduct.deleteMany()
@@ -776,7 +777,6 @@ async function main() {
       dealId: deal1.id,
       buyerId: bob.id,
       sellerId: alice.id,
-      matrixRoomId: '!demo-room-1:matrix.marketplace.dev',
     },
   })
 
@@ -785,7 +785,6 @@ async function main() {
       dealId: deal1.id,
       buyerId: charlie.id,
       sellerId: alice.id,
-      matrixRoomId: '!demo-room-2:matrix.marketplace.dev',
     },
   })
 
@@ -794,7 +793,6 @@ async function main() {
       dealId: deal2.id,
       buyerId: diana.id,
       sellerId: bob.id,
-      matrixRoomId: '!demo-room-3:matrix.marketplace.dev',
     },
   })
 
@@ -803,8 +801,25 @@ async function main() {
       dealId: deal5.id,
       buyerId: charlie.id,
       sellerId: alice.id,
-      matrixRoomId: '!demo-room-4:matrix.marketplace.dev',
     },
+  })
+
+  // =========================================================================
+  // MESSAGES
+  // =========================================================================
+  console.log('  Creating messages...')
+
+  await prisma.message.createMany({
+    data: [
+      { discussionId: discussion1.id, senderId: bob.id, content: 'Hey, is the DJI O3 still available?' },
+      { discussionId: discussion1.id, senderId: alice.id, content: 'Yes it is! Are you interested?' },
+      { discussionId: discussion1.id, senderId: bob.id, content: 'Definitely! Would you do $160?' },
+      { discussionId: discussion2.id, senderId: charlie.id, content: 'Hi, does it come with the original box?' },
+      { discussionId: discussion2.id, senderId: alice.id, content: 'Yes, original box and all accessories included.' },
+      { discussionId: discussion3.id, senderId: diana.id, content: 'Is the Zorro still available? Interested!' },
+      { discussionId: discussion4.id, senderId: charlie.id, content: 'Would you ship to Florida?' },
+      { discussionId: discussion4.id, senderId: alice.id, content: 'Sure, shipping would be about $8 extra.' },
+    ],
   })
 
   // =========================================================================

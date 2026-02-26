@@ -22,10 +22,10 @@ export default async function ProductDetailsPage({
     fetchGraphQL(CATEGORIES_QUERY),
   ])
 
-  const product = productData?.product
+  const product = (productData as any)?.product
   if (!product) notFound()
 
-  const categories = categoriesData?.categories || []
+  const categories = (categoriesData as any)?.categories || []
 
   // Build breadcrumb items
   const parentCategory = categories.find(

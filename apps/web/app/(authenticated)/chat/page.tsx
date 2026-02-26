@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/client/react'
 import { MY_DISCUSSIONS_QUERY } from '@/graphql/queries'
 import { useAuthGuard } from '@/hooks/use-auth-guard'
+import { useChat } from '@/hooks/use-chat'
 import { DiscussionList } from '@/components/chat'
 import { Card, CardContent, Skeleton } from '@marketplace/ui'
 import { MessageSquare } from 'lucide-react'
@@ -11,15 +12,23 @@ import { MessageSquare } from 'lucide-react'
 export default function ChatListPage() {
   const { user, loading: authLoading } = useAuthGuard()
   const [searchQuery, setSearchQuery] = useState('')
+  const { onUnreadUpdate } = useChat()
 
-  const { data, loading } = useQuery(MY_DISCUSSIONS_QUERY, {
+  const { data, loading, refetch } = useQuery(MY_DISCUSSIONS_QUERY, {
     skip: !user,
-    pollInterval: 10000, // Poll every 10 seconds for new messages
   })
+
+  // Refetch on unread update from socket
+  useEffect(() => {
+    const unsub = onUnreadUpdate(() => {
+      refetch()
+    })
+    return unsub
+  }, [onUnreadUpdate, refetch])
 
   if (authLoading) return null
 
-  const discussions = data?.myDiscussions || []
+  const discussions = (data as any)?.myDiscussions || []
 
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto">

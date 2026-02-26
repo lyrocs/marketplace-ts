@@ -35,7 +35,7 @@ export default function AdminSpecsPage() {
   const [deleteSpec] = useMutation(DELETE_SPEC_MUTATION)
   const [deleteSpecType] = useMutation(DELETE_SPEC_TYPE_MUTATION)
 
-  const specTypes = data?.specTypes || []
+  const specTypes = (data as any)?.specTypes || []
 
   const handleCreateType = async () => {
     if (!newType.key || !newType.label) return

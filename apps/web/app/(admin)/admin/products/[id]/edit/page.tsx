@@ -49,7 +49,7 @@ export default function AdminProductEditPage() {
   })
 
   useEffect(() => {
-    const p = productData?.adminProduct
+    const p = (productData as any)?.adminProduct
     if (!p || loaded) return
     setEditProduct({
       id: p.id,
@@ -73,8 +73,8 @@ export default function AdminProductEditPage() {
   const [deleteProductImage] = useMutation(DELETE_PRODUCT_IMAGE_MUTATION)
   const [reuploadImages, { loading: reuploading }] = useMutation(REUPLOAD_PRODUCT_IMAGES_MUTATION)
 
-  const specTypes = specTypesData?.specTypes || []
-  const brands = brandsData?.brands || []
+  const specTypes = (specTypesData as any)?.specTypes || []
+  const brands = (brandsData as any)?.brands || []
 
   const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || ''
   const isExternalImage = (url: string) => s3BaseUrl ? !url.startsWith(s3BaseUrl) : false
@@ -92,8 +92,8 @@ export default function AdminProductEditPage() {
   const handleReuploadImages = async () => {
     try {
       const { data } = await reuploadImages({ variables: { productId: editProduct.id } })
-      if (data?.reuploadProductImages?.images) {
-        setEditProduct({ ...editProduct, images: data.reuploadProductImages.images })
+      if ((data as any)?.reuploadProductImages?.images) {
+        setEditProduct({ ...editProduct, images: (data as any).reuploadProductImages.images })
       }
       toast({ title: 'Images uploaded to S3', variant: 'success' })
     } catch {
@@ -245,7 +245,7 @@ export default function AdminProductEditPage() {
             <Select value={editProduct.categoryId} onValueChange={(v) => setEditProduct({ ...editProduct, categoryId: v })}>
               <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
               <SelectContent>
-                {(categoriesData?.categories || []).map((cat: any) => (
+                {((categoriesData as any)?.categories || []).map((cat: any) => (
                   <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
                 ))}
               </SelectContent>

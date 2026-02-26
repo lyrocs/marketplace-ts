@@ -23,9 +23,9 @@ const httpLink = new HttpLink({
   },
 })
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
+const errorLink = onError(({ graphQLErrors, networkError }: any) => {
   if (graphQLErrors) {
-    graphQLErrors.forEach(({ message }) => {
+    graphQLErrors.forEach(({ message }: any) => {
       console.error('GraphQL Error:', message)
     })
   }

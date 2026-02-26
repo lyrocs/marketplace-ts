@@ -33,7 +33,7 @@ export default function MyDealsPage() {
 
   if (authLoading) return null
 
-  const deals = data?.myDeals || []
+  const deals = (data as any)?.myDeals || []
 
   return (
     <div className="container max-w-4xl py-8">

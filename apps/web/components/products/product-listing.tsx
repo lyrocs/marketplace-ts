@@ -92,9 +92,9 @@ export function ProductListing({ categoryKey, categories, brands, specTypes }: P
   )
 
   const items = isDeal
-    ? productsData?.deals?.data || []
-    : productsData?.products?.data || []
-  const meta = isDeal ? productsData?.deals?.meta : productsData?.products?.meta
+    ? (productsData as any)?.deals?.data || []
+    : (productsData as any)?.products?.data || []
+  const meta = isDeal ? (productsData as any)?.deals?.meta : (productsData as any)?.products?.meta
 
   // --- Filter handlers ---
 

@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { prisma } from '@marketplace/database';
-import { MatrixClientService } from '../matrix/matrix-client.service.js';
 
 @Injectable()
 export class DiscussionsService {
-  constructor(private readonly matrixService: MatrixClientService) {}
-
   async findByUser(userId: string): Promise<any> {
     return prisma.discussion.findMany({
       where: {
@@ -27,10 +24,10 @@ export class DiscussionsService {
       include: {
         deal: { select: { id: true, title: true } },
         buyer: {
-          select: { id: true, name: true, image: true, matrixLogin: true },
+          select: { id: true, name: true, image: true },
         },
         seller: {
-          select: { id: true, name: true, image: true, matrixLogin: true },
+          select: { id: true, name: true, image: true },
         },
         statuses: true,
       },
@@ -48,36 +45,11 @@ export class DiscussionsService {
     buyerId: string;
     sellerId: string;
   }): Promise<any> {
-    // Get user matrix logins
-    const [buyer, seller] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: data.buyerId },
-        select: { matrixLogin: true, name: true },
-      }),
-      prisma.user.findUnique({
-        where: { id: data.sellerId },
-        select: { matrixLogin: true, name: true },
-      }),
-    ]);
-
-    const deal = await prisma.deal.findUnique({
-      where: { id: data.dealId },
-      select: { title: true },
-    });
-
-    // Create Matrix room
-    const roomId = await this.matrixService.createRoom({
-      name: `Deal #${data.dealId}: ${deal?.title || 'Untitled'}`,
-      sellerName: seller?.matrixLogin || '',
-      buyerName: buyer?.matrixLogin || '',
-    });
-
     const discussion = await prisma.discussion.create({
       data: {
         dealId: data.dealId,
         buyerId: data.buyerId,
         sellerId: data.sellerId,
-        matrixRoomId: roomId,
       },
     });
 

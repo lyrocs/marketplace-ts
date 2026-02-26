@@ -72,10 +72,10 @@ export function DealProductPicker({ selectedProducts, onProductsChange }: DealPr
   })
   const [suggestProduct, { loading: creating }] = useMutation(SUGGEST_PRODUCT_MUTATION)
 
-  const categories = categoriesData?.categories || []
-  const brands = brandsData?.brands || []
-  const products: any[] = productsData?.products?.data || []
-  const totalResults = productsData?.products?.meta?.total || 0
+  const categories = (categoriesData as any)?.categories || []
+  const brands = (brandsData as any)?.brands || []
+  const products: any[] = (productsData as any)?.products?.data || []
+  const totalResults = (productsData as any)?.products?.meta?.total || 0
 
   // Debounce search
   useEffect(() => {
@@ -148,7 +148,7 @@ export function DealProductPicker({ selectedProducts, onProductsChange }: DealPr
       const { data } = await suggestProduct({
         variables: { name: newProductName, categoryId: catId, brandId: bId },
       })
-      const created = data?.suggestProduct
+      const created = (data as any)?.suggestProduct
       if (created) {
         // Cache immediately so chips show the name
         const cat = categories.find((c: any) => c.id === catId)

@@ -12,6 +12,7 @@ export var UserRole;
 export var DealStatus;
 (function (DealStatus) {
     DealStatus["DRAFT"] = "DRAFT";
+    DealStatus["PENDING"] = "PENDING";
     DealStatus["PUBLISHED"] = "PUBLISHED";
     DealStatus["DECLINED"] = "DECLINED";
     DealStatus["EXPIRED"] = "EXPIRED";

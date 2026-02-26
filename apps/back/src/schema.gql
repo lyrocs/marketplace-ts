@@ -107,14 +107,12 @@ type DiscussionOutput {
   deal: DiscussionDealOutput!
   hasUnread: Boolean!
   id: Int!
-  matrixRoomId: String!
   seller: DiscussionUserOutput!
 }
 
 type DiscussionUserOutput {
   id: String!
   image: String
-  matrixLogin: String
   name: String
 }
 
@@ -123,6 +121,19 @@ type ImportResultOutput {
   failed: Int!
   imported: Int!
   updated: Int!
+}
+
+type MessageOutput {
+  content: String!
+  createdAt: DateTime!
+  discussionId: Int!
+  id: String!
+  senderId: String!
+}
+
+type MessagesResult {
+  messages: [MessageOutput!]!
+  nextCursor: String
 }
 
 type Mutation {
@@ -227,6 +238,7 @@ type Query {
   deals(categoryId: Int, limit: Int! = 12, page: Int! = 1, specIds: [Int!], title: String): DealsListOutput!
   discussion(id: Int!): DiscussionOutput
   me: UserOutput!
+  messages(cursor: String, discussionId: Int!, limit: Int): MessagesResult!
   myDeals: [DealOutput!]!
   myDiscussions: [DiscussionOutput!]!
   myProfile: UserProfileOutput!
@@ -296,8 +308,6 @@ type UserOutput {
   email: String!
   id: String!
   image: String
-  matrixLogin: String
-  matrixPassword: String
   name: String
   role: String!
 }

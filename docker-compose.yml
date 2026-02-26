@@ -45,8 +45,6 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID}
       FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET}
-      MATRIX_SERVICE_HOST: matrix-service
-      MATRIX_SERVICE_PORT: 3002
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION:-us-east-1}
@@ -56,8 +54,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      matrix-service:
-        condition: service_started
     networks:
       - marketplace-ts-network
     command: >
@@ -69,30 +65,6 @@ services:
       "
 
   # ============================================================================
-  # Matrix Microservice (NestJS TCP)
-  # ============================================================================
-  matrix-service:
-    build:
-      context: .
-      dockerfile: apps/matrix/Dockerfile
-    container_name: marketplace-ts-matrix-service
-    restart: unless-stopped
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://marketplace-ts:${POSTGRES_PASSWORD:-marketplace-ts_dev}@postgres:5432/marketplace-ts
-      MATRIX_HOST: ${MATRIX_HOST}
-      MATRIX_USER: ${MATRIX_USER}
-      MATRIX_PASSWORD: ${MATRIX_PASSWORD}
-      MATRIX_SERVICE_PORT: 3002
-    ports:
-      - "3002:3002"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - marketplace-ts-network
-
-  # ============================================================================
   # Frontend (Next.js)
   # ============================================================================
   web:
@@ -101,36 +73,15 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/graphql}
-        NEXT_PUBLIC_MATRIX_HOST: ${NEXT_PUBLIC_MATRIX_HOST}
     container_name: marketplace-ts-web
     restart: unless-stopped
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/graphql}
-      NEXT_PUBLIC_MATRIX_HOST: ${NEXT_PUBLIC_MATRIX_HOST}
     ports:
       - "3000:3000"
     depends_on:
       - api
-    networks:
-      - marketplace-ts-network
-
-  # ============================================================================
-  # Matrix Synapse (Optional - for real-time chat)
-  # ============================================================================
-  matrix:
-    image: matrixdotorg/synapse:latest
-    container_name: marketplace-ts-matrix
-    restart: unless-stopped
-    profiles:
-      - full # Only start with --profile full
-    environment:
-      SYNAPSE_SERVER_NAME: ${MATRIX_HOST:-matrix.localhost}
-      SYNAPSE_REPORT_STATS: "no"
-    volumes:
-      - matrix_data:/data
-    ports:
-      - "8008:8008"
     networks:
       - marketplace-ts-network
 
@@ -139,8 +90,6 @@ services:
 # ============================================================================
 volumes:
   postgres_data:
-    driver: local
-  matrix_data:
     driver: local
 
 # ============================================================================

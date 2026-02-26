@@ -13,10 +13,6 @@ export const envValidation = Joi.object({
   FACEBOOK_CLIENT_ID: Joi.string().allow('').optional(),
   FACEBOOK_CLIENT_SECRET: Joi.string().allow('').optional(),
 
-  // Matrix microservice
-  MATRIX_SERVICE_HOST: Joi.string().default('localhost'),
-  MATRIX_SERVICE_PORT: Joi.number().default(3002),
-
   // S3
   AWS_ACCESS_KEY_ID: Joi.string().allow('').optional(),
   AWS_SECRET_ACCESS_KEY: Joi.string().allow('').optional(),

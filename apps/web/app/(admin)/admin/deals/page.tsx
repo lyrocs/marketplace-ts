@@ -59,9 +59,9 @@ export default function AdminDealsPage() {
 
   const [updateStatus] = useMutation(ADMIN_UPDATE_DEAL_STATUS_MUTATION)
 
-  const deals = data?.adminDeals?.data || []
-  const meta = data?.adminDeals?.meta
-  const deal = dealData?.deal
+  const deals = (data as any)?.adminDeals?.data || []
+  const meta = (data as any)?.adminDeals?.meta
+  const deal = (dealData as any)?.deal
 
   const handleStatusChange = async (dealId: number, status: string, reason?: string) => {
     try {

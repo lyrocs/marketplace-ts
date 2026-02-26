@@ -7,16 +7,16 @@ import { ScrollArea } from '@marketplace/ui/components/scroll-area';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@marketplace/ui/lib/utils';
 
-export interface MatrixMessage {
-  eventId: string;
-  sender: string;
-  body: string;
-  timestamp: number;
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  content: string;
+  createdAt: string;
 }
 
 interface ChatRoomProps {
-  messages: MatrixMessage[];
-  currentUserMatrixLogin: string;
+  messages: ChatMessage[];
+  currentUserId: string;
   otherUserName?: string;
   otherUserImage?: string;
   isLoading: boolean;
@@ -24,8 +24,8 @@ interface ChatRoomProps {
   hasMore?: boolean;
 }
 
-function formatTimestamp(timestamp: number): string {
-  const date = new Date(timestamp);
+function formatTimestamp(dateStr: string): string {
+  const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
@@ -42,7 +42,7 @@ function formatTimestamp(timestamp: number): string {
 
 export function ChatRoom({
   messages,
-  currentUserMatrixLogin,
+  currentUserId,
   otherUserName,
   otherUserImage,
   isLoading,
@@ -107,11 +107,11 @@ export function ChatRoom({
 
         {/* Messages */}
         {messages.map((message) => {
-          const isOwn = message.sender === currentUserMatrixLogin;
+          const isOwn = message.senderId === currentUserId;
 
           return (
             <div
-              key={message.eventId}
+              key={message.id}
               className={cn(
                 'flex gap-3',
                 isOwn ? 'flex-row-reverse' : 'flex-row'
@@ -137,7 +137,7 @@ export function ChatRoom({
                 )}
               >
                 <p className="text-sm whitespace-pre-wrap break-words">
-                  {message.body}
+                  {message.content}
                 </p>
                 <p
                   className={cn(
@@ -147,7 +147,7 @@ export function ChatRoom({
                       : 'text-muted-foreground'
                   )}
                 >
-                  {formatTimestamp(message.timestamp)}
+                  {formatTimestamp(message.createdAt)}
                 </p>
               </div>
             </div>

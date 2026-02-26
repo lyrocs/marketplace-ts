@@ -94,7 +94,7 @@ export function DealFormStepper({ mode, dealId: initialDealId, initialData }: De
   // Create draft on mount (create mode only)
   useEffect(() => {
     if (mode === 'create' && !dealId) {
-      createDraft().then(({ data }) => {
+      createDraft().then(({ data }: any) => {
         if (data?.createDealDraft) setDealId(data.createDealDraft.id)
       })
     }

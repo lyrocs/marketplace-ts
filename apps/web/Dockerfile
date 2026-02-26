@@ -39,9 +39,7 @@ COPY . .
 # Build Next.js app
 WORKDIR /app/apps/web
 ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_MATRIX_HOST
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_MATRIX_HOST=$NEXT_PUBLIC_MATRIX_HOST
 RUN pnpm build
 
 # ============================================================================

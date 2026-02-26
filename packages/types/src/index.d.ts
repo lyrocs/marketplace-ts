@@ -12,11 +12,6 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
 }
-export interface UserWithMatrix extends User {
-    matrixLogin: string | null;
-    matrixPassword: string | null;
-    matrixToken: string | null;
-}
 export interface AuthPayload {
     user: User;
     accessToken: string;
@@ -39,6 +34,7 @@ export interface JwtPayload {
 }
 export declare enum DealStatus {
     DRAFT = "DRAFT",
+    PENDING = "PENDING",
     PUBLISHED = "PUBLISHED",
     DECLINED = "DECLINED",
     EXPIRED = "EXPIRED",
@@ -202,7 +198,6 @@ export interface Discussion {
     dealId: number;
     buyerId: string;
     sellerId: string;
-    matrixRoomId: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -231,15 +226,12 @@ export interface PaginatedResult<T> {
     data: T[];
     meta: PaginationMeta;
 }
-export interface MatrixCredentials {
-    username: string;
-    password: string;
-}
-export interface MatrixMessage {
-    sender: string;
-    body: string;
-    timestamp: number;
-    roomId: string;
+export interface Message {
+    id: string;
+    discussionId: number;
+    senderId: string;
+    content: string;
+    createdAt: Date;
 }
 export interface UploadResult {
     url: string;

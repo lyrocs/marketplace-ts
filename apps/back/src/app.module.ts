@@ -12,7 +12,7 @@ import { CategoriesModule } from './modules/categories/categories.module.js'
 import { BrandsModule } from './modules/brands/brands.module.js'
 import { SpecsModule } from './modules/specs/specs.module.js'
 import { DiscussionsModule } from './modules/discussions/discussions.module.js'
-import { MatrixModule } from './modules/matrix/matrix.module.js'
+import { MessagesModule } from './modules/messages/messages.module.js'
 import { UploadModule } from './modules/upload/upload.module.js'
 import { MailerModule } from './modules/mailer/mailer.module.js'
 
@@ -39,7 +39,7 @@ import { MailerModule } from './modules/mailer/mailer.module.js'
     BrandsModule,
     SpecsModule,
     DiscussionsModule,
-    MatrixModule,
+    MessagesModule,
     UploadModule,
   ],
 })

@@ -10,8 +10,6 @@ interface AuthUser {
   email: string
   image: string | null
   role: string
-  matrixLogin: string | null
-  matrixPassword: string | null
 }
 
 interface AuthContextType {
@@ -38,8 +36,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   })
 
   useEffect(() => {
-    if (meData?.me) {
-      setUser(meData.me)
+    if ((meData as any)?.me) {
+      setUser((meData as any).me)
     }
   }, [meData])
 
@@ -63,18 +61,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const { data } = await loginMutation({ variables: { email, password } })
-    if (data?.login) {
-      localStorage.setItem('marketplace_token', data.login.accessToken)
-      setUser(data.login.user)
+    if ((data as any)?.login) {
+      localStorage.setItem('marketplace_token', (data as any).login.accessToken)
+      setUser((data as any).login.user)
       setLoading(false)
     }
   }, [loginMutation])
 
   const register = useCallback(async (name: string, email: string, password: string) => {
     const { data } = await registerMutation({ variables: { name, email, password } })
-    if (data?.register) {
-      localStorage.setItem('marketplace_token', data.register.accessToken)
-      setUser(data.register.user)
+    if ((data as any)?.register) {
+      localStorage.setItem('marketplace_token', (data as any).register.accessToken)
+      setUser((data as any).register.user)
       setLoading(false)
     }
   }, [registerMutation])

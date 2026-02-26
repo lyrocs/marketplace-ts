@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   // Fetch data server-side
   const dealsData = await fetchGraphQLCached(RECENT_DEALS_QUERY, undefined, 60)
-  const recentDeals = dealsData?.recentDeals || []
+  const recentDeals = (dealsData as any)?.recentDeals || []
 
   return (
     <div>

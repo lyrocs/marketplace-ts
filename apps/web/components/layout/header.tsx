@@ -14,12 +14,12 @@ import { usePathname } from 'next/navigation'
 export function Header() {
   const { user, logout, isAdmin, isAuthenticated } = useAuth()
   const { data: categoriesData } = useQuery(ROOT_CATEGORIES_QUERY)
-  const rootCategories = categoriesData?.rootCategories || []
+  const rootCategories = (categoriesData as any)?.rootCategories || []
   const { data: unreadData } = useQuery(UNREAD_COUNT_QUERY, {
     skip: !isAuthenticated,
     pollInterval: 15000,
   })
-  const unreadCount = unreadData?.unreadCount?.count || 0
+  const unreadCount = (unreadData as any)?.unreadCount?.count || 0
   const [mobileOpen, setMobileOpen] = useState(false)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false)

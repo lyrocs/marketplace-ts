@@ -51,8 +51,8 @@ export default function ImportProductsPage() {
     if (!jsonInput.trim()) return
     try {
       const { data } = await importProducts({ variables: { json: jsonInput } })
-      setResult(data.importProducts)
-      if (data.importProducts.imported > 0 || data.importProducts.updated > 0) {
+      setResult((data as any).importProducts)
+      if ((data as any).importProducts.imported > 0 || (data as any).importProducts.updated > 0) {
         setJsonInput('')
         setParsed(null)
       }

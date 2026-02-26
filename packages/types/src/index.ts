@@ -18,11 +18,6 @@ export interface User {
   updatedAt: Date
 }
 
-export interface UserWithMatrix extends User {
-  matrixLogin: string | null
-  matrixPassword: string | null
-  matrixToken: string | null
-}
 
 // ============================================================================
 // AUTH TYPES
@@ -263,7 +258,6 @@ export interface Discussion {
   dealId: number
   buyerId: string
   sellerId: string
-  matrixRoomId: string
   createdAt: Date
   updatedAt: Date
 }
@@ -302,19 +296,15 @@ export interface PaginatedResult<T> {
 }
 
 // ============================================================================
-// MATRIX TYPES
+// MESSAGE TYPES
 // ============================================================================
 
-export interface MatrixCredentials {
-  username: string
-  password: string
-}
-
-export interface MatrixMessage {
-  sender: string
-  body: string
-  timestamp: number
-  roomId: string
+export interface Message {
+  id: string
+  discussionId: number
+  senderId: string
+  content: string
+  createdAt: Date
 }
 
 // ============================================================================

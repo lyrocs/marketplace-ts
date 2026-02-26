@@ -22,12 +22,6 @@ export class UserOutput {
 
   @Field()
   role: string
-
-  @Field({ nullable: true })
-  matrixLogin?: string
-
-  @Field({ nullable: true })
-  matrixPassword?: string
 }
 
 @ObjectType()
@@ -90,7 +84,6 @@ export class AuthResolver {
   @UseGuards(JwtAuthGuard)
   @Query(() => UserOutput)
   async me(@CurrentUser() user: any): Promise<UserOutput> {
-    // Fetch full user data including Matrix credentials from database
     const fullUser = await this.usersService.findById(user.id)
     return {
       id: fullUser.id,
@@ -98,8 +91,6 @@ export class AuthResolver {
       email: fullUser.email,
       image: fullUser.image,
       role: fullUser.role,
-      matrixLogin: fullUser.matrixLogin,
-      matrixPassword: fullUser.matrixPassword,
     }
   }
 }

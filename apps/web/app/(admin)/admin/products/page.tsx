@@ -65,11 +65,11 @@ export default function AdminProductsPage() {
   const [addProductImage] = useMutation(ADD_PRODUCT_IMAGE_MUTATION)
   const [deleteProduct] = useMutation(DELETE_PRODUCT_MUTATION)
 
-  const products = data?.products?.data || []
-  const meta = data?.products?.meta
-  const specTypes = specTypesData?.specTypes || []
-  const categories = categoriesData?.categories || []
-  const brands = brandsData?.brands || []
+  const products = (data as any)?.products?.data || []
+  const meta = (data as any)?.products?.meta
+  const specTypes = (specTypesData as any)?.specTypes || []
+  const categories = (categoriesData as any)?.categories || []
+  const brands = (brandsData as any)?.brands || []
 
   // Get spec types for selected category (for create dialog)
   const selectedCategory = categories.find((c: any) => c.id === parseInt(newProduct.categoryId))
@@ -96,7 +96,7 @@ export default function AdminProductsPage() {
         },
       })
 
-      const productId = data?.createProduct?.id
+      const productId = (data as any)?.createProduct?.id
 
       if (productId && newProduct.images.length > 0) {
         for (const imageUrl of newProduct.images) {
